@@ -11,7 +11,9 @@
       "Bash(GH_TOKEN=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 gh api repos/thejonathangu/FixMyFeed --jq '{name,description,homepage,html_url,language,topics}')",
       "Bash(GH_TOKEN=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 gh api repos/HetarthP/Spotlight --jq '{name,description,homepage,html_url,language,topics}')",
       "Bash(GH_TOKEN=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 gh api repos/kyle-su1/ifyShop --jq '{name,description,homepage,html_url,language,topics}')",
-      "Bash(GH_TOKEN=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 gh api repos/aadya-khanna/OpenScore --jq '{name,description,homepage,html_url,language,topics}')"
+      "Bash(GH_TOKEN=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 gh api repos/aadya-khanna/OpenScore --jq '{name,description,homepage,html_url,language,topics}')",
+      "Bash(node:*)",
+      "WebSearch"
     ]
   }
 }

@@ -1072,172 +1072,494 @@ function initSimulator() {
   const canvas = document.getElementById('origami-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  const W = 340, H = 340;
+
+  // ── Canvas setup ──────────────────────────────────────────────────
+  const W = 460, H = 460;
   canvas.width = W; canvas.height = H;
+  const CX = W / 2, CY = H / 2;
+  const HALF = 196; // paper half-size
 
-  const PS = 250, PX = (W-PS)/2, PY = (H-PS)/2;
-  const INIT = () => [
-    {x:PX,y:PY},{x:PX+PS,y:PY},{x:PX+PS,y:PY+PS},{x:PX,y:PY+PS}
+  // ── State ─────────────────────────────────────────────────────────
+  let rotation  = 0;        // radians — paper rotation
+  let foldMode  = 'valley'; // 'valley'|'mountain'|'crease'|'pleat'
+  let foldAngle = 180;      // degrees — for partial folds
+  let showRef   = true;     // reference points overlay
+  let animating = false;
+  let foldCount = 0;
+  let pending   = null;     // first click point (world space)
+  let mouse     = null;     // live mouse pos (world space)
+  let snapPt    = null;     // current snap target
+
+  const INIT_PAPER = () => [
+    {x:CX-HALF, y:CY-HALF}, {x:CX+HALF, y:CY-HALF},
+    {x:CX+HALF, y:CY+HALF}, {x:CX-HALF, y:CY+HALF},
   ];
+  let paper   = INIT_PAPER();
+  let layers  = [];
+  let creases = [];
+  let history = [];
 
-  let paper = INIT(), layers = [], creases = [], history = [];
-  let foldMode = 'valley', pending = null, mouse = null, animating = false, foldCount = 0;
+  // ── Math helpers ──────────────────────────────────────────────────
+  const dot = (a,b) => a.x*b.x + a.y*b.y;
+  const sub = (a,b) => ({x:a.x-b.x, y:a.y-b.y});
+  const add = (a,b) => ({x:a.x+b.x, y:a.y+b.y});
+  const scl = (v,s) => ({x:v.x*s,   y:v.y*s});
+  const nrm = v    => { const l=Math.hypot(v.x,v.y)||1; return {x:v.x/l,y:v.y/l}; };
+  const crs = (a,b,p) => (b.x-a.x)*(p.y-a.y)-(b.y-a.y)*(p.x-a.x);
 
-  const dot=(a,b)=>a.x*b.x+a.y*b.y;
-  const sub=(a,b)=>({x:a.x-b.x,y:a.y-b.y});
-  const add=(a,b)=>({x:a.x+b.x,y:a.y+b.y});
-  const scl=(v,s)=>({x:v.x*s,y:v.y*s});
-  const nrm=v=>{const l=Math.hypot(v.x,v.y)||1;return{x:v.x/l,y:v.y/l};};
-  const prp=v=>({x:-v.y,y:v.x});
-  const crs=(a,b,p)=>(b.x-a.x)*(p.y-a.y)-(b.y-a.y)*(p.x-a.x);
+  // Rotate point around canvas centre
+  function rotPt(p, ang) {
+    const c=Math.cos(ang), s=Math.sin(ang), dx=p.x-CX, dy=p.y-CY;
+    return {x: CX+dx*c-dy*s, y: CY+dx*s+dy*c};
+  }
 
-  function clipPoly(poly,lp1,lp2) {
-    const near=[],far=[],n=poly.length;
-    for(let i=0;i<n;i++){
-      const c=poly[i],nx=poly[(i+1)%n];
-      const sc=crs(lp1,lp2,c),sn=crs(lp1,lp2,nx);
-      if(sc<=0) near.push({...c}); else far.push({...c});
-      if((sc<0&&sn>0)||(sc>0&&sn<0)){
-        const t=sc/(sc-sn);
-        const ip={x:c.x+t*(nx.x-c.x),y:c.y+t*(nx.y-c.y)};
-        near.push({...ip});far.push({...ip});
+  // Screen event → world space (inverse-rotate)
+  function toWorld(e) {
+    const r = canvas.getBoundingClientRect();
+    const sx = (e.clientX-r.left)*(W/r.width);
+    const sy = (e.clientY-r.top)*(H/r.height);
+    return rotPt({x:sx, y:sy}, -rotation);
+  }
+
+  function reflectPt(v, lp1, lp2) {
+    const dir=nrm(sub(lp2,lp1)), d=sub(v,lp1);
+    const foot=add(lp1, scl(dir, dot(d,dir)));
+    return {x:2*foot.x-v.x, y:2*foot.y-v.y};
+  }
+
+  // Polygon clip: splits poly into {near, far} halves across line lp1→lp2
+  function clipPoly(poly, lp1, lp2) {
+    const near=[], far=[], n=poly.length;
+    for (let i=0; i<n; i++) {
+      const a=poly[i], b=poly[(i+1)%n];
+      const ca=crs(lp1,lp2,a), cb=crs(lp1,lp2,b);
+      if (ca<=0) near.push({...a}); else far.push({...a});
+      if ((ca<0&&cb>0)||(ca>0&&cb<0)) {
+        const t=ca/(ca-cb);
+        const ix={x:a.x+t*(b.x-a.x), y:a.y+t*(b.y-a.y)};
+        near.push({...ix}); far.push({...ix});
       }
     }
-    return{near,far};
+    return {near, far};
   }
 
-  function reflectPt(v,lp1,lp2){
-    const dir=nrm(sub(lp2,lp1)),d=sub(v,lp1),t=dot(d,dir),foot=add(lp1,scl(dir,t));
-    return{x:2*foot.x-v.x,y:2*foot.y-v.y};
-  }
-
-  function foldPt(v,lp1,lp2,theta){
-    const dir=nrm(sub(lp2,lp1)),pp=prp(dir),d=sub(v,lp1);
-    const t=dot(d,dir),foot=add(lp1,scl(dir,t));
-    const dPerp=dot(d,pp),dAbs=Math.abs(dPerp);
-    return{
-      x:foot.x+pp.x*dPerp*Math.cos(theta),
-      y:foot.y+pp.y*dPerp*Math.cos(theta)-dAbs*Math.sin(theta)*0.3
+  // Animated fold position for a vertex at angle theta (0→PI)
+  function animPt(v, lp1, lp2, theta) {
+    const dir=nrm(sub(lp2,lp1)), d=sub(v,lp1);
+    const foot=add(lp1, scl(dir, dot(d,dir)));
+    const perp=sub(v,foot), dAbs=Math.hypot(perp.x,perp.y);
+    const pn=nrm(perp);
+    return {
+      x: foot.x + pn.x*dAbs*Math.cos(theta),
+      y: foot.y + pn.y*dAbs*Math.cos(theta) - dAbs*Math.sin(theta)*0.28,
     };
   }
 
-  function drawPoly(verts,fill,stroke,lw=1.5){
-    if(verts.length<2)return;
-    ctx.beginPath();ctx.moveTo(verts[0].x,verts[0].y);
-    for(let i=1;i<verts.length;i++)ctx.lineTo(verts[i].x,verts[i].y);
+  // ── Snap system ───────────────────────────────────────────────────
+  function getRefPoints() {
+    const pts = [];
+    const n = paper.length;
+    // Corners (orange)
+    paper.forEach(p => pts.push({...p, k:'corner'}));
+    // Edge subdivisions (halves, quarters, thirds, eighths)
+    for (let i=0; i<n; i++) {
+      const a=paper[i], b=paper[(i+1)%n];
+      [1/2,1/3,2/3,1/4,3/4,1/8,3/8,5/8,7/8].forEach(f => {
+        const k = f===0.5?'mid':f===0.25||f===0.75?'quarter':'eighth';
+        pts.push({x:a.x+f*(b.x-a.x), y:a.y+f*(b.y-a.y), k});
+      });
+    }
+    // Center (purple)
+    const cx=paper.reduce((s,p)=>s+p.x,0)/n, cy=paper.reduce((s,p)=>s+p.y,0)/n;
+    pts.push({x:cx, y:cy, k:'center'});
+    // Crease endpoints (blue)
+    creases.forEach(c => { pts.push({...c.p1,k:'crease'}); pts.push({...c.p2,k:'crease'}); });
+    // Crease-crease intersections inside paper (green)
+    for (let i=0; i<creases.length; i++) {
+      for (let j=i+1; j<creases.length; j++) {
+        const ix = lineX(creases[i].p1, creases[i].p2, creases[j].p1, creases[j].p2);
+        if (ix && inPoly(paper, ix)) pts.push({...ix, k:'xing'});
+      }
+    }
+    return pts;
+  }
+
+  function lineX(p1,p2,p3,p4) {
+    const dx1=p2.x-p1.x, dy1=p2.y-p1.y, dx2=p4.x-p3.x, dy2=p4.y-p3.y;
+    const d=dx1*dy2-dy1*dx2;
+    if (Math.abs(d)<1e-10) return null;
+    const t=((p3.x-p1.x)*dy2-(p3.y-p1.y)*dx2)/d;
+    return {x:p1.x+t*dx1, y:p1.y+t*dy1};
+  }
+
+  function inPoly(poly, pt) {
+    let inside=false;
+    for (let i=0,j=poly.length-1; i<poly.length; j=i++) {
+      const xi=poly[i].x,yi=poly[i].y,xj=poly[j].x,yj=poly[j].y;
+      if (((yi>pt.y)!==(yj>pt.y))&&pt.x<(xj-xi)*(pt.y-yi)/(yj-yi)+xi) inside=!inside;
+    }
+    return inside;
+  }
+
+  function findSnap(wp, R=22) {
+    let best=null, bd=R;
+    getRefPoints().forEach(p => {
+      const d=Math.hypot(p.x-wp.x, p.y-wp.y);
+      if (d<bd) { bd=d; best=p; }
+    });
+    return best;
+  }
+
+  // ── Rendering ─────────────────────────────────────────────────────
+  // Draw polygon in world space, applying rotation transform to screen
+  function drawPolyW(verts, fill, stroke, lw=1.5) {
+    if (verts.length<2) return;
+    ctx.beginPath();
+    const s0=rotPt(verts[0], rotation);
+    ctx.moveTo(s0.x, s0.y);
+    for (let i=1; i<verts.length; i++) { const s=rotPt(verts[i],rotation); ctx.lineTo(s.x,s.y); }
     ctx.closePath();
-    if(fill){ctx.fillStyle=fill;ctx.fill();}
-    if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke();}
+    if (fill)   { ctx.fillStyle=fill;   ctx.fill(); }
+    if (stroke) { ctx.strokeStyle=stroke; ctx.lineWidth=lw; ctx.stroke(); }
   }
 
-  function render(anim){
+  // Layer fill colors (slightly varying tones to show depth)
+  const LAYER_FILLS   = ['rgba(240,232,213,0.10)','rgba(240,232,213,0.08)','rgba(220,218,205,0.07)','rgba(200,210,215,0.07)','rgba(210,200,220,0.06)'];
+  const LAYER_STROKES = ['rgba(240,232,213,0.65)','rgba(240,232,213,0.55)','rgba(240,232,213,0.45)','rgba(240,232,213,0.38)','rgba(240,232,213,0.30)'];
+
+  function render() {
     ctx.clearRect(0,0,W,H);
-    ctx.save();ctx.strokeStyle='rgba(240,232,213,0.03)';ctx.lineWidth=0.5;
-    for(let i=0;i<=8;i++){
-      const x=PX+PS/8*i,y=PY+PS/8*i;
-      ctx.beginPath();ctx.moveTo(x,PY);ctx.lineTo(x,PY+PS);ctx.stroke();
-      ctx.beginPath();ctx.moveTo(PX,y);ctx.lineTo(PX+PS,y);ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Faint grid (screen space, doesn't rotate)
+    ctx.strokeStyle='rgba(240,232,213,0.022)'; ctx.lineWidth=0.5;
+    for (let x=0; x<=W; x+=40) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y=0; y<=H; y+=40) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+    // Rotation indicator arc
+    if (rotation % (2*Math.PI) !== 0) {
+      ctx.save(); ctx.beginPath();
+      ctx.arc(CX,CY, HALF+16, -Math.PI/2, -Math.PI/2+rotation, rotation<0);
+      ctx.strokeStyle='rgba(240,152,78,0.25)'; ctx.lineWidth=2; ctx.setLineDash([4,4]); ctx.stroke();
+      ctx.restore(); ctx.setLineDash([]);
     }
-    ctx.restore();
-    drawPoly(paper,'rgba(240,232,213,0.07)','rgba(240,232,213,0.55)',1.8);
-    layers.forEach((l)=>{
-      drawPoly(l,'rgba(240,232,213,0.06)','rgba(240,232,213,0.45)',1.4);
-      ctx.save();ctx.globalAlpha=0.1;
-      ctx.shadowColor='rgba(0,0,0,1)';ctx.shadowBlur=8;ctx.shadowOffsetY=3;
-      drawPoly(l,'rgba(0,0,0,1)',null);
-      ctx.restore();
-    });
-    creases.forEach(c=>{
-      ctx.save();ctx.beginPath();ctx.moveTo(c.p1.x,c.p1.y);ctx.lineTo(c.p2.x,c.p2.y);
-      ctx.strokeStyle=c.type==='valley'?'rgba(96,165,212,0.65)':'rgba(224,85,85,0.65)';
-      ctx.setLineDash(c.type==='valley'?[7,5]:[2,4]);ctx.lineWidth=1.3;ctx.stroke();ctx.restore();
-    });
-    if(anim){
-      const av=anim.far.map(v=>foldPt(v,anim.p1,anim.p2,anim.theta));
-      const a=0.45+0.25*Math.cos(anim.theta);
-      drawPoly(av,`rgba(240,232,213,${a*0.18})`,`rgba(240,232,213,${a*0.72})`,1.6);
-    }
-    if(pending){
+
+    // Base paper
+    drawPolyW(paper, 'rgba(240,232,213,0.09)', 'rgba(240,232,213,0.65)', 2.0);
+
+    // Folded layers (stacked, each with depth shadow)
+    layers.forEach((layer, idx) => {
+      const fi = Math.min(idx, LAYER_FILLS.length-1);
       ctx.save();
-      ctx.beginPath();ctx.arc(pending.x,pending.y,5,0,Math.PI*2);
-      ctx.fillStyle='rgba(245,196,48,0.9)';ctx.fill();
-      ctx.beginPath();ctx.arc(pending.x,pending.y,9,0,Math.PI*2);
-      ctx.strokeStyle='rgba(245,196,48,0.35)';ctx.lineWidth=1;ctx.stroke();
-      if(mouse){
-        ctx.beginPath();ctx.moveTo(pending.x,pending.y);ctx.lineTo(mouse.x,mouse.y);
-        ctx.strokeStyle=foldMode==='valley'?'rgba(96,165,212,0.5)':'rgba(224,85,85,0.5)';
-        ctx.lineWidth=1.5;ctx.setLineDash([8,6]);ctx.stroke();
-      }
+      ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=8; ctx.shadowOffsetY=3;
+      drawPolyW(layer, LAYER_FILLS[fi], LAYER_STROKES[fi], 1.5);
       ctx.restore();
-    } else if(mouse){
-      ctx.save();ctx.beginPath();ctx.arc(mouse.x,mouse.y,3,0,Math.PI*2);
-      ctx.fillStyle='rgba(240,232,213,0.18)';ctx.fill();ctx.restore();
+    });
+
+    // Crease lines
+    creases.forEach(c => {
+      const s=rotPt(c.p1,rotation), e=rotPt(c.p2,rotation);
+      ctx.beginPath(); ctx.moveTo(s.x,s.y); ctx.lineTo(e.x,e.y);
+      if      (c.type==='valley')   { ctx.strokeStyle='rgba(96,165,212,0.75)';  ctx.setLineDash([7,4]); }
+      else if (c.type==='mountain') { ctx.strokeStyle='rgba(224,85,85,0.75)';   ctx.setLineDash([2,4]); }
+      else                          { ctx.strokeStyle='rgba(240,232,213,0.35)'; ctx.setLineDash([3,7]); }
+      ctx.lineWidth=1.5; ctx.stroke(); ctx.setLineDash([]);
+    });
+
+    // Reference points overlay
+    if (showRef) {
+      const REF_COLOR = {
+        corner:'rgba(240,152,78,0.6)', center:'rgba(192,143,255,0.65)',
+        mid:'rgba(245,196,48,0.55)', quarter:'rgba(245,196,48,0.35)',
+        eighth:'rgba(240,232,213,0.18)', crease:'rgba(96,165,212,0.50)',
+        xing:'rgba(122,184,122,0.65)',
+      };
+      const REF_R = {corner:4.5, center:5.5, mid:3.5, quarter:2.8, eighth:2.0, crease:2.5, xing:3.5};
+      getRefPoints().forEach(p => {
+        const ps=rotPt(p, rotation);
+        ctx.beginPath();
+        ctx.arc(ps.x, ps.y, REF_R[p.k]||2, 0, Math.PI*2);
+        ctx.fillStyle=REF_COLOR[p.k]||'rgba(240,232,213,0.15)';
+        ctx.fill();
+      });
+    }
+
+    // Ghost fold preview (where paper will land)
+    const target = snapPt || mouse;
+    if (pending && target) {
+      const p1s=rotPt(pending,rotation), p2s=rotPt(target,rotation);
+      // Preview fold line
+      const LC = foldMode==='valley'?'rgba(96,165,212,0.95)':foldMode==='mountain'?'rgba(224,85,85,0.95)':foldMode==='pleat'?'rgba(122,184,122,0.95)':'rgba(240,232,213,0.7)';
+      ctx.beginPath(); ctx.moveTo(p1s.x,p1s.y); ctx.lineTo(p2s.x,p2s.y);
+      ctx.strokeStyle=LC; ctx.setLineDash([5,3]); ctx.lineWidth=2; ctx.stroke(); ctx.setLineDash([]);
+      // Ghost paper (reflected position)
+      if (foldMode!=='crease') {
+        const {far} = clipPoly(paper, pending, target);
+        if (far.length>=3) {
+          const ghost=far.map(p=>reflectPt(p, pending, target));
+          drawPolyW(ghost, 'rgba(245,196,48,0.07)', 'rgba(245,196,48,0.38)', 1.0);
+        }
+        // For pleat: show second parallel fold line
+        if (foldMode==='pleat') {
+          const dir=nrm(sub(target,pending)), perp={x:-dir.y,y:dir.x};
+          const off=26;
+          const q1=rotPt({x:pending.x+perp.x*off,y:pending.y+perp.y*off},rotation);
+          const q2=rotPt({x:target.x+perp.x*off,y:target.y+perp.y*off},rotation);
+          ctx.beginPath(); ctx.moveTo(q1.x,q1.y); ctx.lineTo(q2.x,q2.y);
+          ctx.strokeStyle='rgba(224,85,85,0.6)'; ctx.setLineDash([2,4]); ctx.lineWidth=1.3; ctx.stroke(); ctx.setLineDash([]);
+        }
+      }
+    }
+
+    // First-click point indicator
+    if (pending) {
+      const ps=rotPt(pending,rotation);
+      ctx.beginPath(); ctx.arc(ps.x,ps.y,5,0,Math.PI*2);
+      ctx.fillStyle='rgba(245,196,48,0.95)'; ctx.fill();
+      ctx.beginPath(); ctx.arc(ps.x,ps.y,10,0,Math.PI*2);
+      ctx.strokeStyle='rgba(245,196,48,0.40)'; ctx.lineWidth=1.5; ctx.stroke();
+    }
+
+    // Snap ring
+    if (snapPt) {
+      const ps=rotPt(snapPt,rotation);
+      ctx.beginPath(); ctx.arc(ps.x,ps.y,11,0,Math.PI*2);
+      ctx.strokeStyle='rgba(245,196,48,0.85)'; ctx.lineWidth=2;
+      ctx.setLineDash([3,3]); ctx.stroke(); ctx.setLineDash([]);
+    }
+
+    // Floating mouse dot (when nothing selected)
+    if (mouse && !pending && !snapPt) {
+      const ms=rotPt(mouse,rotation);
+      ctx.beginPath(); ctx.arc(ms.x,ms.y,3,0,Math.PI*2);
+      ctx.fillStyle='rgba(240,232,213,0.22)'; ctx.fill();
     }
   }
 
-  function setHint(msg){const el=document.getElementById('sim-hint');if(el)el.textContent=msg;}
-  function setCount(n){const el=document.getElementById('fold-count');if(el)el.textContent=n;}
+  // ── Helpers ───────────────────────────────────────────────────────
+  function setHint(msg) { const el=document.getElementById('sim-hint'); if(el) el.textContent=msg; }
+  function setCount(n)  { const el=document.getElementById('fold-count'); if(el) el.textContent=n; }
 
-  function performFold(lp1,lp2){
-    const{near,far}=clipPoly(paper,lp1,lp2);
-    if(near.length<3||far.length<3){setHint('Line must cross the paper edge to edge — try again');return;}
-    const isCrease=foldMode==='crease';
-    animating=true;setHint(isCrease?'Marking crease…':'Folding…');
-    let f=0;const F=55;
+  // ── Fold execution ────────────────────────────────────────────────
+  function performFold(lp1, lp2) {
+    if (Math.hypot(lp2.x-lp1.x, lp2.y-lp1.y) < 6) return;
+    const {near, far} = clipPoly(paper, lp1, lp2);
+    if (near.length<3 || far.length<3) {
+      setHint('Fold line must cross the paper edge to edge — try again'); render(); return;
+    }
+    const isCrease = foldMode==='crease';
+    const isPleat  = foldMode==='pleat';
+    const targetTheta = (foldAngle/180)*Math.PI;
+    const animTheta   = isCrease ? Math.PI*0.36 : targetTheta;
+
+    animating=true;
+    setHint(isCrease?'Marking crease — will fold and unfold…':'Folding…');
+
+    let f=0; const F=58;
     (function step(){
-      const t=f/F,e=t<0.5?2*t*t:-1+(4-2*t)*t;
-      render({theta:Math.PI*e*(isCrease?0.42:1),p1:lp1,p2:lp2,far});
+      const t=f/F, e=t<0.5?2*t*t:-1+(4-2*t)*t;
+      const theta=animTheta*e;
+
+      ctx.clearRect(0,0,W,H);
+      drawPolyW(paper,'rgba(240,232,213,0.09)','rgba(240,232,213,0.65)',2.0);
+      layers.forEach((l,idx)=>{
+        const fi=Math.min(idx,LAYER_FILLS.length-1);
+        ctx.save();
+        ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=7; ctx.shadowOffsetY=2;
+        drawPolyW(l,LAYER_FILLS[fi],LAYER_STROKES[fi],1.5);
+        ctx.restore();
+      });
+      creases.forEach(c=>{
+        const s=rotPt(c.p1,rotation), e2=rotPt(c.p2,rotation);
+        ctx.beginPath(); ctx.moveTo(s.x,s.y); ctx.lineTo(e2.x,e2.y);
+        ctx.strokeStyle=c.type==='valley'?'rgba(96,165,212,0.70)':c.type==='mountain'?'rgba(224,85,85,0.70)':'rgba(240,232,213,0.30)';
+        ctx.setLineDash(c.type==='valley'?[7,4]:c.type==='mountain'?[2,4]:[3,7]);
+        ctx.lineWidth=1.4; ctx.stroke(); ctx.setLineDash([]);
+      });
+
+      // Animated folding flap
+      const a=0.45+0.25*Math.cos(theta);
+      const aFar=far.map(v=>rotPt(animPt(v,lp1,lp2,theta),rotation));
+      ctx.save(); ctx.globalAlpha=a;
+      ctx.beginPath(); ctx.moveTo(aFar[0].x,aFar[0].y);
+      aFar.slice(1).forEach(p=>ctx.lineTo(p.x,p.y));
+      ctx.closePath();
+      ctx.fillStyle=`rgba(240,232,213,${a*0.20})`; ctx.fill();
+      ctx.strokeStyle=`rgba(240,232,213,${a*0.75})`; ctx.lineWidth=1.7; ctx.stroke();
+      ctx.restore();
+
       f++;
-      if(f<=F)requestAnimationFrame(step);
-      else{
-        if(!isCrease){
-          history.push({paper:paper.map(v=>({...v})),layers:layers.map(l=>l.map(v=>({...v}))),creases:[...creases],foldCount});
-          paper=near;
-          layers.push(far.map(v=>reflectPt(v,lp1,lp2)));
-          foldCount++;setCount(foldCount);
+      if (f<=F) { requestAnimationFrame(step); return; }
+
+      // ── Finalize fold ──
+      animating=false;
+      history.push({
+        paper:  paper.map(v=>({...v})),
+        layers: layers.map(l=>l.map(v=>({...v}))),
+        creases:creases.map(c=>({...c,p1:{...c.p1},p2:{...c.p2}})),
+        foldCount,
+      });
+
+      if (!isCrease) {
+        paper = near;
+        layers.push(far.map(v=>reflectPt(v,lp1,lp2)));
+        foldCount++; setCount(foldCount);
+        // Pleat: also mark a parallel mountain crease on folded flap
+        if (isPleat) {
+          const dir=nrm(sub(lp2,lp1)), perp={x:-dir.y,y:dir.x}, off=26;
+          creases.push({
+            p1:{x:lp1.x+perp.x*off, y:lp1.y+perp.y*off},
+            p2:{x:lp2.x+perp.x*off, y:lp2.y+perp.y*off},
+            type:'mountain',
+          });
         }
-        creases.push({p1:lp1,p2:lp2,type:isCrease?'valley':foldMode});
-        animating=false;render(null);
-        setHint(isCrease?'Crease marked! Click two more points':'Nice fold! Click two more points to continue');
       }
+      creases.push({p1:{...lp1}, p2:{...lp2}, type: isCrease?'crease':isPleat?'valley':foldMode});
+      render();
+      setHint(isCrease
+        ? 'Crease marked ✓  Now fold along it, or add more reference creases'
+        : `Fold ${foldCount} done ✓  ↩ undo · ↺ reset · continue folding`);
     })();
   }
 
-  function getPt(e){
-    const r=canvas.getBoundingClientRect(),sx=W/r.width,sy=H/r.height;
-    return{x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy};
+  // ── Inject extra controls (guard against double-init) ─────────────
+  if (!document.getElementById('sim-extra-wrap')) {
+    const wrap = document.createElement('div');
+    wrap.id = 'sim-extra-wrap';
+    wrap.className = 'sim-extra-controls';
+    wrap.innerHTML = `
+      <div class="sim-ctrl-row">
+        <span class="sim-ctrl-lbl">rotate</span>
+        <button class="sim-action-btn" id="rot-ccw" title="Rotate paper 45° counter-clockwise">↺ 45°</button>
+        <button class="sim-action-btn" id="rot-cw"  title="Rotate paper 45° clockwise">↻ 45°</button>
+        <button class="sim-action-btn" id="rot-180" title="Rotate paper 180°">↻ 180°</button>
+        <span class="sim-rot-val" id="rot-val">0°</span>
+      </div>
+      <div class="sim-ctrl-row">
+        <span class="sim-ctrl-lbl">tools</span>
+        <button class="sim-action-btn" id="fold-flip" title="Mirror paper horizontally">⇄ flip</button>
+        <span class="sim-ctrl-sep">·</span>
+        <span class="sim-ctrl-lbl">angle</span>
+        <input type="range" id="fold-angle-range" class="sim-angle-slider" min="10" max="180" value="180" step="5"/>
+        <span class="sim-angle-val" id="fold-angle-val">180°</span>
+      </div>
+      <div class="sim-ctrl-row">
+        <span class="sim-ctrl-lbl">presets</span>
+        <button class="sim-action-btn sim-preset" id="pre-half-h"  title="Fold in half: top meets bottom">½ horiz</button>
+        <button class="sim-action-btn sim-preset" id="pre-half-v"  title="Fold in half: left meets right">½ vert</button>
+        <button class="sim-action-btn sim-preset" id="pre-diag1"   title="Fold diagonal ↘">⟋ diag</button>
+        <button class="sim-action-btn sim-preset" id="pre-diag2"   title="Fold diagonal ↙">⟍ diag</button>
+        <button class="sim-action-btn sim-preset" id="pre-qtr-h"   title="Fold to quarter — left ¼">¼ H</button>
+        <button class="sim-action-btn sim-preset" id="pre-qtr-v"   title="Fold to quarter — top ¼">¼ V</button>
+      </div>
+      <div class="sim-ctrl-row">
+        <label class="sim-ref-toggle">
+          <input type="checkbox" id="show-ref-chk" checked/>
+          <span>show reference points</span>
+        </label>
+        <span class="sim-ref-legend">
+          <span style="color:#f0984e">●</span>corner
+          <span style="color:#c08fff">●</span>center
+          <span style="color:#f5c430">●</span>½ ¼
+          <span style="color:#60a5d4">●</span>crease
+          <span style="color:#7ab87a">●</span>crossing
+        </span>
+      </div>`;
+    canvas.insertAdjacentElement('beforebegin', wrap);
   }
 
-  canvas.addEventListener('click',e=>{
-    if(animating)return;
-    const pt=getPt(e);
-    if(!pending){pending=pt;setHint('Now click a second point to complete the fold line');}
-    else{const p1=pending;pending=null;mouse=null;performFold(p1,pt);}
+  // ── Canvas events ─────────────────────────────────────────────────
+  canvas.addEventListener('mousemove', e => {
+    if (animating) return;
+    const wp=toWorld(e); mouse=wp; snapPt=findSnap(wp); render();
   });
-  canvas.addEventListener('mousemove',e=>{mouse=getPt(e);if(!animating)render(null);});
-  canvas.addEventListener('mouseleave',()=>{mouse=null;if(!animating)render(null);});
+  canvas.addEventListener('mouseleave', () => { mouse=null; snapPt=null; render(); });
+  canvas.addEventListener('click', e => {
+    if (animating) return;
+    const wp=toWorld(e), eff=findSnap(wp)||wp;
+    if (!pending) {
+      pending=eff;
+      setHint('Second point — snap dots help you hit exact references');
+      render();
+    } else {
+      const lp1=pending; pending=null; snapPt=null; mouse=null;
+      performFold(lp1, eff);
+    }
+  });
 
+  // ── Fold-mode buttons ─────────────────────────────────────────────
   function setFoldMode(mode) {
-    foldMode = mode;
-    ['fold-valley','fold-mountain','fold-crease'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.classList.toggle('active', id === 'fold-' + mode);
-    });
+    foldMode=mode;
+    ['fold-valley','fold-mountain','fold-crease','fold-pleat'].forEach(id =>
+      document.getElementById(id)?.classList.toggle('active', id==='fold-'+mode));
+    pending=null; snapPt=null; render();
+    setHint('Click two points on the paper to draw a fold line');
   }
-  document.getElementById('fold-valley')?.addEventListener('click', () => setFoldMode('valley'));
-  document.getElementById('fold-mountain')?.addEventListener('click', () => setFoldMode('mountain'));
-  document.getElementById('fold-crease')?.addEventListener('click', () => setFoldMode('crease'));
-  document.getElementById('fold-reset')?.addEventListener('click',()=>{
-    paper=INIT();layers=[];creases=[];history=[];pending=null;foldCount=0;setCount(0);
-    render(null);setHint('Click two points on the paper to place a fold line');
-  });
-  document.getElementById('fold-undo')?.addEventListener('click',()=>{
-    if(!history.length)return;
-    const prev=history.pop();paper=prev.paper;layers=prev.layers;creases=prev.creases;foldCount=prev.foldCount;
-    pending=null;setCount(foldCount);render(null);
+  document.getElementById('fold-valley')?.addEventListener('click',   ()=>setFoldMode('valley'));
+  document.getElementById('fold-mountain')?.addEventListener('click', ()=>setFoldMode('mountain'));
+  document.getElementById('fold-crease')?.addEventListener('click',   ()=>setFoldMode('crease'));
+  document.getElementById('fold-pleat')?.addEventListener('click',    ()=>setFoldMode('pleat'));
+
+  document.getElementById('fold-undo')?.addEventListener('click', () => {
+    if (!history.length) return;
+    const prev=history.pop();
+    paper=prev.paper; layers=prev.layers; foldCount=prev.foldCount;
+    pending=null; snapPt=null; setCount(foldCount); render();
+    setHint('Unfolded — crease lines remain visible');
   });
 
-  render(null);
+  document.getElementById('fold-reset')?.addEventListener('click', () => {
+    paper=INIT_PAPER(); layers=[]; creases=[]; history=[];
+    foldCount=0; rotation=0; pending=null; snapPt=null;
+    const rv=document.getElementById('rot-val'); if(rv) rv.textContent='0°';
+    setCount(0); render();
+    setHint('Paper reset! Click two reference points (dots) to start folding');
+  });
+
+  // ── New control handlers ──────────────────────────────────────────
+  function updateRotDisplay() {
+    const rv=document.getElementById('rot-val');
+    if (rv) rv.textContent = (Math.round(rotation*180/Math.PI)%360)+'°';
+  }
+  document.getElementById('rot-ccw')?.addEventListener('click',  ()=>{ rotation-=Math.PI/4; updateRotDisplay(); render(); });
+  document.getElementById('rot-cw')?.addEventListener('click',   ()=>{ rotation+=Math.PI/4; updateRotDisplay(); render(); });
+  document.getElementById('rot-180')?.addEventListener('click',  ()=>{ rotation+=Math.PI;   updateRotDisplay(); render(); });
+
+  document.getElementById('fold-flip')?.addEventListener('click', () => {
+    const cx=paper.reduce((s,p)=>s+p.x,0)/paper.length;
+    const mx=p=>({...p, x:2*cx-p.x});
+    paper=paper.map(mx);
+    layers=layers.map(l=>l.map(mx));
+    creases=creases.map(c=>({...c,p1:mx(c.p1),p2:mx(c.p2)}));
+    render();
+  });
+
+  document.getElementById('fold-angle-range')?.addEventListener('input', e=>{
+    foldAngle=parseInt(e.target.value);
+    const av=document.getElementById('fold-angle-val'); if(av) av.textContent=foldAngle+'°';
+  });
+
+  document.getElementById('show-ref-chk')?.addEventListener('change', e=>{ showRef=e.target.checked; render(); });
+
+  // Preset folds
+  function getBounds() {
+    const xs=paper.map(p=>p.x), ys=paper.map(p=>p.y);
+    return {x1:Math.min(...xs),x2:Math.max(...xs),y1:Math.min(...ys),y2:Math.max(...ys),
+            cx:(Math.min(...xs)+Math.max(...xs))/2, cy:(Math.min(...ys)+Math.max(...ys))/2};
+  }
+  function doPreset(lp1,lp2) { pending=null; snapPt=null; setTimeout(()=>performFold(lp1,lp2),40); }
+
+  document.getElementById('pre-half-h')?.addEventListener('click',()=>{ const b=getBounds(); doPreset({x:b.x1,y:b.cy},{x:b.x2,y:b.cy}); });
+  document.getElementById('pre-half-v')?.addEventListener('click',()=>{ const b=getBounds(); doPreset({x:b.cx,y:b.y1},{x:b.cx,y:b.y2}); });
+  document.getElementById('pre-diag1')?.addEventListener('click', ()=>{ const b=getBounds(); doPreset({x:b.x1,y:b.y1},{x:b.x2,y:b.y2}); });
+  document.getElementById('pre-diag2')?.addEventListener('click', ()=>{ const b=getBounds(); doPreset({x:b.x2,y:b.y1},{x:b.x1,y:b.y2}); });
+  document.getElementById('pre-qtr-h')?.addEventListener('click', ()=>{ const b=getBounds(); doPreset({x:b.x1,y:(b.y1+b.cy)/2},{x:b.x2,y:(b.y1+b.cy)/2}); });
+  document.getElementById('pre-qtr-v')?.addEventListener('click', ()=>{ const b=getBounds(); doPreset({x:(b.x1+b.cx)/2,y:b.y1},{x:(b.x1+b.cx)/2,y:b.y2}); });
+
+  // Initial render
+  setCount(0);
+  setHint('Click two reference dots (or any two points) to draw a fold line');
+  render();
 }
 
 // ---- Guide step data ----
@@ -1497,17 +1819,17 @@ function initPinpoint(arena) {
 
   arena.innerHTML = `<div class="pinpoint-wrap">
     <div class="pinpoint-header"><div class="pinpoint-eyebrow">What's the category?</div></div>
-    <div class="pinpoint-clues" id="pp-clues"></div>
+    <div class="pinpoint-clues"></div>
     <div class="pinpoint-input-row">
-      <input class="pinpoint-input" id="pp-in" type="text" placeholder="Type your guess…" autocomplete="off"/>
-      <button class="crane-btn primary" id="pp-sub">Guess</button>
+      <input class="pinpoint-input" type="text" placeholder="Type your guess…" autocomplete="off" spellcheck="false"/>
+      <button class="crane-btn primary pp-sub-btn">Guess</button>
     </div>
-    <div class="pinpoint-msg" id="pp-msg"></div>
-    <button class="crane-btn" id="pp-rev" style="margin-top:0.5rem">Reveal next clue (${puzzle.clues.length - 1} left)</button>
+    <div class="pinpoint-msg"></div>
+    <button class="crane-btn pp-rev-btn" style="margin-top:0.5rem">Reveal next clue (<span class="pp-left">${puzzle.clues.length - 1}</span> left)</button>
   </div>`;
 
   function renderClues() {
-    const el = document.getElementById('pp-clues'); if (!el) return;
+    const el = arena.querySelector('.pinpoint-clues'); if (!el) return;
     el.innerHTML = '';
     for (let i = 0; i < revealed; i++) {
       const d = document.createElement('div');
@@ -1518,8 +1840,9 @@ function initPinpoint(arena) {
 
   function check() {
     if (guessed) return;
-    const val = document.getElementById('pp-in')?.value.trim().toUpperCase();
-    const msg = document.getElementById('pp-msg');
+    const inp = arena.querySelector('.pinpoint-input');
+    const msg = arena.querySelector('.pinpoint-msg');
+    const val = inp?.value.trim().toUpperCase();
     if (!val) return;
     if (val === puzzle.category.toUpperCase()) {
       guessed = true;
@@ -1529,46 +1852,51 @@ function initPinpoint(arena) {
       msg.textContent = 'Nope — try again or reveal another clue';
       msg.className = 'pinpoint-msg lose';
     }
-    document.getElementById('pp-in').value = '';
+    if (inp) inp.value = '';
   }
 
-  document.getElementById('pp-sub')?.addEventListener('click', check);
-  document.getElementById('pp-in')?.addEventListener('keydown', e => { if (e.key==='Enter') check(); });
-  document.getElementById('pp-rev')?.addEventListener('click', () => {
+  arena.querySelector('.pp-sub-btn').addEventListener('click', check);
+  arena.querySelector('.pinpoint-input').addEventListener('keydown', e => { if (e.key==='Enter') check(); });
+  arena.querySelector('.pp-rev-btn').addEventListener('click', () => {
     if (revealed < puzzle.clues.length) {
       revealed++;
       renderClues();
-      const btn = document.getElementById('pp-rev');
       const left = puzzle.clues.length - revealed;
-      if (btn) btn.textContent = left ? `Reveal next clue (${left} left)` : 'All clues revealed';
-      if (!left && btn) btn.disabled = true;
+      const leftEl = arena.querySelector('.pp-left');
+      if (leftEl) leftEl.textContent = left;
+      const btn = arena.querySelector('.pp-rev-btn');
+      if (!left && btn) { btn.disabled = true; btn.textContent = 'All clues revealed'; }
     }
   });
 
   renderClues();
-  setTimeout(() => document.getElementById('pp-in')?.focus(), 50);
+  setTimeout(() => arena.querySelector('.pinpoint-input')?.focus(), 50);
 }
 
 // ---- Queens ----
 function initQueens(arena) {
   const N = 6;
   const REGIONS = [
-    [0,0,0,1,1,1],[0,0,0,1,1,1],[0,2,2,2,1,1],
-    [3,2,2,2,4,4],[3,3,2,4,4,4],[3,3,5,5,4,4],
+    [0,0,1,1,2,2],
+    [0,0,1,2,2,3],
+    [0,4,4,2,3,3],
+    [4,4,5,5,3,3],
+    [4,5,5,5,3,3],
+    [4,4,5,5,5,3],
   ];
-  const COLORS = ['#60a5d4','#7ab87a','#e05555','#f5c430','#c08fff','#f0984e'];
-  const NAMES  = ['Blue','Green','Red','Yellow','Purple','Orange'];
+  const HEX = ['#60a5d4','#7ab87a','#e05555','#f5c430','#c08fff','#f0984e'];
+  const NAMES = ['Blue','Green','Red','Yellow','Purple','Orange'];
   let grid = Array.from({length:N}, () => Array(N).fill(0));
 
   arena.innerHTML = `<div class="queens-wrap">
     <div class="queens-header">
       <div class="queens-eyebrow">Place one ♛ in each color region</div>
-      <div class="queens-rules">No two queens can touch — not even diagonally.</div>
+      <div class="queens-rules">No two queens can touch — not even diagonally. Click once = ♛, again = dot, again = clear.</div>
     </div>
-    <div class="queens-grid" id="q-grid"></div>
-    <div class="queens-msg" id="q-msg"></div>
-    <button class="crane-btn" id="q-reset">↺ reset</button>
-    <div class="queens-legend">${NAMES.map((n,i)=>`<span class="queens-legend-item"><span style="background:${COLORS[i]};display:inline-block;width:10px;height:10px;border-radius:2px"></span> ${n}</span>`).join('')}</div>
+    <div class="queens-grid" style="display:grid;grid-template-columns:repeat(${N},1fr);gap:3px;width:fit-content;margin-bottom:1rem"></div>
+    <div class="queens-msg"></div>
+    <button class="crane-btn q-reset-btn">↺ reset</button>
+    <div class="queens-legend">${NAMES.map((n,i)=>`<span class="queens-legend-item"><span style="background:${HEX[i]};display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px"></span>${n}</span>`).join('')}</div>
   </div>`;
 
   function validate() {
@@ -1584,33 +1912,38 @@ function initQueens(arena) {
   }
 
   function renderGrid() {
-    const g = document.getElementById('q-grid'); if (!g) return;
-    g.innerHTML = ''; g.style.gridTemplateColumns = `repeat(${N},1fr)`;
+    const g = arena.querySelector('.queens-grid'); if (!g) return;
+    g.innerHTML = '';
     for (let r=0;r<N;r++) for (let c=0;c<N;c++) {
       const cell = document.createElement('div');
       cell.className = 'queens-cell';
       const reg = REGIONS[r][c];
-      cell.style.background = COLORS[reg] + '22';
-      cell.style.borderColor = COLORS[reg] + '88';
-      if (grid[r][c]===1) cell.textContent = '♛';
-      else if (grid[r][c]===-1) cell.textContent = '·';
-      cell.addEventListener('click', () => {
-        grid[r][c] = grid[r][c]===0 ? 1 : grid[r][c]===1 ? -1 : 0;
-        const res = validate(); const msg = document.getElementById('q-msg');
-        if (msg) {
-          if (res===true) { msg.textContent='♛ All queens placed correctly!'; msg.className='queens-msg win'; }
-          else if (res===false) { msg.textContent='✗ Conflict detected'; msg.className='queens-msg lose'; }
-          else { msg.textContent=''; msg.className='queens-msg'; }
-        }
-        renderGrid();
-      });
+      cell.style.background = HEX[reg] + '28';
+      cell.style.borderColor = HEX[reg] + '66';
+      cell.style.borderWidth = '1.5px';
+      cell.style.borderStyle = 'solid';
+      if (grid[r][c]===1) { cell.textContent = '♛'; cell.style.color = HEX[reg]; cell.style.fontSize = '1.4rem'; }
+      else if (grid[r][c]===-1) { cell.textContent = '·'; cell.style.color = 'rgba(240,232,213,0.3)'; cell.style.fontSize = '1.2rem'; }
+      cell.dataset.r = r; cell.dataset.c = c;
       g.appendChild(cell);
     }
   }
 
-  document.getElementById('q-reset')?.addEventListener('click', () => {
+  arena.querySelector('.queens-grid').addEventListener('click', e => {
+    const cell = e.target.closest('.queens-cell'); if (!cell) return;
+    const r = +cell.dataset.r, c = +cell.dataset.c;
+    grid[r][c] = grid[r][c]===0 ? 1 : grid[r][c]===1 ? -1 : 0;
+    const res = validate();
+    const msg = arena.querySelector('.queens-msg');
+    if (res===true) { msg.textContent='♛ Perfect placement!'; msg.className='queens-msg win'; }
+    else if (res===false) { msg.textContent='✗ Conflict detected'; msg.className='queens-msg lose'; }
+    else { msg.textContent=''; msg.className='queens-msg'; }
+    renderGrid();
+  });
+
+  arena.querySelector('.q-reset-btn').addEventListener('click', () => {
     grid = Array.from({length:N}, ()=>Array(N).fill(0));
-    const msg = document.getElementById('q-msg'); if (msg) { msg.textContent=''; msg.className='queens-msg'; }
+    const msg = arena.querySelector('.queens-msg'); if (msg) { msg.textContent=''; msg.className='queens-msg'; }
     renderGrid();
   });
 
@@ -1621,7 +1954,6 @@ function initQueens(arena) {
 function initMathLab(arena) {
   let level = 0, score = 0;
   function ri(lo,hi){return Math.floor(Math.random()*(hi-lo+1))+lo;}
-  const fact=n=>n<=1?1:n*fact(n-1);
 
   const LEVELS = [
     {name:'Addition',      gen:()=>{const a=ri(5,99),b=ri(5,99);return{q:`${a} + ${b}`,a:a+b};}},
@@ -1631,31 +1963,34 @@ function initMathLab(arena) {
     {name:'Exponents',     gen:()=>{const b=ri(2,9),e=ri(2,4);return{q:`${b}^${e}`,a:Math.pow(b,e)};}},
     {name:'Modulo',        gen:()=>{const a=ri(20,99),b=ri(3,12);return{q:`${a} mod ${b}`,a:a%b};}},
     {name:'Square Roots',  gen:()=>{const ns=[4,9,16,25,36,49,64,81,100,121,144];const n=ns[ri(0,ns.length-1)];return{q:`√${n}`,a:Math.round(Math.sqrt(n))};}},
-    {name:'Derivatives',   gen:()=>{const qs=[{q:'d/dx[x²] at x=3',a:6},{q:'d/dx[3x²+4x] at x=1',a:10},{q:'d/dx[x³] at x=2',a:12},{q:'d/dx[2x³] at x=2',a:24}];return qs[ri(0,qs.length-1)];}},
+    {name:'Derivatives',   gen:()=>{const qs=[{q:'d/dx[x²] at x=3',a:6},{q:'d/dx[3x²+4x] at x=1',a:10},{q:'d/dx[x³] at x=2',a:12},{q:'d/dx[2x³] at x=2',a:24},{q:'d/dx[x⁴] at x=1',a:4}];return qs[ri(0,qs.length-1)];}},
   ];
 
   let current = null;
 
   arena.innerHTML = `<div class="mathlab-wrap">
-    <div class="mathlab-levels" id="ml-lvls"></div>
-    <div class="mathlab-level-name" id="ml-name"></div>
-    <div class="mathlab-question" id="ml-q"></div>
+    <div class="mathlab-levels"></div>
+    <div class="mathlab-level-name"></div>
+    <div class="mathlab-question"></div>
     <div class="mathlab-input-row">
-      <input class="mathlab-input" id="ml-in" type="number" placeholder="?" autocomplete="off"/>
-      <button class="crane-btn primary" id="ml-sub">→</button>
+      <input class="mathlab-input" type="number" placeholder="?" autocomplete="off" step="any"/>
+      <button class="crane-btn primary ml-sub-btn">→</button>
     </div>
-    <div class="mathlab-feedback" id="ml-fb"></div>
-    <div class="mathlab-score">score: <span id="ml-sc">0</span></div>
+    <div class="mathlab-feedback"></div>
+    <div class="mathlab-score">score: <span class="ml-score-val">0</span> / ${LEVELS.length}</div>
   </div>`;
 
   function renderLevels() {
-    const el = document.getElementById('ml-lvls'); if (!el) return;
-    el.innerHTML = LEVELS.map((l,i) => `<div class="mathlab-level-pip ${i<level?'done':i===level?'active':''}">${i+1}</div>`).join('');
+    const el = arena.querySelector('.mathlab-levels'); if (!el) return;
+    el.innerHTML = LEVELS.map((l,i) => `<div class="mathlab-level-pip ${i<level?'done':i===level?'active':''}" title="${l.name}">${i+1}</div>`).join('');
   }
 
   function newQ() {
     current = LEVELS[level].gen();
-    const q=document.getElementById('ml-q'), n=document.getElementById('ml-name'), fb=document.getElementById('ml-fb'), inp=document.getElementById('ml-in');
+    const q = arena.querySelector('.mathlab-question');
+    const n = arena.querySelector('.mathlab-level-name');
+    const fb = arena.querySelector('.mathlab-feedback');
+    const inp = arena.querySelector('.mathlab-input');
     if (q) q.textContent = current.q + ' = ?';
     if (n) n.textContent = `Level ${level+1} · ${LEVELS[level].name}`;
     if (fb) { fb.textContent=''; fb.className='mathlab-feedback'; }
@@ -1663,31 +1998,702 @@ function initMathLab(arena) {
   }
 
   function submit() {
-    const val = parseFloat(document.getElementById('ml-in')?.value);
-    const fb = document.getElementById('ml-fb');
+    const inp = arena.querySelector('.mathlab-input');
+    const fb = arena.querySelector('.mathlab-feedback');
+    const val = parseFloat(inp?.value);
     if (isNaN(val)||!fb) return;
     if (Math.abs(val - current.a) < 0.01) {
-      score++; document.getElementById('ml-sc').textContent = score;
+      score++;
+      const sc = arena.querySelector('.ml-score-val');
+      if (sc) sc.textContent = score;
       fb.textContent = '✓ Correct!'; fb.className = 'mathlab-feedback win';
       if (level < LEVELS.length - 1) { level++; renderLevels(); setTimeout(newQ, 700); }
-      else { fb.textContent = `🏆 All 8 levels complete! Score: ${score}`; }
+      else { fb.textContent = `🏆 All ${LEVELS.length} levels complete! Score: ${score}/${LEVELS.length}`; }
     } else {
       fb.textContent = `✗ Answer was ${current.a}`; fb.className = 'mathlab-feedback lose';
       setTimeout(newQ, 1100);
     }
   }
 
-  document.getElementById('ml-sub')?.addEventListener('click', submit);
-  document.getElementById('ml-in')?.addEventListener('keydown', e => { if(e.key==='Enter') submit(); });
+  arena.querySelector('.ml-sub-btn').addEventListener('click', submit);
+  arena.querySelector('.mathlab-input').addEventListener('keydown', e => { if(e.key==='Enter') submit(); });
 
   renderLevels(); newQ();
+}
+
+// ---- RPS (standalone) ----
+function initRPSGame(arena) {
+  let you = 0, ai = 0, rounds = 0;
+  const choices = ['rock','paper','scissors'];
+  const emoji = {rock:'✊',paper:'✋',scissors:'✌️'};
+  const beats = {rock:'scissors', paper:'rock', scissors:'paper'};
+
+  arena.innerHTML = `<div class="rps-hub-wrap">
+    <div class="rps-hub-score">
+      <div class="rps-hub-side"><span class="rps-hub-num rps-you-num">0</span><span class="rps-hub-label">you</span></div>
+      <div class="rps-hub-vs">vs</div>
+      <div class="rps-hub-side"><span class="rps-hub-num rps-ai-num">0</span><span class="rps-hub-label">AI</span></div>
+    </div>
+    <div class="rps-hub-result">Pick your move</div>
+    <div class="rps-hub-btns">
+      ${choices.map(c=>`<button class="rps-hub-choice" data-c="${c}">${emoji[c]}<span>${c}</span></button>`).join('')}
+    </div>
+    <button class="crane-btn rps-hub-reset" style="margin-top:1rem">↺ new game</button>
+  </div>`;
+
+  function play(c) {
+    if (rounds >= 3) return;
+    const a = choices[Math.floor(Math.random()*3)];
+    let res;
+    if (c === a) { res = 'tie'; }
+    else if (beats[c] === a) { you++; res = 'win'; arena.querySelector('.rps-you-num').textContent = you; }
+    else { ai++; res = 'lose'; arena.querySelector('.rps-ai-num').textContent = ai; }
+    rounds++;
+    const resEl = arena.querySelector('.rps-hub-result');
+    const msgs = { win:`${emoji[c]} beats ${emoji[a]} — you win this round!`, lose:`${emoji[a]} beats ${emoji[c]} — AI wins this round!`, tie:`${emoji[c]} vs ${emoji[a]} — tie!` };
+    resEl.textContent = msgs[res];
+    resEl.className = 'rps-hub-result ' + res;
+    if (rounds >= 3) {
+      setTimeout(() => {
+        if (you > ai) resEl.textContent = `🏆 You win ${you}–${ai}!`;
+        else if (ai > you) resEl.textContent = `AI wins ${ai}–${you}. Try again!`;
+        else resEl.textContent = `Draw ${you}–${ai}!`;
+      }, 800);
+    }
+  }
+
+  arena.querySelector('.rps-hub-btns').addEventListener('click', e => {
+    const btn = e.target.closest('.rps-hub-choice'); if (!btn) return;
+    play(btn.dataset.c);
+  });
+  arena.querySelector('.rps-hub-reset').addEventListener('click', () => {
+    you = 0; ai = 0; rounds = 0;
+    arena.querySelector('.rps-you-num').textContent = '0';
+    arena.querySelector('.rps-ai-num').textContent = '0';
+    arena.querySelector('.rps-hub-result').textContent = 'Pick your move';
+    arena.querySelector('.rps-hub-result').className = 'rps-hub-result';
+  });
+}
+
+// ---- Tic Tac Toe (standalone) ----
+function initTTTGame(arena) {
+  let board = Array(9).fill('');
+  let over = false;
+
+  arena.innerHTML = `<div class="ttt-hub-wrap">
+    <div class="ttt-hub-status">Your turn (X)</div>
+    <div class="ttt-hub-grid">${Array(9).fill(0).map((_,i)=>`<button class="ttt-hub-cell" data-i="${i}"></button>`).join('')}</div>
+    <button class="crane-btn ttt-hub-reset" style="margin-top:1rem">↺ reset</button>
+  </div>`;
+
+  const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  function winner(b) { for (const [a,c,d] of WINS) if (b[a]&&b[a]===b[c]&&b[a]===b[d]) return b[a]; return null; }
+  function minimax(b, isMax, depth) {
+    const w = winner(b); if (w==='O') return 10-depth; if (w==='X') return depth-10;
+    if (b.every(c=>c)) return 0;
+    let best = isMax ? -Infinity : Infinity;
+    for (let i=0;i<9;i++) { if (!b[i]) { b[i]=isMax?'O':'X'; const s=minimax(b,!isMax,depth+1); b[i]=''; best=isMax?Math.max(best,s):Math.min(best,s); } }
+    return best;
+  }
+  function aiMove() {
+    let best=-Infinity, move=null;
+    for (let i=0;i<9;i++) { if (!board[i]) { board[i]='O'; const s=minimax(board,false,0); board[i]=''; if(s>best){best=s;move=i;} } }
+    return move;
+  }
+
+  function render() {
+    arena.querySelectorAll('.ttt-hub-cell').forEach((cell,i) => {
+      cell.textContent = board[i];
+      cell.dataset.val = board[i];
+      cell.disabled = !!board[i] || over;
+    });
+  }
+
+  function setStatus(msg) { arena.querySelector('.ttt-hub-status').textContent = msg; }
+
+  function reset() {
+    board = Array(9).fill(''); over = false;
+    setStatus('Your turn (X)'); render();
+  }
+
+  arena.querySelector('.ttt-hub-grid').addEventListener('click', e => {
+    const cell = e.target.closest('.ttt-hub-cell'); if (!cell || over) return;
+    const i = +cell.dataset.i; if (board[i]) return;
+    board[i] = 'X'; render();
+    const w = winner(board);
+    if (w) { setStatus(w==='X'?'You win! 🎉':'AI wins!'); over=true; return; }
+    if (board.every(c=>c)) { setStatus("It's a draw!"); over=true; return; }
+    setStatus('AI thinking…');
+    setTimeout(() => {
+      const m = aiMove(); if (m!==null) board[m]='O';
+      render();
+      const w2 = winner(board);
+      if (w2) { setStatus(w2==='X'?'You win! 🎉':'AI wins!'); over=true; }
+      else if (board.every(c=>c)) { setStatus("It's a draw!"); over=true; }
+      else setStatus('Your turn (X)');
+    }, 300);
+  });
+
+  arena.querySelector('.ttt-hub-reset').addEventListener('click', reset);
+  render();
+}
+
+// ---- Connect 4 ----
+function initConnect4(arena) {
+  const ROWS=6, COLS=7;
+  let grid = Array.from({length:ROWS},()=>Array(COLS).fill(0)); // 0=empty 1=player 2=ai
+  let over = false;
+
+  arena.innerHTML = `<div class="c4-wrap">
+    <div class="c4-status">Your turn (🔴)</div>
+    <div class="c4-col-btns">${Array.from({length:COLS},(_,c)=>`<button class="c4-col-btn" data-c="${c}">↓</button>`).join('')}</div>
+    <div class="c4-board" style="display:grid;grid-template-columns:repeat(${COLS},1fr);gap:4px"></div>
+    <button class="crane-btn c4-reset" style="margin-top:1rem">↺ reset</button>
+  </div>`;
+
+  function checkWin(g, p) {
+    const dirs=[[0,1],[1,0],[1,1],[1,-1]];
+    for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
+      if (g[r][c]!==p) continue;
+      for (const [dr,dc] of dirs) {
+        let cnt=1;
+        for (let k=1;k<4;k++) { const nr=r+dr*k,nc=c+dc*k; if(nr<0||nr>=ROWS||nc<0||nc>=COLS||g[nr][nc]!==p) break; cnt++; }
+        if (cnt>=4) return true;
+      }
+    }
+    return false;
+  }
+
+  function drop(g, col, p) {
+    for (let r=ROWS-1;r>=0;r--) { if (!g[r][col]) { g[r][col]=p; return true; } }
+    return false;
+  }
+
+  function aiPick() {
+    const pref=[3,2,4,1,5,0,6];
+    // win
+    for (const c of pref) { const g=grid.map(r=>[...r]); if(drop(g,c,2)&&checkWin(g,2)) return c; }
+    // block
+    for (const c of pref) { const g=grid.map(r=>[...r]); if(drop(g,c,1)&&checkWin(g,1)) return c; }
+    // prefer center
+    for (const c of pref) { if (grid[0][c]===0) return c; }
+    return null;
+  }
+
+  function render() {
+    const board = arena.querySelector('.c4-board'); board.innerHTML='';
+    for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
+      const cell=document.createElement('div'); cell.className='c4-cell';
+      if (grid[r][c]===1) { cell.classList.add('p1'); cell.textContent='🔴'; }
+      else if (grid[r][c]===2) { cell.classList.add('p2'); cell.textContent='🟡'; }
+      board.appendChild(cell);
+    }
+    arena.querySelectorAll('.c4-col-btn').forEach(btn => { btn.disabled = over || grid[0][+btn.dataset.c]!==0; });
+  }
+
+  function setStatus(msg) { arena.querySelector('.c4-status').textContent = msg; }
+
+  function reset() {
+    grid=Array.from({length:ROWS},()=>Array(COLS).fill(0)); over=false;
+    setStatus('Your turn (🔴)'); render();
+  }
+
+  arena.querySelector('.c4-col-btns').addEventListener('click', e => {
+    const btn=e.target.closest('.c4-col-btn'); if(!btn||over) return;
+    const col=+btn.dataset.c;
+    if (!drop(grid,col,1)) return;
+    render();
+    if (checkWin(grid,1)) { setStatus('You win! 🎉'); over=true; render(); return; }
+    if (grid[0].every(c=>c)) { setStatus("Draw!"); over=true; return; }
+    setStatus('AI thinking…');
+    setTimeout(() => {
+      const m=aiPick(); if(m!==null) drop(grid,m,2);
+      render();
+      if (checkWin(grid,2)) { setStatus('AI wins! 🟡'); over=true; }
+      else if (grid[0].every(c=>c)) { setStatus("Draw!"); over=true; }
+      else setStatus('Your turn (🔴)');
+    }, 400);
+  });
+
+  arena.querySelector('.c4-reset').addEventListener('click', reset);
+  render();
+}
+
+// ---- Sudoku ----
+function initSudoku(arena) {
+  const PUZZLE = [
+    [5,3,0,0,7,0,0,0,0],
+    [6,0,0,1,9,5,0,0,0],
+    [0,9,8,0,0,0,0,6,0],
+    [8,0,0,0,6,0,0,0,3],
+    [4,0,0,8,0,3,0,0,1],
+    [7,0,0,0,2,0,0,0,6],
+    [0,6,0,0,0,0,2,8,0],
+    [0,0,0,4,1,9,0,0,5],
+    [0,0,0,0,8,0,0,7,9],
+  ];
+  const SOLUTION = [
+    [5,3,4,6,7,8,9,1,2],
+    [6,7,2,1,9,5,3,4,8],
+    [1,9,8,3,4,2,5,6,7],
+    [8,5,9,7,6,1,4,2,3],
+    [4,2,6,8,5,3,7,9,1],
+    [7,1,3,9,2,4,8,5,6],
+    [9,6,1,5,3,7,2,8,4],
+    [2,8,7,4,1,9,6,3,5],
+    [3,4,5,2,8,6,1,7,9],
+  ];
+  let grid = PUZZLE.map(r=>[...r]);
+  let selected = null;
+
+  arena.innerHTML = `<div class="su-wrap">
+    <div class="su-eyebrow">Classic Sudoku — fill every row, column, and 3×3 box</div>
+    <div class="su-board" style="display:grid;grid-template-columns:repeat(9,1fr);gap:1px"></div>
+    <div class="su-numpad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button class="su-num" data-n="${n}">${n}</button>`).join('')}<button class="su-num su-clr" data-n="0">⌫</button></div>
+    <div class="su-actions"><button class="crane-btn su-check">Check</button><button class="crane-btn su-reset">↺ reset</button></div>
+    <div class="su-msg"></div>
+  </div>`;
+
+  function render() {
+    const board = arena.querySelector('.su-board'); board.innerHTML='';
+    for (let r=0;r<9;r++) for (let c=0;c<9;c++) {
+      const cell=document.createElement('div'); cell.className='su-cell';
+      const locked=PUZZLE[r][c]!==0;
+      if (locked) cell.classList.add('locked');
+      if (selected&&selected[0]===r&&selected[1]===c) cell.classList.add('selected');
+      cell.textContent = grid[r][c] || '';
+      if (!locked&&grid[r][c]&&grid[r][c]!==SOLUTION[r][c]) cell.classList.add('wrong');
+      // thick borders for 3x3 boxes
+      if (c%3===0&&c>0) cell.style.borderLeft='2px solid rgba(240,232,213,0.4)';
+      if (r%3===0&&r>0) cell.style.borderTop='2px solid rgba(240,232,213,0.4)';
+      cell.dataset.r=r; cell.dataset.c=c;
+      board.appendChild(cell);
+    }
+  }
+
+  arena.querySelector('.su-board').addEventListener('click', e => {
+    const cell=e.target.closest('.su-cell'); if(!cell) return;
+    const r=+cell.dataset.r, c=+cell.dataset.c;
+    if (PUZZLE[r][c]!==0) { selected=null; render(); return; }
+    selected=[r,c]; render();
+  });
+
+  arena.querySelector('.su-numpad').addEventListener('click', e => {
+    const btn=e.target.closest('.su-num'); if(!btn||!selected) return;
+    const n=+btn.dataset.n;
+    grid[selected[0]][selected[1]]=n;
+    render();
+  });
+
+  arena.querySelector('.su-check').addEventListener('click', () => {
+    const msg=arena.querySelector('.su-msg');
+    const solved=grid.every((row,r)=>row.every((v,c)=>v===SOLUTION[r][c]));
+    if (solved) { msg.textContent='🏆 Solved!'; msg.className='su-msg win'; }
+    else { msg.textContent='Not quite — check highlighted cells'; msg.className='su-msg lose'; render(); }
+  });
+
+  arena.querySelector('.su-reset').addEventListener('click', () => {
+    grid=PUZZLE.map(r=>[...r]); selected=null;
+    arena.querySelector('.su-msg').textContent='';
+    arena.querySelector('.su-msg').className='su-msg';
+    render();
+  });
+
+  const keyHandler = e => {
+    if (!selected) return;
+    const n=parseInt(e.key);
+    if (n>=1&&n<=9) { grid[selected[0]][selected[1]]=n; render(); }
+    else if (e.key==='Backspace'||e.key==='Delete'||e.key==='0') { grid[selected[0]][selected[1]]=0; render(); }
+  };
+  document.addEventListener('keydown', keyHandler);
+  arena._cleanup = () => document.removeEventListener('keydown', keyHandler);
+
+  render();
+}
+
+// ---- Spelling Bee ----
+function initSpelling(arena) {
+  const PUZZLES = [
+    { center:'A', outer:['P','C','E','H','T','R'], pangram:'TEACHER', words:['TEACHER','TEACH','REACH','EACH','RACE','PACE','CARE','TEAR','HEAR','HEAT','HATE','RATE','TRACE','CHART','CHEAT','ACHE','ARCH','CART','TRAP','TARP'] },
+    { center:'I', outer:['N','G','H','T','L','S'], words:['NIGHTS','NIGHT','LIGHT','SIGHT','THING','STING','SLING','LINT','HINT','GILT','GIST','THIN','SHIN','LING','NILS'], pangram:'NIGHTS' },
+    { center:'O', outer:['C','K','R','B','A','T'], words:['CORBAT','TRACK','CROAK','BLOCK','CLOCK','BARK','BOAT','COAT','ROCK','TACK','CORK','CART','CRAB','BACK','BRAT'], pangram:'CORBAT' },
+  ];
+  const p = PUZZLES[Math.floor(Date.now() / 86400000) % PUZZLES.length];
+  let found = [], word = '';
+
+  arena.innerHTML = `<div class="sb-wrap">
+    <div class="sb-eyebrow">Make words using the letters — center letter required!</div>
+    <div class="sb-word-display"></div>
+    <div class="sb-hive">
+      <div class="sb-hive-row sb-row-top">
+        ${[0,1].map(i=>`<button class="sb-hex sb-outer" data-l="${p.outer[i]}">${p.outer[i]}</button>`).join('')}
+      </div>
+      <div class="sb-hive-row sb-row-mid">
+        ${[2,3].map(i=>`<button class="sb-hex sb-outer" data-l="${p.outer[i]}">${p.outer[i]}</button>`).join('')}
+        <button class="sb-hex sb-center" data-l="${p.center}">${p.center}</button>
+        ${[4,5].map(i=>`<button class="sb-hex sb-outer" data-l="${p.outer[i]}">${p.outer[i]}</button>`).join('')}
+      </div>
+      <div class="sb-hive-row sb-row-bot">
+        ${[4,5].map(i=>`<button class="sb-hex sb-outer" style="visibility:hidden" aria-hidden="true"></button>`).join('')}
+      </div>
+    </div>
+    <div class="sb-controls">
+      <button class="crane-btn sb-del">⌫</button>
+      <button class="crane-btn primary sb-enter">Enter</button>
+      <button class="crane-btn sb-shuffle">⇌</button>
+    </div>
+    <div class="sb-msg"></div>
+    <div class="sb-found-header">Found: <span class="sb-count">0</span></div>
+    <div class="sb-found-list"></div>
+  </div>`;
+
+  const allLetters = [p.center, ...p.outer];
+
+  function renderWord() { arena.querySelector('.sb-word-display').textContent = word || '–'; }
+  function setMsg(m, cls='') { const el=arena.querySelector('.sb-msg'); el.textContent=m; el.className='sb-msg '+cls; setTimeout(()=>{el.textContent='';el.className='sb-msg';},1400); }
+
+  function enter() {
+    const w = word.toUpperCase();
+    if (w.length < 4) { setMsg('Too short!', 'lose'); word=''; renderWord(); return; }
+    if (!w.includes(p.center)) { setMsg(`Must use ${p.center}!`, 'lose'); word=''; renderWord(); return; }
+    if (!w.split('').every(l=>allLetters.includes(l))) { setMsg('Bad letter!', 'lose'); word=''; renderWord(); return; }
+    if (found.includes(w)) { setMsg('Already found!', ''); word=''; renderWord(); return; }
+    if (!p.words.includes(w)) { setMsg('Not in word list', 'lose'); word=''; renderWord(); return; }
+    found.push(w);
+    const isPangram = w === p.pangram;
+    setMsg(isPangram ? '🌟 Pangram!' : '✓ Nice!', 'win');
+    word=''; renderWord();
+    arena.querySelector('.sb-count').textContent = found.length;
+    const list=arena.querySelector('.sb-found-list');
+    const chip=document.createElement('span'); chip.className='sb-chip'+(isPangram?' pangram':''); chip.textContent=w;
+    list.prepend(chip);
+  }
+
+  arena.querySelector('.sb-hive').addEventListener('click', e => {
+    const btn=e.target.closest('.sb-hex'); if(!btn||!btn.dataset.l) return;
+    word += btn.dataset.l; renderWord();
+  });
+  arena.querySelector('.sb-del').addEventListener('click', () => { word=word.slice(0,-1); renderWord(); });
+  arena.querySelector('.sb-enter').addEventListener('click', enter);
+  arena.querySelector('.sb-shuffle').addEventListener('click', () => {
+    // shuffle outer letters display only
+    const btns = [...arena.querySelectorAll('.sb-outer')];
+    const letters = [...p.outer].sort(()=>Math.random()-0.5);
+    btns.forEach((b,i) => { b.dataset.l=letters[i]; b.textContent=letters[i]; });
+  });
+
+  const keyH = e => {
+    if (e.key==='Enter') { enter(); return; }
+    if (e.key==='Backspace') { word=word.slice(0,-1); renderWord(); return; }
+    const l=e.key.toUpperCase();
+    if (allLetters.includes(l)) { word+=l; renderWord(); }
+  };
+  document.addEventListener('keydown', keyH);
+  arena._cleanup = () => document.removeEventListener('keydown', keyH);
+
+  renderWord();
+}
+
+// ---- Mini Crossword ----
+function initCrossword(arena) {
+  const GRID = [
+    ['C','R','A','N','E'],
+    ['O','#','R','#','A'],
+    ['D','R','A','W','N'],
+    ['E','#','Y','#','G'],
+    ['S','C','A','L','E'],
+  ];
+  const ANSWERS = GRID.map(r=>r.map(c=>c==='#'?null:c));
+  const CLUES = {
+    across: ['1. Origami bird (5)','2. Like a taut line (4)','3. Sketched (5)','4. Do Re Mi progression (5)'],
+    down:   ['1. Cipher keys (5)','2. To haul or tug (4)','3. Folded paper art (7)','4. Rhymes with "rang" (4)'],
+  };
+
+  let userGrid = ANSWERS.map(r=>r.map(c=>c===null?null:''));
+  let dir = 'across';
+  let sel = null;
+
+  arena.innerHTML = `<div class="cw-wrap">
+    <div class="cw-dir-btns">
+      <button class="crane-btn cw-across active">→ Across</button>
+      <button class="crane-btn cw-down">↓ Down</button>
+    </div>
+    <div class="cw-board" style="display:grid;grid-template-columns:repeat(5,1fr);gap:2px;max-width:280px"></div>
+    <div class="cw-clues">
+      <div class="cw-clue-group"><div class="cw-clue-head">Across</div>${CLUES.across.map(c=>`<div class="cw-clue">${c}</div>`).join('')}</div>
+      <div class="cw-clue-group"><div class="cw-clue-head">Down</div>${CLUES.down.map(c=>`<div class="cw-clue">${c}</div>`).join('')}</div>
+    </div>
+    <div class="cw-actions"><button class="crane-btn primary cw-check">Check</button><button class="crane-btn cw-reset">↺ reset</button></div>
+    <div class="cw-msg"></div>
+  </div>`;
+
+  function render() {
+    const board=arena.querySelector('.cw-board'); board.innerHTML='';
+    for (let r=0;r<5;r++) for (let c=0;c<5;c++) {
+      const cell=document.createElement('div');
+      if (ANSWERS[r][c]===null) { cell.className='cw-cell cw-black'; board.appendChild(cell); continue; }
+      cell.className='cw-cell';
+      if (sel&&sel[0]===r&&sel[1]===c) cell.classList.add('selected');
+      if (userGrid[r][c]) { cell.textContent=userGrid[r][c]; if(userGrid[r][c]!==ANSWERS[r][c]) cell.classList.add('wrong'); }
+      cell.dataset.r=r; cell.dataset.c=c;
+      board.appendChild(cell);
+    }
+  }
+
+  arena.querySelector('.cw-board').addEventListener('click', e => {
+    const cell=e.target.closest('.cw-cell'); if(!cell||cell.classList.contains('cw-black')) return;
+    const r=+cell.dataset.r, c=+cell.dataset.c;
+    if (sel&&sel[0]===r&&sel[1]===c) { dir=dir==='across'?'down':'across'; updateDirBtns(); }
+    sel=[r,c]; render();
+  });
+
+  function updateDirBtns() {
+    arena.querySelector('.cw-across').classList.toggle('active', dir==='across');
+    arena.querySelector('.cw-down').classList.toggle('active', dir==='down');
+  }
+
+  arena.querySelector('.cw-across').addEventListener('click', () => { dir='across'; updateDirBtns(); });
+  arena.querySelector('.cw-down').addEventListener('click', () => { dir='down'; updateDirBtns(); });
+
+  const keyH = e => {
+    if (!sel) return;
+    const [r,c]=sel;
+    if (e.key==='Backspace') { userGrid[r][c]=''; e.preventDefault(); render(); return; }
+    if (e.key==='ArrowRight') { sel=[r,Math.min(4,c+1)]; dir='across'; updateDirBtns(); render(); return; }
+    if (e.key==='ArrowLeft') { sel=[r,Math.max(0,c-1)]; dir='across'; updateDirBtns(); render(); return; }
+    if (e.key==='ArrowDown') { sel=[Math.min(4,r+1),c]; dir='down'; updateDirBtns(); render(); return; }
+    if (e.key==='ArrowUp') { sel=[Math.max(0,r-1),c]; dir='down'; updateDirBtns(); render(); return; }
+    const l=e.key.toUpperCase();
+    if (!/^[A-Z]$/.test(l)) return;
+    e.preventDefault();
+    userGrid[r][c]=l;
+    if (dir==='across') { let nc=c+1; while(nc<5&&ANSWERS[r][nc]===null) nc++; if(nc<5) sel=[r,nc]; }
+    else { let nr=r+1; while(nr<5&&ANSWERS[nr][c]===null) nr++; if(nr<5) sel=[nr,c]; }
+    render();
+  };
+  document.addEventListener('keydown', keyH);
+  arena._cleanup = () => document.removeEventListener('keydown', keyH);
+
+  arena.querySelector('.cw-check').addEventListener('click', () => {
+    const msg=arena.querySelector('.cw-msg');
+    const solved=ANSWERS.every((row,r)=>row.every((v,c)=>v===null||userGrid[r][c]===v));
+    if (solved) { msg.textContent='🏆 Solved!'; msg.className='cw-msg win'; }
+    else { msg.textContent='Some letters are wrong — check highlighted cells'; msg.className='cw-msg lose'; render(); }
+  });
+
+  arena.querySelector('.cw-reset').addEventListener('click', () => {
+    userGrid=ANSWERS.map(r=>r.map(c=>c===null?null:'')); sel=null;
+    arena.querySelector('.cw-msg').textContent='';
+    arena.querySelector('.cw-msg').className='cw-msg';
+    render();
+  });
+
+  render();
+}
+
+// ---- Tango ----
+function initTango(arena) {
+  const N=6;
+  // 0=empty 1=sun☀️ 2=moon🌙; valid 6x6 solution: 3 of each per row/col, no 3-in-a-row
+  const SOL = [
+    [1,2,1,2,1,2],
+    [2,1,2,1,2,1],
+    [1,2,2,1,2,1],
+    [2,1,1,2,1,2],
+    [1,2,1,2,2,1],
+    [2,1,2,1,1,2],
+  ];
+  const LOCK_POS = [[0,1],[0,4],[2,0],[2,5],[3,0],[3,5],[5,1],[5,4]];
+  let grid = Array.from({length:N},()=>Array(N).fill(0));
+  LOCK_POS.forEach(([r,c])=>grid[r][c]=SOL[r][c]);
+  const locked = Array.from({length:N},(_,r)=>Array.from({length:N},(_,c)=>LOCK_POS.some(([lr,lc])=>lr===r&&lc===c)));
+
+  const SYM = ['','☀️','🌙'];
+
+  arena.innerHTML = `<div class="tg-wrap">
+    <div class="tg-eyebrow">Fill the grid — 3 suns ☀️ and 3 moons 🌙 per row & column, no 3 in a row</div>
+    <div class="tg-board" style="display:grid;grid-template-columns:repeat(${N},1fr);gap:3px;width:fit-content"></div>
+    <div class="tg-msg"></div>
+    <button class="crane-btn tg-reset" style="margin-top:0.75rem">↺ reset</button>
+  </div>`;
+
+  function validate() {
+    for (let r=0;r<N;r++) {
+      const row=grid[r]; if (row.some(v=>!v)) return null;
+      const suns=row.filter(v=>v===1).length; if(suns!==3) return false;
+      for (let c=0;c<N-2;c++) if(row[c]&&row[c]===row[c+1]&&row[c]===row[c+2]) return false;
+    }
+    for (let c=0;c<N;c++) {
+      const col=grid.map(r=>r[c]); if(col.some(v=>!v)) return null;
+      const suns=col.filter(v=>v===1).length; if(suns!==3) return false;
+      for (let r=0;r<N-2;r++) if(col[r]&&col[r]===col[r+1]&&col[r]===col[r+2]) return false;
+    }
+    return true;
+  }
+
+  function render() {
+    const board=arena.querySelector('.tg-board'); board.innerHTML='';
+    for (let r=0;r<N;r++) for (let c=0;c<N;c++) {
+      const cell=document.createElement('div'); cell.className='tg-cell';
+      if (locked[r][c]) cell.classList.add('locked');
+      cell.textContent=SYM[grid[r][c]];
+      cell.dataset.r=r; cell.dataset.c=c;
+      board.appendChild(cell);
+    }
+  }
+
+  arena.querySelector('.tg-board').addEventListener('click', e => {
+    const cell=e.target.closest('.tg-cell'); if(!cell) return;
+    const r=+cell.dataset.r, c=+cell.dataset.c;
+    if (locked[r][c]) return;
+    grid[r][c]=(grid[r][c]+1)%3;
+    const res=validate();
+    const msg=arena.querySelector('.tg-msg');
+    if (res===true) { msg.textContent='🏆 Solved! Perfect balance!'; msg.className='tg-msg win'; }
+    else if (res===false) { msg.textContent='✗ Conflict — check row/column balance'; msg.className='tg-msg lose'; }
+    else { msg.textContent=''; msg.className='tg-msg'; }
+    render();
+  });
+
+  arena.querySelector('.tg-reset').addEventListener('click', () => {
+    grid=Array.from({length:N},()=>Array(N).fill(0));
+    LOCK_POS.forEach(([r,c])=>grid[r][c]=SOL[r][c]);
+    arena.querySelector('.tg-msg').textContent='';
+    arena.querySelector('.tg-msg').className='tg-msg';
+    render();
+  });
+
+  render();
+}
+
+// ---- Numberlink ----
+function initNumberlink(arena) {
+  const N=6;
+  // Number pairs: [r1,c1,r2,c2,color]
+  const PAIRS = [
+    [0,0, 3,3, '#60a5d4'],
+    [0,5, 2,3, '#7ab87a'],
+    [1,0, 4,5, '#e05555'],
+    [2,0, 5,2, '#f5c430'],
+    [0,2, 5,5, '#c08fff'],
+  ];
+  const NUM_GRID = Array.from({length:N},()=>Array(N).fill(0));
+  PAIRS.forEach(([r1,c1,r2,c2,],i)=>{ NUM_GRID[r1][c1]=i+1; NUM_GRID[r2][c2]=i+1; });
+  const COLORS = PAIRS.map(p=>p[4]);
+
+  let paths = Array.from({length:PAIRS.length},()=>[]); // array of [r,c] arrays
+  let drawing = null; // {num, path}
+  let pathGrid = Array.from({length:N},()=>Array(N).fill(-1)); // which path index fills each cell
+
+  arena.innerHTML = `<div class="nl-wrap">
+    <div class="nl-eyebrow">Connect matching numbers with a path — fill every cell!</div>
+    <div class="nl-board" style="display:grid;grid-template-columns:repeat(${N},1fr);gap:2px;width:fit-content;user-select:none"></div>
+    <div class="nl-msg"></div>
+    <button class="crane-btn nl-reset" style="margin-top:0.75rem">↺ reset</button>
+  </div>`;
+
+  function render() {
+    const board=arena.querySelector('.nl-board'); board.innerHTML='';
+    for (let r=0;r<N;r++) for (let c=0;c<N;c++) {
+      const cell=document.createElement('div'); cell.className='nl-cell';
+      const num=NUM_GRID[r][c];
+      const pathIdx=pathGrid[r][c];
+      if (pathIdx>=0) { cell.style.background=COLORS[pathIdx]+'55'; }
+      if (num>0) {
+        cell.textContent=num; cell.classList.add('nl-endpoint');
+        cell.style.color=COLORS[num-1]; cell.style.borderColor=COLORS[num-1];
+        cell.style.background=COLORS[num-1]+'22';
+      }
+      cell.dataset.r=r; cell.dataset.c=c;
+      board.appendChild(cell);
+    }
+  }
+
+  function startPath(r,c) {
+    const num=NUM_GRID[r][c]; if(!num) return;
+    const idx=num-1;
+    // clear this path
+    paths[idx]=[];
+    pathGrid=pathGrid.map(row=>row.map(v=>v===idx?-1:v));
+    drawing={idx,path:[[r,c]]};
+    pathGrid[r][c]=idx;
+    render();
+  }
+
+  function extendPath(r,c) {
+    if(!drawing) return;
+    const {idx,path}=drawing;
+    const [lr,lc]=path[path.length-1];
+    if (Math.abs(r-lr)+Math.abs(c-lc)!==1) return; // must be adjacent
+    // If we step back, trim path
+    if (path.length>=2&&path[path.length-2][0]===r&&path[path.length-2][1]===c) {
+      pathGrid[lr][lc]=-1; path.pop(); render(); return;
+    }
+    if (pathGrid[r][c]>=0&&pathGrid[r][c]!==idx) return; // occupied by another path
+    // If endpoint of same number, complete
+    const num=NUM_GRID[r][c];
+    if (num&&num!==idx+1) return;
+    pathGrid[r][c]=idx; path.push([r,c]);
+    if (num===idx+1&&path.length>1) { paths[idx]=[...path]; drawing=null; checkComplete(); }
+    render();
+  }
+
+  function checkComplete() {
+    const allFilled=pathGrid.every(row=>row.every(v=>v>=0));
+    const allConnected=paths.every((p,i)=>{
+      if(p.length<2) return false;
+      const [r1,c1]=PAIRS[i]; const [r2,c2]=[PAIRS[i][2],PAIRS[i][3]];
+      const s=p[0],e=p[p.length-1];
+      return (s[0]===r1&&s[1]===c1&&e[0]===r2&&e[1]===c2)||(s[0]===r2&&s[1]===c2&&e[0]===r1&&e[1]===c1);
+    });
+    const msg=arena.querySelector('.nl-msg');
+    if (allFilled&&allConnected) { msg.textContent='🏆 Solved!'; msg.className='nl-msg win'; }
+  }
+
+  const board=arena.querySelector('.nl-board');
+  let mouseDown=false;
+  board.addEventListener('mousedown', e=>{
+    const cell=e.target.closest('.nl-cell'); if(!cell) return;
+    mouseDown=true; startPath(+cell.dataset.r,+cell.dataset.c);
+  });
+  board.addEventListener('mouseover', e=>{
+    if(!mouseDown||!drawing) return;
+    const cell=e.target.closest('.nl-cell'); if(!cell) return;
+    extendPath(+cell.dataset.r,+cell.dataset.c);
+  });
+  document.addEventListener('mouseup', ()=>{ mouseDown=false; if(drawing){paths[drawing.idx]=[...drawing.path];drawing=null;} });
+
+  arena.querySelector('.nl-reset').addEventListener('click', ()=>{
+    paths=Array.from({length:PAIRS.length},()=>[]);
+    pathGrid=Array.from({length:N},()=>Array(N).fill(-1));
+    drawing=null; mouseDown=false;
+    arena.querySelector('.nl-msg').textContent='';
+    arena.querySelector('.nl-msg').className='nl-msg';
+    render();
+  });
+
+  render();
 }
 
 function initGamesHub() {
   const arena = document.getElementById('games-arena');
   if (!arena) return;
 
-  const INIT_MAP = { wordle:initWordle, connections:initConnections, pinpoint:initPinpoint, queens:initQueens, mathlab:initMathLab };
+  const INIT_MAP = {
+    wordle: initWordle,
+    connections: initConnections,
+    spelling: initSpelling,
+    crossword: initCrossword,
+    pinpoint: initPinpoint,
+    tango: initTango,
+    numberlink: initNumberlink,
+    queens: initQueens,
+    sudoku: initSudoku,
+    mathlab: initMathLab,
+    rps: initRPSGame,
+    tictactoe: initTTTGame,
+    connect4: initConnect4,
+  };
   let current = 'wordle';
 
   INIT_MAP[current](arena);
@@ -1701,7 +2707,7 @@ function initGamesHub() {
       card.classList.add('active');
       if (typeof arena._cleanup === 'function') { arena._cleanup(); arena._cleanup = null; }
       arena.innerHTML = '';
-      INIT_MAP[g](arena);
+      INIT_MAP[g]?.(arena);
     });
   });
 }

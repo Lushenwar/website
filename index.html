@@ -329,6 +329,7 @@
               <button class="orig-guide-tab active" data-guide="crane">🦢 crane</button>
               <button class="orig-guide-tab" data-guide="lotus">🌸 lotus</button>
               <button class="orig-guide-tab" data-guide="boat">⛵ boat</button>
+              <button class="orig-guide-tab" data-guide="types">📖 folds</button>
             </div>
 
             <div class="guide-content active" id="guide-crane">
@@ -362,14 +363,74 @@
             </div>
           </div>
 
+            <!-- Fold Types Reference -->
+            <div class="guide-content" id="guide-types">
+              <div class="fold-dict">
+                <div class="fd-entry">
+                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><rect x="4" y="4" width="48" height="28" stroke="var(--ink-faint)" stroke-width="1"/><path d="M4 18 L 52 18" stroke="var(--cobalt)" stroke-width="1.5" stroke-dasharray="6 4"/><path d="M 22 12 L 28 18 L 22 24" stroke="var(--cobalt)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="18" width="48" height="14" fill="rgba(96,165,212,0.08)"/></svg>
+                  <div><div class="fd-name">Valley Fold ⌄</div><div class="fd-desc">Fold toward you — paper bends down into a V. Blue dashed line in diagrams. The most common fold.</div></div>
+                </div>
+                <div class="fd-entry">
+                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><rect x="4" y="4" width="48" height="28" stroke="var(--ink-faint)" stroke-width="1"/><path d="M4 18 L 52 18" stroke="var(--rouge)" stroke-width="1.5" stroke-dasharray="2 4"/><path d="M 22 24 L 28 18 L 22 12" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="4" width="48" height="14" fill="rgba(224,85,85,0.08)"/></svg>
+                  <div><div class="fd-name">Mountain Fold ⌃</div><div class="fd-desc">Fold away from you — paper peaks upward. Red dot-dash line. Same geometry as valley but flipped.</div></div>
+                </div>
+                <div class="fd-entry">
+                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><rect x="4" y="4" width="48" height="28" stroke="var(--ink-faint)" stroke-width="1"/><path d="M4 18 L 52 18" stroke="var(--ink-muted)" stroke-width="1.2" stroke-dasharray="3 6"/><circle cx="14" cy="18" r="2" fill="var(--ink-faint)"/><circle cx="28" cy="18" r="2" fill="var(--ink-faint)"/><circle cx="42" cy="18" r="2" fill="var(--ink-faint)"/></svg>
+                  <div><div class="fd-name">Crease &amp; Unfold ◇</div><div class="fd-desc">Fold then unfold — leaves a reference crease. Essential for setting up petal folds, bird base, and pre-creasing crane.</div></div>
+                </div>
+                <div class="fd-entry">
+                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><path d="M4 4 L52 4 L52 36 L4 36 Z" fill="rgba(240,232,213,0.05)" stroke="var(--ink-faint)" stroke-width="1"/><path d="M18 4 L18 36" stroke="var(--cobalt)" stroke-width="1.5" stroke-dasharray="6 4"/><path d="M32 4 L32 36" stroke="var(--rouge)" stroke-width="1.2" stroke-dasharray="2 4"/><rect x="18" y="4" width="14" height="32" fill="rgba(122,184,122,0.12)"/></svg>
+                  <div><div class="fd-name">Pleat Fold ≡</div><div class="fd-desc">Two parallel folds: valley then mountain. Creates a zigzag ridge — like accordion pleats in a shirt.</div></div>
+                </div>
+                <div class="fd-entry">
+                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><path d="M4 36 L28 4 L52 36" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M28 4 L28 36" stroke="var(--pencil)" stroke-width="1.2" stroke-dasharray="4 3"/><path d="M4 20 L28 20" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="5 3"/><path d="M52 20 L28 20" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="5 3"/></svg>
+                  <div><div class="fd-name">Petal Fold</div><div class="fd-desc">Opens a flap into two symmetric points. Core move in bird base: fold edges to center, unfold, lift top, collapse sides.</div></div>
+                </div>
+                <div class="fd-entry">
+                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><path d="M28 4 L4 28 L52 28 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M20 20 C28 12 36 20 28 28" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M28 4 L28 20" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="4 3"/></svg>
+                  <div><div class="fd-name">Squash Fold</div><div class="fd-desc">Open a layered flap from the top and press it flat. Creates a wider, symmetric flap from a narrow point.</div></div>
+                </div>
+                <div class="fd-entry">
+                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><path d="M28 4 L4 36 L52 36 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M16 20 L28 4 L40 20" stroke="var(--pencil)" stroke-width="1.5" fill="rgba(245,196,48,0.08)" stroke-linejoin="round"/><path d="M28 4 L28 24" stroke="var(--rouge)" stroke-width="1.2" stroke-dasharray="3 3"/></svg>
+                  <div><div class="fd-name">Rabbit Ear Fold</div><div class="fd-desc">Three creases converge: two edge creases + center bisector. Creates a single pointed ear/fin. Two = petal fold.</div></div>
+                </div>
+                <div class="fd-entry">
+                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><path d="M28 4 L4 20 L28 36 L52 20 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M28 14 L28 28" stroke="var(--cobalt)" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="28" cy="20" r="4" stroke="var(--rouge)" stroke-width="1.5" fill="none"/></svg>
+                  <div><div class="fd-name">Inside Reverse Fold</div><div class="fd-desc">Reverses a point inward between layers. Used for crane head and tail. Pre-crease the fold line first.</div></div>
+                </div>
+                <div class="fd-entry">
+                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><path d="M28 4 L4 20 L28 36 L52 20 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M28 14 C20 8 14 14 12 20" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M28 14 C36 8 42 14 44 20" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+                  <div><div class="fd-name">Outside Reverse Fold</div><div class="fd-desc">Reverses a point outward around the layers. Tip bends back over the outside of the model.</div></div>
+                </div>
+                <div class="fd-entry">
+                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><path d="M4 28 L28 4 L52 28" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M28 20 L28 28" stroke="var(--cobalt)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 3"/><circle cx="28" cy="14" r="3" stroke="var(--pencil)" stroke-width="1.5" fill="rgba(245,196,48,0.15)"/><path d="M20 28 L28 20 L36 28" stroke="var(--sage)" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <div><div class="fd-name">Sink Fold</div><div class="fd-desc">Pushes a corner tip inward by collapsing it inside the model. Requires pre-creasing around the target corner.</div></div>
+                </div>
+                <div class="fd-entry fd-entry-wide">
+                  <div class="fd-bases">
+                    <div class="fd-base"><span class="fd-base-name">◇ Kite Base</span><span class="fd-base-desc">2 edges → center diagonal</span></div>
+                    <div class="fd-base"><span class="fd-base-name">◇ Square Base</span><span class="fd-base-desc">X + + creases → collapse</span></div>
+                    <div class="fd-base"><span class="fd-base-name">◇ Bird Base</span><span class="fd-base-desc">Square base + 2 petal folds</span></div>
+                    <div class="fd-base"><span class="fd-base-name">◇ Waterbomb Base</span><span class="fd-base-desc">X mountain + + valley → collapse</span></div>
+                    <div class="fd-base"><span class="fd-base-name">◇ Frog Base</span><span class="fd-base-desc">Waterbomb + 4 squash folds + 4 petal folds</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="fd-kawasaki">
+                <span class="fd-kaw-label">Kawasaki's theorem</span>
+                At any vertex, alternating angles around it must sum to 180° for flat-foldability. Mountain − Valley = ±2 at every vertex (Maekawa's theorem).
+              </div>
+            </div>
+
           <!-- RIGHT: Simulator -->
           <div class="orig-sim-panel">
             <div class="orig-sim-header">
               <span class="orig-sim-title">fold it yourself</span>
               <div class="orig-sim-fold-types">
-                <button class="sim-mode-btn active" id="fold-valley">⌄ valley</button>
-                <button class="sim-mode-btn" id="fold-mountain">⌃ mountain</button>
-                <button class="sim-mode-btn" id="fold-crease">◇ crease</button>
+                <button class="sim-mode-btn active" id="fold-valley" title="Valley fold: fold toward you">⌄ valley</button>
+                <button class="sim-mode-btn" id="fold-mountain" title="Mountain fold: fold away from you">⌃ mountain</button>
+                <button class="sim-mode-btn" id="fold-crease" title="Crease &amp; unfold: mark without folding">◇ crease</button>
+                <button class="sim-mode-btn" id="fold-pleat" title="Pleat fold: valley + parallel mountain mark">≡ pleat</button>
               </div>
               <div class="orig-sim-actions">
                 <button class="sim-action-btn" id="fold-undo" title="undo">↩</button>
@@ -400,31 +461,19 @@
         <div class="games-hub-inner">
           <p class="games-hub-desc">These also cycle in as challenges for unlocking projects.</p>
           <div class="games-selector">
-            <button class="game-card active" data-game="wordle">
-              <span class="game-card-icon">🟩</span>
-              <span class="game-card-name">Wordle</span>
-              <span class="game-card-desc">5-letter word, 6 guesses</span>
-            </button>
-            <button class="game-card" data-game="connections">
-              <span class="game-card-icon">🔗</span>
-              <span class="game-card-name">Connections</span>
-              <span class="game-card-desc">Group 16 words</span>
-            </button>
-            <button class="game-card" data-game="pinpoint">
-              <span class="game-card-icon">📍</span>
-              <span class="game-card-name">Pinpoint</span>
-              <span class="game-card-desc">Guess the category</span>
-            </button>
-            <button class="game-card" data-game="queens">
-              <span class="game-card-icon">♛</span>
-              <span class="game-card-name">Queens</span>
-              <span class="game-card-desc">Logic grid puzzle</span>
-            </button>
-            <button class="game-card" data-game="mathlab">
-              <span class="game-card-icon">∫</span>
-              <span class="game-card-name">Math Lab</span>
-              <span class="game-card-desc">Arithmetic → calculus</span>
-            </button>
+            <button class="game-card active" data-game="wordle"><span class="game-card-icon">🟩</span><span class="game-card-name">Wordle</span><span class="game-card-desc">5-letter word</span></button>
+            <button class="game-card" data-game="connections"><span class="game-card-icon">🔗</span><span class="game-card-name">Connections</span><span class="game-card-desc">Group 16 words</span></button>
+            <button class="game-card" data-game="spelling"><span class="game-card-icon">🐝</span><span class="game-card-name">Spelling Bee</span><span class="game-card-desc">Make words from 7 letters</span></button>
+            <button class="game-card" data-game="crossword"><span class="game-card-icon">✏️</span><span class="game-card-name">Mini Crossword</span><span class="game-card-desc">5×5 puzzle</span></button>
+            <button class="game-card" data-game="pinpoint"><span class="game-card-icon">📍</span><span class="game-card-name">Pinpoint</span><span class="game-card-desc">Guess the category</span></button>
+            <button class="game-card" data-game="tango"><span class="game-card-icon">☯</span><span class="game-card-name">Tango</span><span class="game-card-desc">Sun & moon balance</span></button>
+            <button class="game-card" data-game="numberlink"><span class="game-card-icon">🔗</span><span class="game-card-name">Numberlink</span><span class="game-card-desc">Connect the pairs</span></button>
+            <button class="game-card" data-game="queens"><span class="game-card-icon">♛</span><span class="game-card-name">Queens</span><span class="game-card-desc">One queen per region</span></button>
+            <button class="game-card" data-game="sudoku"><span class="game-card-icon">🔢</span><span class="game-card-name">Sudoku</span><span class="game-card-desc">Classic 9×9</span></button>
+            <button class="game-card" data-game="mathlab"><span class="game-card-icon">∫</span><span class="game-card-name">Math Lab</span><span class="game-card-desc">Arithmetic → calculus</span></button>
+            <button class="game-card" data-game="rps"><span class="game-card-icon">✊</span><span class="game-card-name">RPS</span><span class="game-card-desc">Best of 3</span></button>
+            <button class="game-card" data-game="tictactoe"><span class="game-card-icon">✕</span><span class="game-card-name">Tic Tac Toe</span><span class="game-card-desc">Beat the AI</span></button>
+            <button class="game-card" data-game="connect4"><span class="game-card-icon">🔴</span><span class="game-card-name">Connect 4</span><span class="game-card-desc">Drop to win</span></button>
           </div>
           <div class="games-arena" id="games-arena"></div>
         </div>

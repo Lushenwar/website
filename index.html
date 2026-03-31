@@ -162,6 +162,16 @@
     <!-- Custom cursor -->
     <div id="cursor" aria-hidden="true"></div>
 
+    <nav class="top-nav" id="top-nav">
+      <span class="top-nav-brand">ryan qi</span>
+      <div class="top-nav-tabs">
+        <button class="top-tab active" data-section="sec-portfolio">portfolio</button>
+        <button class="top-tab" data-section="sec-origami">origami</button>
+        <button class="top-tab" data-section="sec-games">games</button>
+      </div>
+    </nav>
+
+    <div class="top-section active" id="sec-portfolio">
     <main>
 
       <!-- HERO -->
@@ -205,135 +215,13 @@
           </svg>
           <span class="section-eyebrow">selected builds</span>
         </div>
+        <div class="proj-filter-tabs">
+          <button class="proj-tab active" data-filter="hackathon">hackathon projects</button>
+          <button class="proj-tab" data-filter="personal">personal projects</button>
+        </div>
         <div class="projects-list" id="projects-list">
           <!-- Injected by JS -->
         </div>
-      </section>
-
-      <!-- ORIGAMI -->
-      <section class="origami-section" id="origami">
-        <div class="section-header">
-          <svg class="section-squiggle" width="60" height="14" viewBox="0 0 60 14" fill="none">
-            <path d="M 2 7 C 10 2, 18 12, 30 7 C 42 2, 50 12, 58 7" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" fill="none"/>
-          </svg>
-          <span class="section-eyebrow">take a break · fold something</span>
-        </div>
-
-        <!-- Legend -->
-        <div class="orig-legend" aria-label="fold type legend">
-          <span class="legend-heading">legend</span>
-          <div class="legend-item">
-            <svg width="56" height="18" viewBox="0 0 56 18" fill="none" aria-hidden="true">
-              <line x1="2" y1="9" x2="54" y2="9" stroke="var(--cobalt)" stroke-width="1.8" stroke-dasharray="7 5"/>
-              <path d="M 25 3 L 28 9 L 31 3" stroke="var(--cobalt)" stroke-width="1.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
-            </svg>
-            <span>valley fold</span>
-          </div>
-          <div class="legend-item">
-            <svg width="56" height="18" viewBox="0 0 56 18" fill="none" aria-hidden="true">
-              <path d="M 2 9 L 9 9 M 12 9 L 14 9 M 17 9 L 24 9 M 27 9 L 29 9 M 32 9 L 39 9 M 42 9 L 44 9 M 47 9 L 54 9"
-                    stroke="var(--rouge)" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M 25 15 L 28 9 L 31 15" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
-            </svg>
-            <span>mountain fold</span>
-          </div>
-          <div class="legend-item">
-            <svg width="56" height="18" viewBox="0 0 56 18" fill="none" aria-hidden="true">
-              <line x1="2" y1="9" x2="54" y2="9" stroke="var(--ink-muted)" stroke-width="1"/>
-              <circle cx="12" cy="9" r="2" fill="var(--ink-muted)" opacity="0.5"/>
-              <circle cx="28" cy="9" r="2" fill="var(--ink-muted)" opacity="0.5"/>
-              <circle cx="44" cy="9" r="2" fill="var(--ink-muted)" opacity="0.5"/>
-            </svg>
-            <span>existing crease</span>
-          </div>
-          <div class="legend-item">
-            <svg width="56" height="18" viewBox="0 0 56 18" fill="none" aria-hidden="true">
-              <path d="M 10 14 L 28 4 L 46 14" stroke="var(--pencil)" stroke-width="1.5" fill="none" stroke-linejoin="round" stroke-linecap="round" opacity="0.7"/>
-              <path d="M 4 14 L 28 2 L 52 14" stroke="var(--pencil)" stroke-width="0.8" fill="none" stroke-linejoin="round" stroke-linecap="round" opacity="0.3"/>
-            </svg>
-            <span>fold direction</span>
-          </div>
-        </div>
-
-        <!-- Tabs -->
-        <div class="orig-tabs" role="tablist">
-          <button class="orig-tab active" data-panel="orig-sim" role="tab" aria-selected="true">origami simulator</button>
-          <button class="orig-tab" data-panel="orig-guide" role="tab" aria-selected="false">crane guide</button>
-        </div>
-
-        <!-- Simulator Panel -->
-        <div class="orig-panel active" id="orig-sim" role="tabpanel">
-          <div class="sim-layout">
-
-            <div class="sim-controls">
-              <div class="sim-control-group">
-                <span class="sim-label">fold type</span>
-                <div class="sim-mode-row">
-                  <button class="sim-mode-btn active" id="fold-valley">
-                    <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
-                      <line x1="1" y1="7" x2="21" y2="7" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5 3"/>
-                      <path d="M 9 2 L 11 7 L 13 2" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
-                    </svg>
-                    valley
-                  </button>
-                  <button class="sim-mode-btn" id="fold-mountain">
-                    <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
-                      <path d="M 1 7 L 4 7 M 6 7 L 7 7 M 9 7 L 12 7 M 14 7 L 15 7 M 17 7 L 21 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                      <path d="M 9 12 L 11 7 L 13 12" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
-                    </svg>
-                    mountain
-                  </button>
-                </div>
-              </div>
-
-              <div class="sim-control-group">
-                <span class="sim-label">actions</span>
-                <div class="sim-action-row">
-                  <button class="sim-action-btn" id="fold-undo">↩ undo</button>
-                  <button class="sim-action-btn" id="fold-reset">↺ reset</button>
-                </div>
-              </div>
-
-              <div class="sim-hint-box">
-                <div class="sim-hint-icon">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <circle cx="8" cy="8" r="7" stroke="var(--ink-muted)" stroke-width="1"/>
-                    <path d="M8 5 L8 9 M8 11 L8 11" stroke="var(--ink-muted)" stroke-width="1.5" stroke-linecap="round"/>
-                  </svg>
-                </div>
-                <p class="sim-hint" id="sim-hint">Click two points on the paper to place a fold line</p>
-              </div>
-
-              <div class="sim-folds-count">
-                <span id="fold-count">0</span> folds applied
-              </div>
-            </div>
-
-            <div class="sim-canvas-wrap">
-              <canvas id="origami-canvas" aria-label="origami paper folding canvas"></canvas>
-              <div class="sim-canvas-label">click anywhere on the paper to begin</div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Crane Guide Panel -->
-        <div class="orig-panel" id="orig-guide" role="tabpanel">
-          <div class="crane-layout">
-            <div class="crane-step-visual" id="crane-step-svg"><!-- injected by JS --></div>
-            <div class="crane-right">
-              <div class="crane-step-counter">
-                step <span id="crane-step-num">1</span> <span class="crane-sep">of</span> <span id="crane-step-total">8</span>
-              </div>
-              <p class="crane-step-desc" id="crane-step-desc">Start with a square sheet of paper, colored side down.</p>
-              <div class="crane-controls">
-                <button class="crane-btn" id="crane-prev" disabled>← back</button>
-                <button class="crane-btn primary" id="crane-next">next →</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
       </section>
 
       <!-- ABOUT -->
@@ -383,6 +271,166 @@
         </div>
       </footer>
     </main>
+    </div><!-- /#sec-portfolio -->
+
+    <!-- Mini-gate modal (per-project challenge) -->
+    <div id="mini-gate" class="mini-gate" style="display:none" role="dialog" aria-modal="true" aria-labelledby="mini-gate-title">
+      <div class="mini-gate-card">
+        <button class="mini-gate-close" aria-label="close">×</button>
+        <div class="mini-gate-eyebrow">earn access</div>
+        <h3 class="mini-gate-title" id="mini-gate-title">beat the AI to unlock this project</h3>
+        <div id="mini-game-container"></div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         ORIGAMI SECTION
+         ============================================================ -->
+    <div class="top-section" id="sec-origami">
+      <section class="origami-section" style="padding: 3rem 5vw 6rem;">
+        <div class="section-header">
+          <svg class="section-squiggle" width="60" height="14" viewBox="0 0 60 14" fill="none">
+            <path d="M 2 7 C 10 2, 18 12, 30 7 C 42 2, 50 12, 58 7" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="section-eyebrow">take a break · fold something</span>
+        </div>
+
+        <div class="orig-legend">
+          <span class="legend-heading">legend</span>
+          <div class="legend-item">
+            <svg width="56" height="18" viewBox="0 0 56 18" fill="none">
+              <line x1="2" y1="9" x2="54" y2="9" stroke="var(--cobalt)" stroke-width="1.8" stroke-dasharray="7 5"/>
+              <path d="M 25 3 L 28 9 L 31 3" stroke="var(--cobalt)" stroke-width="1.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+            <span>valley fold</span>
+          </div>
+          <div class="legend-item">
+            <svg width="56" height="18" viewBox="0 0 56 18" fill="none">
+              <path d="M 2 9 L 9 9 M 12 9 L 14 9 M 17 9 L 24 9 M 27 9 L 29 9 M 32 9 L 39 9 M 42 9 L 44 9 M 47 9 L 54 9" stroke="var(--rouge)" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M 25 15 L 28 9 L 31 15" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+            <span>mountain fold</span>
+          </div>
+          <div class="legend-item">
+            <svg width="56" height="18" viewBox="0 0 56 18" fill="none">
+              <line x1="2" y1="9" x2="54" y2="9" stroke="var(--ink-muted)" stroke-width="1"/>
+              <circle cx="12" cy="9" r="2" fill="var(--ink-muted)" opacity="0.5"/>
+              <circle cx="28" cy="9" r="2" fill="var(--ink-muted)" opacity="0.5"/>
+              <circle cx="44" cy="9" r="2" fill="var(--ink-muted)" opacity="0.5"/>
+            </svg>
+            <span>existing crease</span>
+          </div>
+        </div>
+
+        <div class="orig-main-layout">
+          <!-- LEFT: Guide panel -->
+          <div class="orig-guide-panel">
+            <div class="orig-guide-tabs">
+              <button class="orig-guide-tab active" data-guide="crane">🦢 crane</button>
+              <button class="orig-guide-tab" data-guide="lotus">🌸 lotus</button>
+              <button class="orig-guide-tab" data-guide="boat">⛵ boat</button>
+            </div>
+
+            <div class="guide-content active" id="guide-crane">
+              <div class="guide-step-visual" id="crane-step-svg"></div>
+              <div class="guide-step-counter">step <span id="crane-step-num">1</span> <span class="guide-sep">of</span> <span id="crane-step-total">8</span></div>
+              <p class="guide-step-desc" id="crane-step-desc"></p>
+              <div class="guide-controls">
+                <button class="crane-btn" id="crane-prev" disabled>← back</button>
+                <button class="crane-btn primary" id="crane-next">next →</button>
+              </div>
+            </div>
+
+            <div class="guide-content" id="guide-lotus">
+              <div class="guide-step-visual" id="lotus-step-svg"></div>
+              <div class="guide-step-counter">step <span id="lotus-step-num">1</span> <span class="guide-sep">of</span> <span id="lotus-step-total">6</span></div>
+              <p class="guide-step-desc" id="lotus-step-desc"></p>
+              <div class="guide-controls">
+                <button class="crane-btn" id="lotus-prev" disabled>← back</button>
+                <button class="crane-btn primary" id="lotus-next">next →</button>
+              </div>
+            </div>
+
+            <div class="guide-content" id="guide-boat">
+              <div class="guide-step-visual" id="boat-step-svg"></div>
+              <div class="guide-step-counter">step <span id="boat-step-num">1</span> <span class="guide-sep">of</span> <span id="boat-step-total">7</span></div>
+              <p class="guide-step-desc" id="boat-step-desc"></p>
+              <div class="guide-controls">
+                <button class="crane-btn" id="boat-prev" disabled>← back</button>
+                <button class="crane-btn primary" id="boat-next">next →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Simulator -->
+          <div class="orig-sim-panel">
+            <div class="orig-sim-header">
+              <span class="orig-sim-title">fold it yourself</span>
+              <div class="orig-sim-fold-types">
+                <button class="sim-mode-btn active" id="fold-valley">⌄ valley</button>
+                <button class="sim-mode-btn" id="fold-mountain">⌃ mountain</button>
+                <button class="sim-mode-btn" id="fold-crease">◇ crease</button>
+              </div>
+              <div class="orig-sim-actions">
+                <button class="sim-action-btn" id="fold-undo" title="undo">↩</button>
+                <button class="sim-action-btn" id="fold-reset" title="reset">↺</button>
+              </div>
+            </div>
+            <canvas id="origami-canvas"></canvas>
+            <div class="sim-status-row">
+              <span class="sim-hint" id="sim-hint">Click two points to draw a fold line</span>
+              <span class="sim-folds-count"><span id="fold-count">0</span> folds</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div><!-- /#sec-origami -->
+
+    <!-- ============================================================
+         GAMES SECTION
+         ============================================================ -->
+    <div class="top-section" id="sec-games">
+      <div class="games-hub">
+        <div class="section-header" style="padding: 3rem 5vw 0;">
+          <svg class="section-squiggle" width="60" height="14" viewBox="0 0 60 14" fill="none">
+            <path d="M 2 7 C 10 2, 18 12, 30 7 C 42 2, 50 12, 58 7" stroke="var(--lavender)" stroke-width="2" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="section-eyebrow">games · play to explore</span>
+        </div>
+        <div class="games-hub-inner">
+          <p class="games-hub-desc">These also cycle in as challenges for unlocking projects.</p>
+          <div class="games-selector">
+            <button class="game-card active" data-game="wordle">
+              <span class="game-card-icon">🟩</span>
+              <span class="game-card-name">Wordle</span>
+              <span class="game-card-desc">5-letter word, 6 guesses</span>
+            </button>
+            <button class="game-card" data-game="connections">
+              <span class="game-card-icon">🔗</span>
+              <span class="game-card-name">Connections</span>
+              <span class="game-card-desc">Group 16 words</span>
+            </button>
+            <button class="game-card" data-game="pinpoint">
+              <span class="game-card-icon">📍</span>
+              <span class="game-card-name">Pinpoint</span>
+              <span class="game-card-desc">Guess the category</span>
+            </button>
+            <button class="game-card" data-game="queens">
+              <span class="game-card-icon">♛</span>
+              <span class="game-card-name">Queens</span>
+              <span class="game-card-desc">Logic grid puzzle</span>
+            </button>
+            <button class="game-card" data-game="mathlab">
+              <span class="game-card-icon">∫</span>
+              <span class="game-card-name">Math Lab</span>
+              <span class="game-card-desc">Arithmetic → calculus</span>
+            </button>
+          </div>
+          <div class="games-arena" id="games-arena"></div>
+        </div>
+      </div>
+    </div><!-- /#sec-games -->
+
   </div><!-- /#portfolio -->
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>

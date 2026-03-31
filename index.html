@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ryan Qi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Hidden SVG filters -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+    <defs>
+      <filter id="roughen" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.055 0.065" numOctaves="2" seed="3" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="roughen-heavy" x="-8%" y="-8%" width="116%" height="116%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04 0.055" numOctaves="3" seed="7" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="pencil-glow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="3" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- ============================================================
+       GATE SCREEN
+       ============================================================ -->
+  <div id="gate">
+    <!-- Background doodles -->
+    <div class="gate-doodles" aria-hidden="true">
+      <svg class="doodle doodle-tl" width="180" height="180" viewBox="0 0 180 180" fill="none">
+        <path d="M 20 160 C 40 100, 80 60, 160 20" stroke="var(--ink-faint)" stroke-width="1.5" stroke-dasharray="5 8"/>
+        <circle cx="20" cy="160" r="4" stroke="var(--ink-faint)" stroke-width="1.5" fill="none"/>
+        <path d="M 50 20 L 55 30 M 50 20 L 60 22" stroke="var(--ink-faint)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M 90 140 L 95 150 M 90 140 L 100 142" stroke="var(--ink-faint)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M 140 60 C 142 55, 148 55, 150 60 C 152 65, 148 70, 143 68 C 138 66, 138 62, 140 60 Z" stroke="var(--ink-faint)" stroke-width="1.5" fill="none"/>
+      </svg>
+      <svg class="doodle doodle-tr" width="180" height="180" viewBox="0 0 180 180" fill="none">
+        <path d="M 30 30 C 60 80, 100 120, 160 150" stroke="var(--ink-faint)" stroke-width="1.5" stroke-dasharray="3 10"/>
+        <path d="M 100 30 L 106 40 L 100 50 L 94 40 Z" stroke="var(--pencil)" stroke-width="1.5" fill="none" opacity="0.4"/>
+        <path d="M 150 80 m -8 0 l 8 -14 l 8 14 Z" stroke="var(--ink-faint)" stroke-width="1.5" fill="none"/>
+      </svg>
+      <svg class="doodle doodle-bl" width="180" height="180" viewBox="0 0 180 180" fill="none">
+        <path d="M 30 40 C 70 80, 110 120, 150 160" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="8 6"/>
+        <path d="M 60 120 C 62 115, 68 115, 70 120 C 72 125, 68 130, 63 128 C 58 126, 58 122, 60 120 Z" stroke="var(--cobalt)" stroke-width="1.5" fill="none" opacity="0.4"/>
+      </svg>
+      <svg class="doodle doodle-br" width="180" height="180" viewBox="0 0 180 180" fill="none">
+        <path d="M 20 30 L 160 160" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="4 12"/>
+        <path d="M 120 40 L 124 52 L 112 52 Z" stroke="var(--rouge)" stroke-width="1.5" fill="none" opacity="0.4"/>
+      </svg>
+    </div>
+
+    <div class="gate-inner">
+      <div class="gate-title">
+        <span class="gate-name">Ryan Qi</span>
+        <div class="gate-sub">prove you're interesting.</div>
+      </div>
+
+      <div class="gate-card" id="game-container">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div class="gate-hint">refresh for a different challenge ↻</div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PORTFOLIO
+       ============================================================ -->
+  <div id="portfolio">
+
+    <!-- Three.js canvas -->
+    <canvas id="bg"></canvas>
+
+    <!-- Hand-drawn astronaut -->
+    <div id="faller" aria-hidden="true">
+      <svg id="astronaut-svg" width="150" height="220" viewBox="0 0 150 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Helmet outer (hand-drawn irregular path) -->
+        <path d="M 75 14 C 96 12, 112 24, 111 46 C 110 67, 96 80, 74 79 C 52 78, 37 65, 38 44 C 39 23, 55 16, 75 14 Z"
+              stroke="var(--ink)" stroke-width="2.8" fill="none" stroke-linecap="round" filter="url(#pencil-glow)"/>
+        <!-- Sketch corner tick on helmet -->
+        <path d="M 111 46 L 116 50" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+        <path d="M 38 44 L 32 48" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+
+        <!-- Visor (organic oval) -->
+        <path d="M 63 34 C 74 30, 88 33, 91 47 C 94 60, 82 70, 68 68 C 54 66, 49 55, 53 43 C 56 34, 63 34, 63 34 Z"
+              fill="rgba(240,232,213,0.07)" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round"/>
+        <!-- Visor glare -->
+        <path d="M 62 37 C 65 40, 66 46, 63 50" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round" opacity="0.45"/>
+
+        <!-- Neck collar -->
+        <path d="M 58 79 L 55 90 M 75 79 L 75 90 M 92 79 L 95 90" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M 53 89 C 55 87, 95 87, 97 89" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+        <!-- Body suit (deliberately imperfect rectangle) -->
+        <path d="M 37 96 C 35 93, 33 108, 34 122 L 35 155 C 36 163, 48 170, 68 170 C 88 170, 108 164, 110 155 L 111 122 C 112 108, 110 93, 108 96 Z"
+              stroke="var(--ink)" stroke-width="2.8" fill="rgba(240,232,213,0.025)" stroke-linejoin="round"/>
+        <!-- Suit wrinkle lines -->
+        <path d="M 45 120 C 50 118, 60 120, 65 118" stroke="var(--ink)" stroke-width="1" stroke-linecap="round" opacity="0.3" fill="none"/>
+        <path d="M 90 124 C 95 122, 100 124, 105 122" stroke="var(--ink)" stroke-width="1" stroke-linecap="round" opacity="0.3" fill="none"/>
+
+        <!-- Chest panel (rough rectangle with overshoot marks) -->
+        <path d="M 52 106 L 51 130 L 95 129 L 96 105 Z" stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,232,213,0.05)" stroke-linejoin="round"/>
+        <!-- Panel overshoot marks -->
+        <path d="M 52 106 L 49 103" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+        <path d="M 96 105 L 99 102" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+        <path d="M 51 130 L 48 133" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+        <path d="M 95 129 L 98 132" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+
+        <!-- Status lights (hand-drawn circles) -->
+        <path d="M 62 118 C 63 116, 66 116, 67 118 C 68 120, 67 122, 65 122 C 63 122, 61 120, 62 118 Z" fill="var(--rouge)" stroke="var(--rouge)" stroke-width="0.5"/>
+        <path d="M 72 118 C 73 116, 76 116, 77 118 C 78 120, 77 122, 75 122 C 73 122, 71 120, 72 118 Z" fill="var(--cobalt)" stroke="var(--cobalt)" stroke-width="0.5"/>
+        <path d="M 82 118 C 83 116, 86 116, 87 118 C 88 120, 87 122, 85 122 C 83 122, 81 120, 82 118 Z" fill="var(--sage)" stroke="var(--sage)" stroke-width="0.5"/>
+
+        <!-- Jetpack (slightly rotated/imperfect) -->
+        <path d="M 111 100 L 112 98 L 132 101 L 131 136 L 109 133 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.03)" stroke-linejoin="round"/>
+        <!-- Jetpack vents -->
+        <path d="M 116 130 L 114 142" stroke="var(--rouge)" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M 126 131 L 128 143" stroke="var(--rouge)" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- Jetpack fire scribble -->
+        <path d="M 112 143 C 114 150, 118 155, 116 162 C 114 157, 112 152, 115 148" stroke="var(--pencil)" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+        <path d="M 126 143 C 128 150, 132 156, 130 163 C 128 158, 126 153, 129 149" stroke="var(--pencil)" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+
+        <!-- Left arm (organic, reaching out) -->
+        <path d="M 37 110 C 28 114, 14 128, 8 140 C 4 150, 8 160, 18 162" stroke="var(--ink)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+        <!-- Left glove (sketched irregular shape) -->
+        <path d="M 16 161 C 6 163, 0 170, 3 177 C 6 184, 18 186, 26 182 C 32 178, 30 168, 16 161 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
+
+        <!-- Right arm (reaching forward/up) -->
+        <path d="M 108 106 C 120 110, 135 120, 140 135 C 144 146, 140 156, 130 158" stroke="var(--ink)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+        <!-- Right glove -->
+        <path d="M 131 157 C 140 159, 147 166, 145 173 C 143 180, 131 182, 123 178 C 116 174, 117 164, 131 157 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
+
+        <!-- Left leg -->
+        <path d="M 54 170 C 52 182, 48 196, 46 208" stroke="var(--ink)" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+        <!-- Left boot (sketchy shoe shape) -->
+        <path d="M 40 207 C 35 209, 32 216, 37 220 C 42 224, 56 223, 60 219 C 63 216, 58 209, 46 208 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
+
+        <!-- Right leg -->
+        <path d="M 88 170 C 90 182, 94 196, 97 208" stroke="var(--ink)" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+        <!-- Right boot -->
+        <path d="M 92 207 C 98 210, 106 215, 103 221 C 100 226, 86 225, 82 220 C 79 217, 84 209, 92 207 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
+
+        <!-- Floating stars around astronaut -->
+        <path d="M 22 90 L 23 94 M 22 90 L 26 91 M 22 90 L 23 86 M 22 90 L 18 91" stroke="var(--pencil)" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+        <path d="M 135 85 L 136 88 M 135 85 L 138 86 M 135 85 L 136 82 M 135 85 L 132 86" stroke="var(--cobalt)" stroke-width="1.3" stroke-linecap="round" opacity="0.5"/>
+        <path d="M 18 45 L 19 48 M 18 45 L 21 46 M 18 45 L 19 42 M 18 45 L 15 46" stroke="var(--rouge)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+      </svg>
+      <div class="faller-trail"></div>
+    </div>
+
+    <!-- Grain overlay -->
+    <div class="grain-overlay" aria-hidden="true"></div>
+
+    <!-- Custom cursor -->
+    <div id="cursor" aria-hidden="true"></div>
+
+    <main>
+
+      <!-- HERO -->
+      <section class="hero" id="hero">
+        <div class="hero-eyebrow">portfolio · 2026</div>
+
+        <div class="hero-body">
+          <h1 class="hero-name">
+            <span class="name-line name-solid">RYAN</span>
+            <span class="name-line name-outline">QI</span>
+          </h1>
+          <div class="hero-right">
+            <div class="hero-roles">
+              builder <span class="dot">·</span> hacker <span class="dot">·</span> ml nerd
+            </div>
+            <p class="hero-bio">Making weird things real —<br><em>one hackathon at a time.</em></p>
+            <nav class="hero-nav">
+              <a href="https://github.com/Lushenwar" target="_blank" rel="noopener" class="nav-link">GitHub ↗</a>
+              <a href="https://www.linkedin.com/in/ryanqi1/" target="_blank" rel="noopener" class="nav-link">LinkedIn ↗</a>
+              <a href="mailto:ryan.qi@mail.utoronto.ca" class="nav-link">Email ↗</a>
+            </nav>
+          </div>
+        </div>
+
+        <!-- Hand-drawn arrow pointing down -->
+        <div class="scroll-indicator">
+          <svg width="120" height="40" viewBox="0 0 120 40" fill="none">
+            <path d="M 10 20 C 30 18, 70 22, 100 20" stroke="var(--ink-muted)" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M 94 12 C 98 16, 102 20, 94 28" stroke="var(--ink-muted)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="scroll-label">scroll to explore</span>
+        </div>
+      </section>
+
+      <!-- PROJECTS -->
+      <section class="projects-section" id="projects">
+        <!-- Hand-drawn section header -->
+        <div class="section-header">
+          <svg class="section-squiggle" width="60" height="14" viewBox="0 0 60 14" fill="none">
+            <path d="M 2 7 C 10 2, 18 12, 30 7 C 42 2, 50 12, 58 7" stroke="var(--pencil)" stroke-width="2" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="section-eyebrow">selected builds</span>
+        </div>
+        <div class="projects-list" id="projects-list">
+          <!-- Injected by JS -->
+        </div>
+      </section>
+
+      <!-- ORIGAMI -->
+      <section class="origami-section" id="origami">
+        <div class="section-header">
+          <svg class="section-squiggle" width="60" height="14" viewBox="0 0 60 14" fill="none">
+            <path d="M 2 7 C 10 2, 18 12, 30 7 C 42 2, 50 12, 58 7" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="section-eyebrow">take a break · fold something</span>
+        </div>
+
+        <!-- Legend -->
+        <div class="orig-legend" aria-label="fold type legend">
+          <span class="legend-heading">legend</span>
+          <div class="legend-item">
+            <svg width="56" height="18" viewBox="0 0 56 18" fill="none" aria-hidden="true">
+              <line x1="2" y1="9" x2="54" y2="9" stroke="var(--cobalt)" stroke-width="1.8" stroke-dasharray="7 5"/>
+              <path d="M 25 3 L 28 9 L 31 3" stroke="var(--cobalt)" stroke-width="1.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+            <span>valley fold</span>
+          </div>
+          <div class="legend-item">
+            <svg width="56" height="18" viewBox="0 0 56 18" fill="none" aria-hidden="true">
+              <path d="M 2 9 L 9 9 M 12 9 L 14 9 M 17 9 L 24 9 M 27 9 L 29 9 M 32 9 L 39 9 M 42 9 L 44 9 M 47 9 L 54 9"
+                    stroke="var(--rouge)" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M 25 15 L 28 9 L 31 15" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+            <span>mountain fold</span>
+          </div>
+          <div class="legend-item">
+            <svg width="56" height="18" viewBox="0 0 56 18" fill="none" aria-hidden="true">
+              <line x1="2" y1="9" x2="54" y2="9" stroke="var(--ink-muted)" stroke-width="1"/>
+              <circle cx="12" cy="9" r="2" fill="var(--ink-muted)" opacity="0.5"/>
+              <circle cx="28" cy="9" r="2" fill="var(--ink-muted)" opacity="0.5"/>
+              <circle cx="44" cy="9" r="2" fill="var(--ink-muted)" opacity="0.5"/>
+            </svg>
+            <span>existing crease</span>
+          </div>
+          <div class="legend-item">
+            <svg width="56" height="18" viewBox="0 0 56 18" fill="none" aria-hidden="true">
+              <path d="M 10 14 L 28 4 L 46 14" stroke="var(--pencil)" stroke-width="1.5" fill="none" stroke-linejoin="round" stroke-linecap="round" opacity="0.7"/>
+              <path d="M 4 14 L 28 2 L 52 14" stroke="var(--pencil)" stroke-width="0.8" fill="none" stroke-linejoin="round" stroke-linecap="round" opacity="0.3"/>
+            </svg>
+            <span>fold direction</span>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="orig-tabs" role="tablist">
+          <button class="orig-tab active" data-panel="orig-sim" role="tab" aria-selected="true">origami simulator</button>
+          <button class="orig-tab" data-panel="orig-guide" role="tab" aria-selected="false">crane guide</button>
+        </div>
+
+        <!-- Simulator Panel -->
+        <div class="orig-panel active" id="orig-sim" role="tabpanel">
+          <div class="sim-layout">
+
+            <div class="sim-controls">
+              <div class="sim-control-group">
+                <span class="sim-label">fold type</span>
+                <div class="sim-mode-row">
+                  <button class="sim-mode-btn active" id="fold-valley">
+                    <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
+                      <line x1="1" y1="7" x2="21" y2="7" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5 3"/>
+                      <path d="M 9 2 L 11 7 L 13 2" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+                    </svg>
+                    valley
+                  </button>
+                  <button class="sim-mode-btn" id="fold-mountain">
+                    <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
+                      <path d="M 1 7 L 4 7 M 6 7 L 7 7 M 9 7 L 12 7 M 14 7 L 15 7 M 17 7 L 21 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      <path d="M 9 12 L 11 7 L 13 12" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+                    </svg>
+                    mountain
+                  </button>
+                </div>
+              </div>
+
+              <div class="sim-control-group">
+                <span class="sim-label">actions</span>
+                <div class="sim-action-row">
+                  <button class="sim-action-btn" id="fold-undo">↩ undo</button>
+                  <button class="sim-action-btn" id="fold-reset">↺ reset</button>
+                </div>
+              </div>
+
+              <div class="sim-hint-box">
+                <div class="sim-hint-icon">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="7" stroke="var(--ink-muted)" stroke-width="1"/>
+                    <path d="M8 5 L8 9 M8 11 L8 11" stroke="var(--ink-muted)" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <p class="sim-hint" id="sim-hint">Click two points on the paper to place a fold line</p>
+              </div>
+
+              <div class="sim-folds-count">
+                <span id="fold-count">0</span> folds applied
+              </div>
+            </div>
+
+            <div class="sim-canvas-wrap">
+              <canvas id="origami-canvas" aria-label="origami paper folding canvas"></canvas>
+              <div class="sim-canvas-label">click anywhere on the paper to begin</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Crane Guide Panel -->
+        <div class="orig-panel" id="orig-guide" role="tabpanel">
+          <div class="crane-layout">
+            <div class="crane-step-visual" id="crane-step-svg"><!-- injected by JS --></div>
+            <div class="crane-right">
+              <div class="crane-step-counter">
+                step <span id="crane-step-num">1</span> <span class="crane-sep">of</span> <span id="crane-step-total">8</span>
+              </div>
+              <p class="crane-step-desc" id="crane-step-desc">Start with a square sheet of paper, colored side down.</p>
+              <div class="crane-controls">
+                <button class="crane-btn" id="crane-prev" disabled>← back</button>
+                <button class="crane-btn primary" id="crane-next">next →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ABOUT -->
+      <section class="about-section" id="about">
+        <div class="section-header">
+          <svg class="section-squiggle" width="60" height="14" viewBox="0 0 60 14" fill="none">
+            <path d="M 2 7 C 10 2, 18 12, 30 7 C 42 2, 50 12, 58 7" stroke="var(--cobalt)" stroke-width="2" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="section-eyebrow">about me</span>
+        </div>
+        <div class="about-inner">
+          <h2 class="about-heading">Building at the<br><em>intersection</em> of<br>ML &amp; experience.</h2>
+          <div class="about-right">
+            <p class="about-text">
+              CS student at the University of Toronto obsessed with hackathons,
+              machine learning, and shipping things that shouldn't exist yet.
+              I've competed at DeerHacks, JAMHacks, GenAI Genesis, DeltaHacks, CxC, Hack404,
+              and more — always chasing the 24-hour deadline rush.
+            </p>
+            <div class="about-stats">
+              <div class="stat">
+                <span class="stat-num">8+</span>
+                <span class="stat-label">hackathons</span>
+              </div>
+              <div class="stat">
+                <span class="stat-num">3</span>
+                <span class="stat-label">awards won</span>
+              </div>
+              <div class="stat">
+                <span class="stat-num">10</span>
+                <span class="stat-label">projects shipped</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="footer-inner">
+          <div class="footer-name">ryan qi</div>
+          <nav class="footer-links">
+            <a href="https://github.com/Lushenwar" target="_blank" rel="noopener">github</a>
+            <a href="https://www.linkedin.com/in/ryanqi1/" target="_blank" rel="noopener">linkedin</a>
+            <a href="mailto:ryan.qi@mail.utoronto.ca">email</a>
+          </nav>
+          <div class="footer-copy">drawn with love · 2026</div>
+        </div>
+      </footer>
+    </main>
+  </div><!-- /#portfolio -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

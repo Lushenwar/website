@@ -81,77 +81,95 @@
 
     <!-- Hand-drawn astronaut -->
     <div id="faller" aria-hidden="true">
-      <svg id="astronaut-svg" width="150" height="220" viewBox="0 0 150 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Helmet outer (hand-drawn irregular path) -->
-        <path d="M 75 14 C 96 12, 112 24, 111 46 C 110 67, 96 80, 74 79 C 52 78, 37 65, 38 44 C 39 23, 55 16, 75 14 Z"
-              stroke="var(--ink)" stroke-width="2.8" fill="none" stroke-linecap="round" filter="url(#pencil-glow)"/>
-        <!-- Sketch corner tick on helmet -->
-        <path d="M 111 46 L 116 50" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
-        <path d="M 38 44 L 32 48" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+      <svg id="astronaut-svg" width="120" height="160" viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Helmet — big round bubble helmet -->
+        <path d="M 60 8 C 84 7, 102 22, 101 48 C 100 74, 82 88, 60 88 C 38 88, 20 74, 19 48 C 18 22, 36 9, 60 8 Z"
+              stroke="var(--ink)" stroke-width="2.5" fill="rgba(240,232,213,0.04)" stroke-linecap="round" filter="url(#pencil-glow)"/>
+        <!-- Helmet highlight arc (top-left sheen) -->
+        <path d="M 28 24 C 32 16, 44 10, 58 10" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.3"/>
+        <!-- Sketch overrun ticks -->
+        <path d="M 101 48 L 107 46" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+        <path d="M 19 48 L 13 46" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
 
-        <!-- Visor (organic oval) -->
-        <path d="M 63 34 C 74 30, 88 33, 91 47 C 94 60, 82 70, 68 68 C 54 66, 49 55, 53 43 C 56 34, 63 34, 63 34 Z"
-              fill="rgba(240,232,213,0.07)" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round"/>
-        <!-- Visor glare -->
-        <path d="M 62 37 C 65 40, 66 46, 63 50" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round" opacity="0.45"/>
+        <!-- Visor — large rounded rect, slightly tilted -->
+        <path d="M 34 28 C 36 22, 84 22, 86 28 C 88 34, 88 62, 86 68 C 84 74, 36 74, 34 68 C 32 62, 32 34, 34 28 Z"
+              fill="rgba(96,165,212,0.10)" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round"/>
+        <!-- Visor glare streaks -->
+        <path d="M 38 30 C 40 35, 40 42, 38 48" stroke="var(--ink)" stroke-width="1.4" stroke-linecap="round" opacity="0.35" fill="none"/>
+        <path d="M 44 27 C 45 30, 45 35, 44 39" stroke="var(--ink)" stroke-width="1" stroke-linecap="round" opacity="0.2" fill="none"/>
 
-        <!-- Neck collar -->
-        <path d="M 58 79 L 55 90 M 75 79 L 75 90 M 92 79 L 95 90" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
-        <path d="M 53 89 C 55 87, 95 87, 97 89" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <!-- Face inside visor — cute expression -->
+        <!-- Eyes -->
+        <path d="M 46 44 C 47 42, 50 42, 51 44 C 52 46, 50 48, 48 48 C 46 48, 45 46, 46 44 Z"
+              fill="var(--ink)" stroke="none" opacity="0.85"/>
+        <path d="M 70 44 C 71 42, 74 42, 75 44 C 76 46, 74 48, 72 48 C 70 48, 69 46, 70 44 Z"
+              fill="var(--ink)" stroke="none" opacity="0.85"/>
+        <!-- Eye shine -->
+        <circle cx="50" cy="43" r="1.2" fill="rgba(240,232,213,0.9)"/>
+        <circle cx="74" cy="43" r="1.2" fill="rgba(240,232,213,0.9)"/>
+        <!-- Smile -->
+        <path d="M 48 56 C 52 61, 68 61, 72 56" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.8"/>
 
-        <!-- Body suit (deliberately imperfect rectangle) -->
-        <path d="M 37 96 C 35 93, 33 108, 34 122 L 35 155 C 36 163, 48 170, 68 170 C 88 170, 108 164, 110 155 L 111 122 C 112 108, 110 93, 108 96 Z"
-              stroke="var(--ink)" stroke-width="2.8" fill="rgba(240,232,213,0.025)" stroke-linejoin="round"/>
-        <!-- Suit wrinkle lines -->
-        <path d="M 45 120 C 50 118, 60 120, 65 118" stroke="var(--ink)" stroke-width="1" stroke-linecap="round" opacity="0.3" fill="none"/>
-        <path d="M 90 124 C 95 122, 100 124, 105 122" stroke="var(--ink)" stroke-width="1" stroke-linecap="round" opacity="0.3" fill="none"/>
+        <!-- Neck ring -->
+        <path d="M 44 88 C 44 93, 76 93, 76 88" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <path d="M 43 93 L 43 100 M 60 93 L 60 100 M 77 93 L 77 100" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"/>
 
-        <!-- Chest panel (rough rectangle with overshoot marks) -->
-        <path d="M 52 106 L 51 130 L 95 129 L 96 105 Z" stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,232,213,0.05)" stroke-linejoin="round"/>
-        <!-- Panel overshoot marks -->
-        <path d="M 52 106 L 49 103" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
-        <path d="M 96 105 L 99 102" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
-        <path d="M 51 130 L 48 133" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
-        <path d="M 95 129 L 98 132" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+        <!-- Body suit — puffy rounded shape -->
+        <path d="M 26 104 C 22 102, 18 118, 20 136 C 21 150, 34 158, 60 158 C 86 158, 99 150, 100 136 C 102 118, 98 102, 94 104 Z"
+              stroke="var(--ink)" stroke-width="2.2" fill="rgba(240,232,213,0.03)" stroke-linejoin="round"/>
+        <!-- Suit horizontal segment lines (EVA suit ribbing) -->
+        <path d="M 22 122 C 35 120, 85 120, 98 122" stroke="var(--ink)" stroke-width="0.9" stroke-linecap="round" fill="none" opacity="0.25"/>
+        <path d="M 20 136 C 34 134, 86 134, 100 136" stroke="var(--ink)" stroke-width="0.9" stroke-linecap="round" fill="none" opacity="0.25"/>
 
-        <!-- Status lights (hand-drawn circles) -->
-        <path d="M 62 118 C 63 116, 66 116, 67 118 C 68 120, 67 122, 65 122 C 63 122, 61 120, 62 118 Z" fill="var(--rouge)" stroke="var(--rouge)" stroke-width="0.5"/>
-        <path d="M 72 118 C 73 116, 76 116, 77 118 C 78 120, 77 122, 75 122 C 73 122, 71 120, 72 118 Z" fill="var(--cobalt)" stroke="var(--cobalt)" stroke-width="0.5"/>
-        <path d="M 82 118 C 83 116, 86 116, 87 118 C 88 120, 87 122, 85 122 C 83 122, 81 120, 82 118 Z" fill="var(--sage)" stroke="var(--sage)" stroke-width="0.5"/>
+        <!-- Chest patch / badge -->
+        <path d="M 46 108 L 46 126 L 74 126 L 74 108 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
+        <!-- Overshoot corners on patch -->
+        <path d="M 46 108 L 43 105" stroke="var(--ink)" stroke-width="1" stroke-linecap="round" opacity="0.4"/>
+        <path d="M 74 108 L 77 105" stroke="var(--ink)" stroke-width="1" stroke-linecap="round" opacity="0.4"/>
+        <!-- Status LEDs on patch -->
+        <circle cx="54" cy="117" r="2.5" fill="var(--rouge)" opacity="0.9"/>
+        <circle cx="61" cy="117" r="2.5" fill="var(--pencil)" opacity="0.9"/>
+        <circle cx="68" cy="117" r="2.5" fill="var(--sage)" opacity="0.9"/>
 
-        <!-- Jetpack (slightly rotated/imperfect) -->
-        <path d="M 111 100 L 112 98 L 132 101 L 131 136 L 109 133 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.03)" stroke-linejoin="round"/>
-        <!-- Jetpack vents -->
-        <path d="M 116 130 L 114 142" stroke="var(--rouge)" stroke-width="2.5" stroke-linecap="round"/>
-        <path d="M 126 131 L 128 143" stroke="var(--rouge)" stroke-width="2.5" stroke-linecap="round"/>
-        <!-- Jetpack fire scribble -->
-        <path d="M 112 143 C 114 150, 118 155, 116 162 C 114 157, 112 152, 115 148" stroke="var(--pencil)" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.7"/>
-        <path d="M 126 143 C 128 150, 132 156, 130 163 C 128 158, 126 153, 129 149" stroke="var(--pencil)" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+        <!-- Left arm — floating/waving up -->
+        <path d="M 26 112 C 16 108, 5 104, -2 98" stroke="var(--ink)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        <!-- Left glove — chunky mitten -->
+        <path d="M -4 95 C -12 90, -16 96, -12 103 C -8 110, 0 112, 6 108 C 10 104, 6 96, -4 95 Z"
+              stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
 
-        <!-- Left arm (organic, reaching out) -->
-        <path d="M 37 110 C 28 114, 14 128, 8 140 C 4 150, 8 160, 18 162" stroke="var(--ink)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
-        <!-- Left glove (sketched irregular shape) -->
-        <path d="M 16 161 C 6 163, 0 170, 3 177 C 6 184, 18 186, 26 182 C 32 178, 30 168, 16 161 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
-
-        <!-- Right arm (reaching forward/up) -->
-        <path d="M 108 106 C 120 110, 135 120, 140 135 C 144 146, 140 156, 130 158" stroke="var(--ink)" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+        <!-- Right arm — relaxed, floating down-right -->
+        <path d="M 94 112 C 104 116, 112 120, 118 116" stroke="var(--ink)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
         <!-- Right glove -->
-        <path d="M 131 157 C 140 159, 147 166, 145 173 C 143 180, 131 182, 123 178 C 116 174, 117 164, 131 157 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
+        <path d="M 120 113 C 128 108, 132 114, 128 121 C 124 128, 116 128, 112 124 C 108 120, 112 112, 120 113 Z"
+              stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
 
-        <!-- Left leg -->
-        <path d="M 54 170 C 52 182, 48 196, 46 208" stroke="var(--ink)" stroke-width="2.8" stroke-linecap="round" fill="none"/>
-        <!-- Left boot (sketchy shoe shape) -->
-        <path d="M 40 207 C 35 209, 32 216, 37 220 C 42 224, 56 223, 60 219 C 63 216, 58 209, 46 208 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
+        <!-- Legs — floating / crossed slightly -->
+        <path d="M 44 158 C 40 164, 36 152, 32 148" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+        <path d="M 76 158 C 82 163, 88 152, 90 148" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+        <!-- Boots -->
+        <path d="M 26 145 C 20 144, 16 150, 20 155 C 24 160, 36 160, 38 155 C 40 150, 34 144, 26 145 Z"
+              stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
+        <path d="M 94 145 C 100 144, 104 150, 100 155 C 96 160, 84 160, 82 155 C 80 150, 86 144, 94 145 Z"
+              stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
 
-        <!-- Right leg -->
-        <path d="M 88 170 C 90 182, 94 196, 97 208" stroke="var(--ink)" stroke-width="2.8" stroke-linecap="round" fill="none"/>
-        <!-- Right boot -->
-        <path d="M 92 207 C 98 210, 106 215, 103 221 C 100 226, 86 225, 82 220 C 79 217, 84 209, 92 207 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
+        <!-- Backpack thruster -->
+        <path d="M 92 106 L 96 104 L 114 108 L 112 136 L 92 132 Z"
+              stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,232,213,0.025)" stroke-linejoin="round"/>
+        <!-- Thruster nozzles -->
+        <path d="M 98 131 L 96 142" stroke="var(--rouge)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M 108 132 L 110 143" stroke="var(--rouge)" stroke-width="2" stroke-linecap="round"/>
+        <!-- Thruster flame -->
+        <path d="M 93 143 C 96 150, 100 154, 98 160 C 96 155, 94 150, 97 146" stroke="var(--pencil)" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.75"/>
+        <path d="M 109 143 C 111 150, 114 155, 112 161 C 110 156, 109 151, 112 147" stroke="var(--pencil)" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.75"/>
 
-        <!-- Floating stars around astronaut -->
-        <path d="M 22 90 L 23 94 M 22 90 L 26 91 M 22 90 L 23 86 M 22 90 L 18 91" stroke="var(--pencil)" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-        <path d="M 135 85 L 136 88 M 135 85 L 138 86 M 135 85 L 136 82 M 135 85 L 132 86" stroke="var(--cobalt)" stroke-width="1.3" stroke-linecap="round" opacity="0.5"/>
-        <path d="M 18 45 L 19 48 M 18 45 L 21 46 M 18 45 L 19 42 M 18 45 L 15 46" stroke="var(--rouge)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+        <!-- Floating sparkles / stars -->
+        <path d="M 14 70 L 15 74 M 14 70 L 18 71 M 14 70 L 15 66 M 14 70 L 10 71" stroke="var(--pencil)" stroke-width="1.4" stroke-linecap="round" opacity="0.65"/>
+        <path d="M 108 55 L 109 58 M 108 55 L 111 56 M 108 55 L 109 52 M 108 55 L 105 56" stroke="var(--cobalt)" stroke-width="1.2" stroke-linecap="round" opacity="0.55"/>
+        <path d="M 6 40 L 7 43 M 6 40 L 9 41 M 6 40 L 7 37 M 6 40 L 3 41" stroke="var(--rouge)" stroke-width="1" stroke-linecap="round" opacity="0.4"/>
+        <!-- Small dots -->
+        <circle cx="110" cy="90" r="1.5" fill="var(--pencil)" opacity="0.4"/>
+        <circle cx="5" cy="88" r="1" fill="var(--cobalt)" opacity="0.35"/>
+        <circle cx="100" cy="28" r="1.2" fill="var(--sage)" opacity="0.4"/>
       </svg>
       <div class="faller-trail"></div>
     </div>
@@ -167,6 +185,7 @@
       <div class="top-nav-tabs">
         <button class="top-tab active" data-section="sec-portfolio">portfolio</button>
         <button class="top-tab" data-section="sec-origami">origami</button>
+        <button class="top-tab" data-section="sec-graph">graph</button>
         <button class="top-tab" data-section="sec-games">games</button>
       </div>
     </nav>
@@ -205,6 +224,36 @@
           <span class="scroll-label">scroll to explore</span>
         </div>
       </section>
+
+      <!-- WINS TICKER -->
+      <div class="wins-ticker-wrap" aria-label="hackathon highlights">
+        <div class="wins-ticker-label">highlights</div>
+        <div class="wins-ticker-track">
+          <div class="wins-ticker-inner">
+            <span class="win-chip win-gold"><span class="win-icon">🏆</span>1st Place — GenAI Genesis <a href="https://devpost.com/software/eco-pulse-fpbo15" target="_blank" rel="noopener" class="win-link">Eco-Pulse ↗</a></span>
+            <span class="win-sep">·</span>
+            <span class="win-chip win-silver"><span class="win-icon">🥉</span>3rd Place — Hack404 <a href="https://devpost.com/software/beginner-track-portfolio" target="_blank" rel="noopener" class="win-link">Health Assistant ↗</a></span>
+            <span class="win-sep">·</span>
+            <span class="win-chip win-award"><span class="win-icon">★</span>Best Use of Auth0 — DeerHacks V <a href="https://devpost.com/software/pathfinder-6h8y1v" target="_blank" rel="noopener" class="win-link">LOCATR ↗</a></span>
+            <span class="win-sep">·</span>
+            <span class="win-chip win-award"><span class="win-icon">★</span>Best Use of Snowflake — CxC 2026 <a href="https://devpost.com/software/ifyshop" target="_blank" rel="noopener" class="win-link">ifyShop ↗</a></span>
+            <span class="win-sep">·</span>
+            <span class="win-chip win-finalist"><span class="win-icon">◈</span>Finalist · 4 tracks — YHacks <a href="https://devpost.com/software/fixmyfeed" target="_blank" rel="noopener" class="win-link">FixMyFeed ↗</a></span>
+            <span class="win-sep">·</span>
+            <!-- duplicate for seamless loop -->
+            <span class="win-chip win-gold"><span class="win-icon">🏆</span>1st Place — GenAI Genesis <a href="https://devpost.com/software/eco-pulse-fpbo15" target="_blank" rel="noopener" class="win-link">Eco-Pulse ↗</a></span>
+            <span class="win-sep">·</span>
+            <span class="win-chip win-silver"><span class="win-icon">🥉</span>3rd Place — Hack404 <a href="https://devpost.com/software/beginner-track-portfolio" target="_blank" rel="noopener" class="win-link">Health Assistant ↗</a></span>
+            <span class="win-sep">·</span>
+            <span class="win-chip win-award"><span class="win-icon">★</span>Best Use of Auth0 — DeerHacks V <a href="https://devpost.com/software/pathfinder-6h8y1v" target="_blank" rel="noopener" class="win-link">LOCATR ↗</a></span>
+            <span class="win-sep">·</span>
+            <span class="win-chip win-award"><span class="win-icon">★</span>Best Use of Snowflake — CxC 2026 <a href="https://devpost.com/software/ifyshop" target="_blank" rel="noopener" class="win-link">ifyShop ↗</a></span>
+            <span class="win-sep">·</span>
+            <span class="win-chip win-finalist"><span class="win-icon">◈</span>Finalist · 4 tracks — YHacks <a href="https://devpost.com/software/fixmyfeed" target="_blank" rel="noopener" class="win-link">FixMyFeed ↗</a></span>
+            <span class="win-sep">·</span>
+          </div>
+        </div>
+      </div>
 
       <!-- PROJECTS -->
       <section class="projects-section" id="projects">
@@ -431,6 +480,12 @@
                 <button class="sim-mode-btn" id="fold-mountain" title="Mountain fold: fold away from you">⌃ mountain</button>
                 <button class="sim-mode-btn" id="fold-crease" title="Crease &amp; unfold: mark without folding">◇ crease</button>
                 <button class="sim-mode-btn" id="fold-pleat" title="Pleat fold: valley + parallel mountain mark">≡ pleat</button>
+                <button class="sim-mode-btn" id="fold-inside-rev" title="Inside reverse: push tip inward between layers">↩ inside rev</button>
+                <button class="sim-mode-btn" id="fold-outside-rev" title="Outside reverse: bend tip outward over layers">↪ outside rev</button>
+                <button class="sim-mode-btn" id="fold-petal" title="Petal fold: opens flap into two symmetric points">⟡ petal</button>
+                <button class="sim-mode-btn" id="fold-squash" title="Squash fold: open and press a layered flap flat">◈ squash</button>
+                <button class="sim-mode-btn" id="fold-rabbit" title="Rabbit ear: three creases converge to a single point">☽ rabbit ear</button>
+                <button class="sim-mode-btn" id="fold-sink" title="Sink fold: push a corner inward inside the model">⇲ sink</button>
               </div>
               <div class="orig-sim-actions">
                 <button class="sim-action-btn" id="fold-undo" title="undo">↩</button>
@@ -446,6 +501,27 @@
         </div>
       </section>
     </div><!-- /#sec-origami -->
+
+    <!-- ============================================================
+         GRAPH SECTION
+         ============================================================ -->
+    <div class="top-section" id="sec-graph">
+      <section class="graph-section" style="padding: 3rem 5vw 6rem;">
+        <div class="section-header">
+          <svg class="section-squiggle" width="60" height="14" viewBox="0 0 60 14" fill="none">
+            <path d="M 2 7 C 10 2, 18 12, 30 7 C 42 2, 50 12, 58 7" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="section-eyebrow">project knowledge graph</span>
+        </div>
+        <p class="graph-desc">Nodes = projects · Edges = shared technology stack · Drag to rotate · Scroll to zoom · Click a node to explore</p>
+        <div class="graph-layout">
+          <canvas id="graph-canvas" class="graph-canvas"></canvas>
+          <div id="graph-info" class="graph-info">
+            <p class="gi-hint">Click a node to explore a project</p>
+          </div>
+        </div>
+      </section>
+    </div><!-- /#sec-graph -->
 
     <!-- ============================================================
          GAMES SECTION

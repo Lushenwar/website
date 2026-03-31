@@ -14,7 +14,7 @@ const PROJECTS = [
     award: '★ Best Use of Auth0',
     tech: ['Python', 'FastAPI', 'LangGraph', 'Next.js', 'Snowflake', 'Redis'],
     github: 'https://github.com/Lushenwar/LOCATR',
-    devpost: null,
+    devpost: 'https://devpost.com/software/pathfinder-6h8y1v',
     demo: null,
     color: '#60a5d4',
     type: 'hackathon',
@@ -28,7 +28,7 @@ const PROJECTS = [
     award: '🏆 1st Place',
     tech: ['TypeScript', 'React', 'Python', 'FastAPI', 'Gemini', 'Leaflet', 'Google Maps'],
     github: 'https://github.com/Lushenwar/Eco-Pulse',
-    devpost: null,
+    devpost: 'https://devpost.com/software/eco-pulse-fpbo15',
     demo: null,
     color: '#7ab87a',
     type: 'hackathon',
@@ -70,7 +70,7 @@ const PROJECTS = [
     award: '★ Best Use of Snowflake',
     tech: ['Python', 'FastAPI', 'Gemini', 'Snowflake', 'Tavily', 'React', 'Auth0'],
     github: 'https://github.com/kyle-su1/ifyShop',
-    devpost: null,
+    devpost: 'https://devpost.com/software/ifyshop',
     demo: null,
     color: '#f5c430',
     type: 'hackathon',
@@ -94,11 +94,11 @@ const PROJECTS = [
     name: 'FIXMYFEED',
     tagline: 'Your feed, rewired.',
     description: 'Behavior-aware social media filter that triages reels in real time — deciding SKIP, WAIT, or LIKE_AND_STAY via a multi-agent LLM pipeline. Uses grayscale as a friction budget, logs behavioral analytics, and provides AI coaching insights through a neural map dashboard.',
-    hackathon: null,
-    award: null,
+    hackathon: 'YHacks',
+    award: '🏆 Finalist · 4 tracks',
     tech: ['TypeScript', 'FastAPI', 'Python', 'Supabase', 'Chrome Extension', 'Lava Models'],
     github: 'https://github.com/thejonathangu/FixMyFeed',
-    devpost: null,
+    devpost: 'https://devpost.com/software/fixmyfeed',
     demo: 'https://fix-my-feed.vercel.app',
     color: '#f0984e',
     type: 'hackathon',
@@ -108,11 +108,11 @@ const PROJECTS = [
     name: 'SPOTLIGHT',
     tagline: 'Stop interrupting content. Be part of it.',
     description: 'AI platform that detects natural product placement opportunities inside video scenes — tables, shelves, billboards, handheld items — and seamlessly inserts brand products using Gemini + FFmpeg. Connects creators with brands through a dynamic marketplace with Backboard-powered persistent campaign memory.',
-    hackathon: null,
+    hackathon: 'HackCanada',
     award: null,
     tech: ['TypeScript', 'Python', 'Gemini', 'FFmpeg', 'Backboard', 'FastAPI'],
     github: 'https://github.com/HetarthP/Spotlight',
-    devpost: null,
+    devpost: 'https://devpost.com/software/spotlight-akypow',
     demo: null,
     color: '#e05555',
     type: 'hackathon',
@@ -137,10 +137,10 @@ const PROJECTS = [
     tagline: 'Your AI-powered daily life companion.',
     description: 'Smart multi-tab web app combining GPT-3.5 mental health chat, customizable reminders with audio/browser alerts, and an interactive calendar. Features offline fallback responses, priority-based categorization, and persistent chat history. Built at Hack404.',
     hackathon: 'Hack404',
-    award: null,
+    award: '🥉 3rd Place · Beginner Stream',
     tech: ['JavaScript', 'HTML/CSS', 'OpenAI GPT-3.5', 'Web APIs'],
     github: 'https://github.com/Lushenwar/HealthAssistant',
-    devpost: null,
+    devpost: 'https://devpost.com/software/beginner-track-portfolio',
     demo: 'https://lushenwar.github.io/HealthAssistant/',
     color: '#7ab87a',
     type: 'hackathon',
@@ -1260,9 +1260,15 @@ function initSimulator() {
     creases.forEach(c => {
       const s=rotPt(c.p1,rotation), e=rotPt(c.p2,rotation);
       ctx.beginPath(); ctx.moveTo(s.x,s.y); ctx.lineTo(e.x,e.y);
-      if      (c.type==='valley')   { ctx.strokeStyle='rgba(96,165,212,0.75)';  ctx.setLineDash([7,4]); }
-      else if (c.type==='mountain') { ctx.strokeStyle='rgba(224,85,85,0.75)';   ctx.setLineDash([2,4]); }
-      else                          { ctx.strokeStyle='rgba(240,232,213,0.35)'; ctx.setLineDash([3,7]); }
+      if      (c.type==='valley')      { ctx.strokeStyle='rgba(96,165,212,0.75)';  ctx.setLineDash([7,4]); }
+      else if (c.type==='mountain')    { ctx.strokeStyle='rgba(224,85,85,0.75)';   ctx.setLineDash([2,4]); }
+      else if (c.type==='inside-rev')  { ctx.strokeStyle='rgba(96,165,212,0.85)';  ctx.setLineDash([5,3,2,3]); }
+      else if (c.type==='outside-rev') { ctx.strokeStyle='rgba(224,85,85,0.85)';   ctx.setLineDash([5,3,2,3]); }
+      else if (c.type==='petal')       { ctx.strokeStyle='rgba(122,184,122,0.80)'; ctx.setLineDash([6,3]); }
+      else if (c.type==='squash')      { ctx.strokeStyle='rgba(192,143,255,0.80)'; ctx.setLineDash([4,4]); }
+      else if (c.type==='rabbit')      { ctx.strokeStyle='rgba(245,196,48,0.80)';  ctx.setLineDash([4,2]); }
+      else if (c.type==='sink')        { ctx.strokeStyle='rgba(76,205,196,0.80)';  ctx.setLineDash([2,2]); }
+      else                             { ctx.strokeStyle='rgba(240,232,213,0.35)'; ctx.setLineDash([3,7]); }
       ctx.lineWidth=1.5; ctx.stroke(); ctx.setLineDash([]);
     });
 
@@ -1289,11 +1295,16 @@ function initSimulator() {
     if (pending && target) {
       const p1s=rotPt(pending,rotation), p2s=rotPt(target,rotation);
       // Preview fold line
-      const LC = foldMode==='valley'?'rgba(96,165,212,0.95)':foldMode==='mountain'?'rgba(224,85,85,0.95)':foldMode==='pleat'?'rgba(122,184,122,0.95)':'rgba(240,232,213,0.7)';
+      const LC = foldMode==='valley'||foldMode==='inside-rev' ? 'rgba(96,165,212,0.95)' :
+                 foldMode==='mountain'||foldMode==='outside-rev' ? 'rgba(224,85,85,0.95)' :
+                 foldMode==='pleat'||foldMode==='petal' ? 'rgba(122,184,122,0.95)' :
+                 foldMode==='squash' ? 'rgba(192,143,255,0.95)' :
+                 foldMode==='rabbit' ? 'rgba(245,196,48,0.95)' :
+                 foldMode==='sink'   ? 'rgba(76,205,196,0.95)' : 'rgba(240,232,213,0.7)';
       ctx.beginPath(); ctx.moveTo(p1s.x,p1s.y); ctx.lineTo(p2s.x,p2s.y);
       ctx.strokeStyle=LC; ctx.setLineDash([5,3]); ctx.lineWidth=2; ctx.stroke(); ctx.setLineDash([]);
       // Ghost paper (reflected position)
-      if (foldMode!=='crease') {
+      if (foldMode!=='crease' && foldMode!=='rabbit' && foldMode!=='sink') {
         const {far} = clipPoly(paper, pending, target);
         if (far.length>=3) {
           const ghost=far.map(p=>reflectPt(p, pending, target));
@@ -1347,13 +1358,20 @@ function initSimulator() {
     if (near.length<3 || far.length<3) {
       setHint('Fold line must cross the paper edge to edge — try again'); render(); return;
     }
-    const isCrease = foldMode==='crease';
-    const isPleat  = foldMode==='pleat';
+    const isCrease    = foldMode==='crease';
+    const isPleat     = foldMode==='pleat';
+    const isRabbit    = foldMode==='rabbit';
+    const isSink      = foldMode==='sink';
+    const isPetal     = foldMode==='petal';
+    const isSquash    = foldMode==='squash';
+    const isInsideRev = foldMode==='inside-rev';
+    const isOutsideRev= foldMode==='outside-rev';
+    const noFold      = isCrease || isRabbit || isSink;
     const targetTheta = (foldAngle/180)*Math.PI;
-    const animTheta   = isCrease ? Math.PI*0.36 : targetTheta;
+    const animTheta   = noFold ? Math.PI*0.36 : targetTheta;
 
     animating=true;
-    setHint(isCrease?'Marking crease — will fold and unfold…':'Folding…');
+    setHint(noFold?'Marking crease — will fold and unfold…':'Folding…');
 
     let f=0; const F=58;
     (function step(){
@@ -1372,8 +1390,15 @@ function initSimulator() {
       creases.forEach(c=>{
         const s=rotPt(c.p1,rotation), e2=rotPt(c.p2,rotation);
         ctx.beginPath(); ctx.moveTo(s.x,s.y); ctx.lineTo(e2.x,e2.y);
-        ctx.strokeStyle=c.type==='valley'?'rgba(96,165,212,0.70)':c.type==='mountain'?'rgba(224,85,85,0.70)':'rgba(240,232,213,0.30)';
-        ctx.setLineDash(c.type==='valley'?[7,4]:c.type==='mountain'?[2,4]:[3,7]);
+        if      (c.type==='valley')      { ctx.strokeStyle='rgba(96,165,212,0.70)';  ctx.setLineDash([7,4]); }
+        else if (c.type==='mountain')    { ctx.strokeStyle='rgba(224,85,85,0.70)';   ctx.setLineDash([2,4]); }
+        else if (c.type==='inside-rev')  { ctx.strokeStyle='rgba(96,165,212,0.80)';  ctx.setLineDash([5,3,2,3]); }
+        else if (c.type==='outside-rev') { ctx.strokeStyle='rgba(224,85,85,0.80)';   ctx.setLineDash([5,3,2,3]); }
+        else if (c.type==='petal')       { ctx.strokeStyle='rgba(122,184,122,0.75)'; ctx.setLineDash([6,3]); }
+        else if (c.type==='squash')      { ctx.strokeStyle='rgba(192,143,255,0.75)'; ctx.setLineDash([4,4]); }
+        else if (c.type==='rabbit')      { ctx.strokeStyle='rgba(245,196,48,0.75)';  ctx.setLineDash([4,2]); }
+        else if (c.type==='sink')        { ctx.strokeStyle='rgba(76,205,196,0.75)';  ctx.setLineDash([2,2]); }
+        else                             { ctx.strokeStyle='rgba(240,232,213,0.30)'; ctx.setLineDash([3,7]); }
         ctx.lineWidth=1.4; ctx.stroke(); ctx.setLineDash([]);
       });
 
@@ -1400,23 +1425,47 @@ function initSimulator() {
         foldCount,
       });
 
-      if (!isCrease) {
+      if (!noFold) {
         paper = near;
         layers.push(far.map(v=>reflectPt(v,lp1,lp2)));
         foldCount++; setCount(foldCount);
-        // Pleat: also mark a parallel mountain crease on folded flap
         if (isPleat) {
           const dir=nrm(sub(lp2,lp1)), perp={x:-dir.y,y:dir.x}, off=26;
-          creases.push({
-            p1:{x:lp1.x+perp.x*off, y:lp1.y+perp.y*off},
-            p2:{x:lp2.x+perp.x*off, y:lp2.y+perp.y*off},
-            type:'mountain',
-          });
+          creases.push({p1:{x:lp1.x+perp.x*off,y:lp1.y+perp.y*off},p2:{x:lp2.x+perp.x*off,y:lp2.y+perp.y*off},type:'mountain'});
+        }
+        if (isPetal) {
+          const dir=nrm(sub(lp2,lp1)), perp={x:-dir.y,y:dir.x};
+          const fLen=Math.hypot(lp2.x-lp1.x,lp2.y-lp1.y), mid={x:(lp1.x+lp2.x)/2,y:(lp1.y+lp2.y)/2};
+          const tip={x:mid.x+perp.x*fLen*0.5,y:mid.y+perp.y*fLen*0.5};
+          creases.push({p1:{...lp1},p2:{...tip},type:'petal'});
+          creases.push({p1:{...lp2},p2:{...tip},type:'petal'});
+        }
+        if (isSquash) {
+          const dir=nrm(sub(lp2,lp1)), perp={x:-dir.y,y:dir.x};
+          const mid={x:(lp1.x+lp2.x)/2,y:(lp1.y+lp2.y)/2};
+          const off=Math.hypot(lp2.x-lp1.x,lp2.y-lp1.y)*0.45;
+          creases.push({p1:{x:mid.x+perp.x*off,y:mid.y+perp.y*off},p2:{x:mid.x-perp.x*off,y:mid.y-perp.y*off},type:'squash'});
         }
       }
-      creases.push({p1:{...lp1}, p2:{...lp2}, type: isCrease?'crease':isPleat?'valley':foldMode});
+      if (isRabbit) {
+        const dir=nrm(sub(lp2,lp1)), perp={x:-dir.y,y:dir.x};
+        const fLen=Math.hypot(lp2.x-lp1.x,lp2.y-lp1.y), mid={x:(lp1.x+lp2.x)/2,y:(lp1.y+lp2.y)/2};
+        const tip={x:mid.x+perp.x*fLen*0.5,y:mid.y+perp.y*fLen*0.5};
+        creases.push({p1:{...lp1},p2:{...tip},type:'rabbit'});
+        creases.push({p1:{...lp2},p2:{...tip},type:'rabbit'});
+      }
+      if (isSink) {
+        const dir=nrm(sub(lp2,lp1)), perp={x:-dir.y,y:dir.x};
+        const mid={x:(lp1.x+lp2.x)/2,y:(lp1.y+lp2.y)/2};
+        const fLen=Math.hypot(lp2.x-lp1.x,lp2.y-lp1.y);
+        const tip={x:mid.x+perp.x*fLen*0.3,y:mid.y+perp.y*fLen*0.3};
+        creases.push({p1:{...lp1},p2:{...tip},type:'sink'});
+        creases.push({p1:{...lp2},p2:{...tip},type:'sink'});
+      }
+      const creaseType = isCrease?'crease':isPleat?'valley':isInsideRev?'inside-rev':isOutsideRev?'outside-rev':isPetal?'petal':isSquash?'squash':isRabbit?'rabbit':isSink?'sink':foldMode;
+      creases.push({p1:{...lp1},p2:{...lp2},type:creaseType});
       render();
-      setHint(isCrease
+      setHint(noFold
         ? 'Crease marked ✓  Now fold along it, or add more reference creases'
         : `Fold ${foldCount} done ✓  ↩ undo · ↺ reset · continue folding`);
     })();
@@ -1490,15 +1539,28 @@ function initSimulator() {
   // ── Fold-mode buttons ─────────────────────────────────────────────
   function setFoldMode(mode) {
     foldMode=mode;
-    ['fold-valley','fold-mountain','fold-crease','fold-pleat'].forEach(id =>
+    ['fold-valley','fold-mountain','fold-crease','fold-pleat','fold-inside-rev','fold-outside-rev','fold-petal','fold-squash','fold-rabbit','fold-sink'].forEach(id =>
       document.getElementById(id)?.classList.toggle('active', id==='fold-'+mode));
     pending=null; snapPt=null; render();
-    setHint('Click two points on the paper to draw a fold line');
+    const hints = {
+      'valley':'Click two points to valley fold (toward you)','mountain':'Click two points to mountain fold (away from you)',
+      'crease':'Click two points to mark a crease without folding','pleat':'Click two points to create a pleat (valley + mountain)',
+      'inside-rev':'Click two points — reverses tip inward between layers','outside-rev':'Click two points — reverses tip outward over layers',
+      'petal':'Click two points — folds + adds symmetric petal creases','squash':'Click two points — folds + adds squash crease pattern',
+      'rabbit':'Click two points — marks rabbit ear creases (3 lines to tip)','sink':'Click two points — marks sink crease pattern at corner',
+    };
+    setHint(hints[mode]||'Click two points on the paper to draw a fold line');
   }
-  document.getElementById('fold-valley')?.addEventListener('click',   ()=>setFoldMode('valley'));
-  document.getElementById('fold-mountain')?.addEventListener('click', ()=>setFoldMode('mountain'));
-  document.getElementById('fold-crease')?.addEventListener('click',   ()=>setFoldMode('crease'));
-  document.getElementById('fold-pleat')?.addEventListener('click',    ()=>setFoldMode('pleat'));
+  document.getElementById('fold-valley')?.addEventListener('click',       ()=>setFoldMode('valley'));
+  document.getElementById('fold-mountain')?.addEventListener('click',     ()=>setFoldMode('mountain'));
+  document.getElementById('fold-crease')?.addEventListener('click',       ()=>setFoldMode('crease'));
+  document.getElementById('fold-pleat')?.addEventListener('click',        ()=>setFoldMode('pleat'));
+  document.getElementById('fold-inside-rev')?.addEventListener('click',   ()=>setFoldMode('inside-rev'));
+  document.getElementById('fold-outside-rev')?.addEventListener('click',  ()=>setFoldMode('outside-rev'));
+  document.getElementById('fold-petal')?.addEventListener('click',        ()=>setFoldMode('petal'));
+  document.getElementById('fold-squash')?.addEventListener('click',       ()=>setFoldMode('squash'));
+  document.getElementById('fold-rabbit')?.addEventListener('click',       ()=>setFoldMode('rabbit'));
+  document.getElementById('fold-sink')?.addEventListener('click',         ()=>setFoldMode('sink'));
 
   document.getElementById('fold-undo')?.addEventListener('click', () => {
     if (!history.length) return;
@@ -1598,6 +1660,7 @@ const BOAT_STEPS = [
 // ================================================================
 
 function initTopNav() {
+  let graphInited = false;
   document.querySelectorAll('.top-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.top-tab').forEach(t => t.classList.remove('active'));
@@ -1606,6 +1669,11 @@ function initTopNav() {
       const sec = document.getElementById(tab.dataset.section);
       if (sec) sec.classList.add('active');
       window.scrollTo(0, 0);
+      // Lazy-init graph when tab first becomes visible (canvas needs visible width)
+      if (tab.dataset.section === 'sec-graph' && !graphInited) {
+        graphInited = true;
+        requestAnimationFrame(() => initProjectGraph());
+      }
     });
   });
 }
@@ -1623,24 +1691,28 @@ function initWordle(arena) {
   const MAX = 6, LEN = 5;
 
   arena.innerHTML = `<div class="wordle-wrap">
-    <div class="wordle-msg" id="w-msg"></div>
-    <div class="wordle-board" id="w-board"></div>
-    <div class="wordle-keyboard" id="w-kb"></div>
+    <div class="wordle-msg"></div>
+    <div class="wordle-board"></div>
+    <div class="wordle-keyboard"></div>
   </div>`;
 
-  const board = document.getElementById('w-board');
-  const kb    = document.getElementById('w-kb');
-  const msg   = document.getElementById('w-msg');
+  const msgEl  = arena.querySelector('.wordle-msg');
+  const boardEl = arena.querySelector('.wordle-board');
+  const kbEl   = arena.querySelector('.wordle-keyboard');
 
+  // Build tile grid using a 2D array of refs (no IDs needed)
+  const tiles = [];
   for (let r = 0; r < MAX; r++) {
     const row = document.createElement('div');
     row.className = 'wordle-row';
+    tiles[r] = [];
     for (let c = 0; c < LEN; c++) {
       const t = document.createElement('div');
-      t.className = 'wordle-tile'; t.id = `wt-${r}-${c}`;
+      t.className = 'wordle-tile';
+      tiles[r][c] = t;
       row.appendChild(t);
     }
-    board.appendChild(row);
+    boardEl.appendChild(row);
   }
 
   const KB_ROWS = [['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['ENTER','Z','X','C','V','B','N','M','⌫']];
@@ -1654,14 +1726,13 @@ function initWordle(arena) {
       btn.addEventListener('click', () => handleKey(k));
       el.appendChild(btn); keyEls[k] = btn;
     });
-    kb.appendChild(el);
+    kbEl.appendChild(el);
   });
 
   function drawRow() {
     const r = guesses.length;
     for (let c = 0; c < LEN; c++) {
-      const t = document.getElementById(`wt-${r}-${c}`);
-      if (!t) continue;
+      const t = tiles[r]?.[c]; if (!t) continue;
       t.textContent = currentGuess[c] || '';
       t.className = 'wordle-tile' + (c < currentGuess.length ? ' active' : '');
     }
@@ -1680,8 +1751,7 @@ function initWordle(arena) {
 
   function reveal(r, guess, result) {
     for (let c = 0; c < LEN; c++) {
-      const t = document.getElementById(`wt-${r}-${c}`);
-      if (!t) continue;
+      const t = tiles[r]?.[c]; if (!t) continue;
       setTimeout(() => {
         t.className = 'wordle-tile ' + result[c]; t.textContent = guess[c];
         const k = guess[c];
@@ -1698,18 +1768,18 @@ function initWordle(arena) {
     if (gameOver) return;
     if (k === '⌫' || k === 'BACKSPACE') { currentGuess = currentGuess.slice(0,-1); drawRow(); return; }
     if (k === 'ENTER') {
-      if (currentGuess.length < LEN) { msg.textContent = 'Not enough letters'; return; }
+      if (currentGuess.length < LEN) { msgEl.textContent = 'Not enough letters'; return; }
       const g = currentGuess, res = score(g);
       guesses.push(g); reveal(guesses.length - 1, g, res);
       currentGuess = '';
       setTimeout(() => {
-        if (g === TARGET) { gameOver = true; msg.textContent = ['Genius!','Magnificent!','Impressive!','Splendid!','Great!','Phew!'][guesses.length-1]||'Nice!'; }
-        else if (guesses.length >= MAX) { gameOver = true; msg.textContent = `The word was ${TARGET}`; }
-        else msg.textContent = '';
+        if (g === TARGET) { gameOver = true; msgEl.textContent = ['Genius!','Magnificent!','Impressive!','Splendid!','Great!','Phew!'][guesses.length-1]||'Nice!'; }
+        else if (guesses.length >= MAX) { gameOver = true; msgEl.textContent = `The word was ${TARGET}`; }
+        else msgEl.textContent = '';
       }, LEN * 110 + 200);
       return;
     }
-    if (/^[A-Z]$/.test(k) && currentGuess.length < LEN) { currentGuess += k; msg.textContent = ''; drawRow(); }
+    if (/^[A-Z]$/.test(k) && currentGuess.length < LEN) { currentGuess += k; msgEl.textContent = ''; drawRow(); }
   }
 
   function onKey(e) {
@@ -1747,24 +1817,33 @@ function initConnections(arena) {
 
   arena.innerHTML = `<div class="conn-wrap">
     <div class="conn-header">
-      <div class="conn-lives">${Array(4).fill(0).map((_,i)=>`<span class="conn-life" id="cl-${i}"></span>`).join('')}</div>
-      <div class="conn-msg" id="c-msg">Select 4 words that share a connection</div>
+      <div class="conn-lives">${Array(4).fill(0).map(()=>`<span class="conn-life"></span>`).join('')}</div>
+      <div class="conn-msg">Select 4 words that share a connection</div>
     </div>
-    <div class="conn-board" id="c-board"></div>
-    <button class="crane-btn primary conn-submit" id="c-submit" disabled>submit</button>
+    <div class="conn-board"></div>
+    <button class="crane-btn primary conn-submit" disabled>submit</button>
   </div>`;
+
+  const boardEl  = arena.querySelector('.conn-board');
+  const submitEl = arena.querySelector('.conn-submit');
+  const msgEl    = arena.querySelector('.conn-msg');
 
   function solvedWords() { return solved.flatMap(g => g.words); }
 
+  function updateLives() {
+    arena.querySelectorAll('.conn-life').forEach((l,i) => {
+      l.className = 'conn-life' + (i >= lives ? ' lost' : '');
+    });
+  }
+
   function renderBoard() {
-    const b = document.getElementById('c-board'); if (!b) return;
-    b.innerHTML = '';
+    boardEl.innerHTML = '';
     solved.forEach(g => {
       const d = document.createElement('div');
       d.className = 'conn-solved-group';
       d.style.borderColor = g.color; d.style.background = g.color + '18';
       d.innerHTML = `<span class="conn-group-name" style="color:${g.color}">${g.name}</span><div class="conn-solved-words">${g.words.join(' · ')}</div>`;
-      b.appendChild(d);
+      boardEl.appendChild(d);
     });
     const grid = document.createElement('div'); grid.className = 'conn-grid';
     allWords.filter(w => !solvedWords().includes(w)).forEach(w => {
@@ -1774,28 +1853,27 @@ function initConnections(arena) {
       btn.addEventListener('click', () => {
         if (selected.includes(w)) selected = selected.filter(s => s !== w);
         else if (selected.length < 4) selected.push(w);
-        document.getElementById('c-submit').disabled = selected.length !== 4;
+        submitEl.disabled = selected.length !== 4;
         renderBoard();
       });
       grid.appendChild(btn);
     });
-    b.appendChild(grid);
+    boardEl.appendChild(grid);
   }
 
-  document.getElementById('c-submit')?.addEventListener('click', () => {
-    const msgEl = document.getElementById('c-msg');
+  submitEl.addEventListener('click', () => {
     const match = puzzle.groups.find(g => !solved.includes(g) && g.words.every(w => selected.includes(w)) && selected.every(w => g.words.includes(w)));
     if (match) {
       solved.push(match); selected = [];
       msgEl.textContent = solved.length === puzzle.groups.length ? '🎉 Solved them all!' : `✓ ${match.name}!`;
-      document.getElementById('c-submit').disabled = true;
+      submitEl.disabled = true;
     } else {
       lives--;
       const oneAway = puzzle.groups.some(g => !solved.includes(g) && g.words.filter(w => selected.includes(w)).length === 3);
       msgEl.textContent = oneAway ? 'One away...' : 'Not quite!';
-      document.querySelectorAll('.conn-life').forEach((l,i) => { l.className = 'conn-life' + (i >= lives ? ' lost' : ''); });
+      updateLives();
       if (lives <= 0) { msgEl.textContent = 'Game over!'; puzzle.groups.forEach(g => { if (!solved.includes(g)) solved.push(g); }); }
-      selected = []; document.getElementById('c-submit').disabled = true;
+      selected = []; submitEl.disabled = true;
     }
     renderBoard();
   });
@@ -2329,12 +2407,13 @@ function initSpelling(arena) {
         ${[0,1].map(i=>`<button class="sb-hex sb-outer" data-l="${p.outer[i]}">${p.outer[i]}</button>`).join('')}
       </div>
       <div class="sb-hive-row sb-row-mid">
-        ${[2,3].map(i=>`<button class="sb-hex sb-outer" data-l="${p.outer[i]}">${p.outer[i]}</button>`).join('')}
+        <button class="sb-hex sb-outer" data-l="${p.outer[2]}">${p.outer[2]}</button>
         <button class="sb-hex sb-center" data-l="${p.center}">${p.center}</button>
-        ${[4,5].map(i=>`<button class="sb-hex sb-outer" data-l="${p.outer[i]}">${p.outer[i]}</button>`).join('')}
+        <button class="sb-hex sb-outer" data-l="${p.outer[3]}">${p.outer[3]}</button>
       </div>
       <div class="sb-hive-row sb-row-bot">
-        ${[4,5].map(i=>`<button class="sb-hex sb-outer" style="visibility:hidden" aria-hidden="true"></button>`).join('')}
+        <button class="sb-hex sb-outer" data-l="${p.outer[4]}">${p.outer[4]}</button>
+        <button class="sb-hex sb-outer" data-l="${p.outer[5]}">${p.outer[5]}</button>
       </div>
     </div>
     <div class="sb-controls">
@@ -2396,17 +2475,19 @@ function initSpelling(arena) {
 
 // ---- Mini Crossword ----
 function initCrossword(arena) {
+  // Grid: BOOKS/OPERA/KNEEL across; BROOK/OBESE/SNAIL down
   const GRID = [
-    ['C','R','A','N','E'],
-    ['O','#','R','#','A'],
-    ['D','R','A','W','N'],
-    ['E','#','Y','#','G'],
-    ['S','C','A','L','E'],
+    ['B','O','O','K','S'],
+    ['R','#','B','#','N'],
+    ['O','P','E','R','A'],
+    ['O','#','S','#','I'],
+    ['K','N','E','E','L'],
   ];
   const ANSWERS = GRID.map(r=>r.map(c=>c==='#'?null:c));
+  const NUMS = {'0,0':1,'0,2':2,'0,4':3,'2,0':4,'4,0':5};
   const CLUES = {
-    across: ['1. Origami bird (5)','2. Like a taut line (4)','3. Sketched (5)','4. Do Re Mi progression (5)'],
-    down:   ['1. Cipher keys (5)','2. To haul or tug (4)','3. Folded paper art (7)','4. Rhymes with "rang" (4)'],
+    across: ['1. Library items (5)','4. Grand ___ musical venue (5)','5. Get down on one knee (5)'],
+    down:   ['1. Babbling waterway (5)','2. Overweight (5)','3. Slimy garden creature (5)'],
   };
 
   let userGrid = ANSWERS.map(r=>r.map(c=>c===null?null:''));
@@ -2434,7 +2515,12 @@ function initCrossword(arena) {
       if (ANSWERS[r][c]===null) { cell.className='cw-cell cw-black'; board.appendChild(cell); continue; }
       cell.className='cw-cell';
       if (sel&&sel[0]===r&&sel[1]===c) cell.classList.add('selected');
-      if (userGrid[r][c]) { cell.textContent=userGrid[r][c]; if(userGrid[r][c]!==ANSWERS[r][c]) cell.classList.add('wrong'); }
+      const n=NUMS[`${r},${c}`];
+      if (n) { const ns=document.createElement('span'); ns.className='cw-cell-num'; ns.textContent=n; cell.appendChild(ns); }
+      if (userGrid[r][c]) {
+        const ls=document.createElement('span'); ls.textContent=userGrid[r][c]; cell.appendChild(ls);
+        if(userGrid[r][c]!==ANSWERS[r][c]) cell.classList.add('wrong');
+      }
       cell.dataset.r=r; cell.dataset.c=c;
       board.appendChild(cell);
     }
@@ -2673,6 +2759,224 @@ function initNumberlink(arena) {
   });
 
   render();
+}
+
+// ================================================================
+// 3D PROJECT GRAPH
+// ================================================================
+
+function initProjectGraph() {
+  const canvas = document.getElementById('graph-canvas');
+  if (!canvas || typeof THREE === 'undefined') return;
+
+  const W = canvas.clientWidth || 700, H = canvas.clientHeight || 500;
+  canvas.width = W; canvas.height = H;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setSize(W, H);
+  renderer.setClearColor(0x0d0c09, 1);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(55, W/H, 0.1, 2000);
+  camera.position.set(0, 0, 500);
+
+  // Ambient + directional light
+  scene.add(new THREE.AmbientLight(0xf0e8d5, 0.4));
+  const dLight = new THREE.DirectionalLight(0xf0e8d5, 0.8);
+  dLight.position.set(1, 1, 1);
+  scene.add(dLight);
+
+  // Node positions — arranged in a loose 3D sphere layout
+  const angleStep = (Math.PI * 2) / PROJECTS.length;
+  const nodeData = PROJECTS.map((p, i) => {
+    const phi   = Math.acos(-1 + (2 * i) / PROJECTS.length);
+    const theta = Math.sqrt(PROJECTS.length * Math.PI) * phi;
+    const R = 180;
+    return {
+      p,
+      x: R * Math.sin(phi) * Math.cos(theta),
+      y: R * Math.sin(phi) * Math.sin(theta),
+      z: R * Math.cos(phi),
+      vx: 0, vy: 0, vz: 0,
+    };
+  });
+
+  // Edges: connect projects sharing >= 2 technologies
+  const edges = [];
+  for (let i = 0; i < PROJECTS.length; i++) {
+    for (let j = i+1; j < PROJECTS.length; j++) {
+      const shared = PROJECTS[i].tech.filter(t => PROJECTS[j].tech.includes(t));
+      if (shared.length >= 1) edges.push({ i, j, strength: shared.length, shared });
+    }
+  }
+
+  // Create node meshes
+  const spheres = nodeData.map(nd => {
+    const geo = new THREE.SphereGeometry(10, 20, 20);
+    const mat = new THREE.MeshPhongMaterial({ color: new THREE.Color(nd.p.color), shininess: 80 });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(nd.x, nd.y, nd.z);
+    mesh.userData = { nd, idx: nodeData.indexOf(nd) };
+    scene.add(mesh);
+    return mesh;
+  });
+
+  // Ring around active node
+  const ringGeo = new THREE.TorusGeometry(14, 1.5, 8, 32);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xf5c430 });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.visible = false;
+  scene.add(ring);
+
+  // Create edge lines
+  const lineMat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.4 });
+  edges.forEach(e => {
+    const pts = [
+      new THREE.Vector3(nodeData[e.i].x, nodeData[e.i].y, nodeData[e.i].z),
+      new THREE.Vector3(nodeData[e.j].x, nodeData[e.j].y, nodeData[e.j].z),
+    ];
+    const colors = [];
+    const c1 = new THREE.Color(PROJECTS[e.i].color);
+    const c2 = new THREE.Color(PROJECTS[e.j].color);
+    colors.push(c1.r, c1.g, c1.b, c2.r, c2.g, c2.b);
+    const geo = new THREE.BufferGeometry().setFromPoints(pts);
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    scene.add(new THREE.Line(geo, lineMat));
+  });
+
+  // Labels (canvas textures)
+  function makeLabel(text, color) {
+    const c = document.createElement('canvas'); c.width = 256; c.height = 64;
+    const ctx = c.getContext('2d');
+    ctx.font = 'bold 24px Caveat, cursive';
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, 128, 32);
+    const tex = new THREE.CanvasTexture(c);
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+    const sprite = new THREE.Sprite(mat);
+    sprite.scale.set(80, 20, 1);
+    return sprite;
+  }
+
+  const labels = nodeData.map(nd => {
+    const sprite = makeLabel(nd.p.name, nd.p.color);
+    sprite.position.set(nd.x, nd.y + 18, nd.z);
+    scene.add(sprite);
+    return sprite;
+  });
+
+  // Info panel
+  const infoEl = document.getElementById('graph-info');
+
+  // Raycaster
+  const raycaster = new THREE.Raycaster();
+  const mouse2D = new THREE.Vector2();
+  let activeIdx = -1;
+
+  function showInfo(idx) {
+    if (!infoEl) return;
+    activeIdx = idx;
+    ring.visible = idx >= 0;
+    if (idx < 0) { infoEl.innerHTML = '<p class="gi-hint">Click a node to explore a project</p>'; return; }
+    const p = PROJECTS[idx];
+    const connNames = edges.filter(e => e.i===idx||e.j===idx).map(e => {
+      const other = e.i===idx ? e.j : e.i;
+      return `<span class="gi-conn-name">${PROJECTS[other].name}</span><span class="gi-conn-shared">${e.shared.join(', ')}</span>`;
+    });
+    infoEl.innerHTML = `
+      <div class="gi-header" style="border-left-color:${p.color}">
+        <span class="gi-name">${p.name}</span>
+        ${p.award ? `<span class="gi-award">${p.award}</span>` : ''}
+        ${p.hackathon ? `<span class="gi-hack">${p.hackathon}</span>` : ''}
+      </div>
+      <p class="gi-tagline">${p.tagline}</p>
+      <div class="gi-tech">${p.tech.map(t=>`<span class="gi-pill" style="border-color:${p.color}44">${t}</span>`).join('')}</div>
+      ${connNames.length ? `<div class="gi-conns"><div class="gi-conns-label">connects to</div>${connNames.map(c=>`<div class="gi-conn-row">${c}</div>`).join('')}</div>` : ''}
+      <div class="gi-links">
+        ${p.github ? `<a href="${p.github}" target="_blank" class="gi-link">GitHub ↗</a>` : ''}
+        ${p.devpost ? `<a href="${p.devpost}" target="_blank" class="gi-link">DevPost ↗</a>` : ''}
+        ${p.demo ? `<a href="${p.demo}" target="_blank" class="gi-link">Demo ↗</a>` : ''}
+      </div>`;
+  }
+
+  // Orbit controls (manual implementation)
+  let isDragging = false, lastX = 0, lastY = 0;
+  let rotX = 0, rotY = 0, autoRot = true;
+
+  canvas.addEventListener('mousedown', e => { isDragging = true; lastX = e.clientX; lastY = e.clientY; autoRot = false; });
+  window.addEventListener('mouseup', () => { isDragging = false; });
+  canvas.addEventListener('mousemove', e => {
+    if (isDragging) {
+      rotY += (e.clientX - lastX) * 0.008;
+      rotX += (e.clientY - lastY) * 0.008;
+      lastX = e.clientX; lastY = e.clientY;
+    }
+    // Hover highlight
+    const rect = canvas.getBoundingClientRect();
+    mouse2D.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1;
+    mouse2D.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
+    raycaster.setFromCamera(mouse2D, camera);
+    const hits = raycaster.intersectObjects(spheres);
+    canvas.style.cursor = hits.length ? 'pointer' : 'grab';
+  });
+
+  canvas.addEventListener('click', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse2D.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1;
+    mouse2D.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
+    raycaster.setFromCamera(mouse2D, camera);
+    const hits = raycaster.intersectObjects(spheres);
+    if (hits.length) {
+      const idx = hits[0].object.userData.idx;
+      showInfo(idx);
+      ring.position.copy(hits[0].object.position);
+    } else {
+      showInfo(-1);
+    }
+  });
+
+  canvas.addEventListener('wheel', e => {
+    camera.position.z = Math.max(200, Math.min(800, camera.position.z + e.deltaY * 0.5));
+  });
+
+  // Touch support
+  let lastTouch = null;
+  canvas.addEventListener('touchstart', e => { lastTouch = e.touches[0]; autoRot = false; }, { passive: true });
+  canvas.addEventListener('touchmove', e => {
+    if (!lastTouch) return;
+    rotY += (e.touches[0].clientX - lastTouch.clientX) * 0.01;
+    rotX += (e.touches[0].clientY - lastTouch.clientY) * 0.01;
+    lastTouch = e.touches[0];
+  }, { passive: true });
+
+  // Group all scene objects for rotation
+  const group = new THREE.Group();
+  spheres.forEach(s => { scene.remove(s); group.add(s); });
+  labels.forEach(l => { scene.remove(l); group.add(l); });
+  scene.children.filter(o => o.isLine).forEach(l => { scene.remove(l); group.add(l); });
+  scene.remove(ring); group.add(ring);
+  scene.add(group);
+
+  // Particle stars
+  const starGeo = new THREE.BufferGeometry();
+  const starPos = new Float32Array(600);
+  for (let i = 0; i < 600; i++) starPos[i] = (Math.random() - 0.5) * 1200;
+  starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+  scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xf0e8d5, size: 1.5, transparent: true, opacity: 0.3 })));
+
+  showInfo(-1);
+
+  // Animate
+  function animate() {
+    requestAnimationFrame(animate);
+    if (autoRot) rotY += 0.003;
+    group.rotation.x = rotX;
+    group.rotation.y = rotY;
+    renderer.render(scene, camera);
+  }
+  animate();
 }
 
 function initGamesHub() {

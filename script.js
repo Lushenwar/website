@@ -507,29 +507,31 @@ function initFaller() {
   const faller = document.getElementById('faller');
   if (!faller || window.innerWidth < 580) return;
 
-  let curTop = 8, curLeft = -22, curAngle = -22;
-  let scrollY = 0, prev = 0;
+  let scrollY = 0, prevScrollY = 0;
+  let curY = 0, curAngle = -15, curSwayX = 0;
 
   window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
 
   (function loop() {
     requestAnimationFrame(loop);
     if (typeof AstronautGate !== 'undefined' && AstronautGate.isPaused()) return;
-    const vel = scrollY - prev; prev = scrollY;
-    const prog = Math.min(scrollY / Math.max(document.body.scrollHeight - window.innerHeight, 1), 1);
 
-    // Sweeps dramatically from far left to far right as you scroll
-    const tLeft  = -22 + prog * 144 + Math.sin(scrollY * 0.0028) * 18;
-    const tTop   = 8 + prog * 75;
-    const tAngle = -25 + prog * 62 + vel * 2.2;
+    const vel = scrollY - prevScrollY;
+    prevScrollY = scrollY;
 
-    curLeft  += (tLeft  - curLeft)  * 0.06;
-    curTop   += (tTop   - curTop)   * 0.07;
-    curAngle += (tAngle - curAngle) * 0.09;
+    // Falls with scroll at ~55% speed — classic parallax "falling through space" feel
+    const targetY     = scrollY * 0.55;
+    // Gentle sinusoidal horizontal drift
+    const targetSwayX = Math.sin(scrollY * 0.0025) * 38;
+    // Tilts with scroll velocity; slow continuous tumble based on distance travelled
+    const targetAngle = -15 + scrollY * 0.03 + vel * 2.8;
 
-    faller.style.left      = `${curLeft}vw`;
-    faller.style.top       = `${curTop}vh`;
-    faller.style.transform = `translate(-50%, -50%) rotate(${curAngle}deg)`;
+    // Lerp — floaty, weightless lag
+    curY      += (targetY     - curY)      * 0.09;
+    curSwayX  += (targetSwayX - curSwayX)  * 0.06;
+    curAngle  += (targetAngle - curAngle)  * 0.09;
+
+    faller.style.transform = `translate(calc(-50% + ${curSwayX}px), ${curY}px) rotate(${curAngle}deg)`;
   })();
 }
 
@@ -1636,7 +1638,7 @@ function initQueens(arena) {
       <div class="queens-eyebrow">Place one ♛ in each color region</div>
       <div class="queens-rules">No two queens can touch — not even diagonally. Click once = ♛, again = dot, again = clear.</div>
     </div>
-    <div class="queens-grid" style="display:grid;grid-template-columns:repeat(${N},1fr);gap:3px;width:fit-content;margin-bottom:1rem"></div>
+    <div class="queens-grid" style="display:grid;grid-template-columns:repeat(${N},50px);gap:3px;margin-bottom:1rem"></div>
     <div class="queens-msg"></div>
     <button class="crane-btn q-reset-btn">↺ reset</button>
     <div class="queens-legend">${NAMES.map((n,i)=>`<span class="queens-legend-item"><span style="background:${HEX[i]};display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px"></span>${n}</span>`).join('')}</div>
@@ -2288,7 +2290,7 @@ function initTango(arena) {
 
   arena.innerHTML = `<div class="tg-wrap">
     <div class="tg-eyebrow">Fill the grid — 3 suns ☀️ and 3 moons 🌙 per row & column, no 3 in a row</div>
-    <div class="tg-board" style="display:grid;grid-template-columns:repeat(${N},1fr);gap:3px;width:fit-content"></div>
+    <div class="tg-board" style="display:grid;grid-template-columns:repeat(${N},50px);gap:3px"></div>
     <div class="tg-msg"></div>
     <button class="crane-btn tg-reset" style="margin-top:0.75rem">↺ reset</button>
   </div>`;
@@ -2364,7 +2366,7 @@ function initNumberlink(arena) {
 
   arena.innerHTML = `<div class="nl-wrap">
     <div class="nl-eyebrow">Connect matching numbers with a path — fill every cell!</div>
-    <div class="nl-board" style="display:grid;grid-template-columns:repeat(${N},1fr);gap:2px;width:fit-content;user-select:none"></div>
+    <div class="nl-board" style="display:grid;grid-template-columns:repeat(${N},50px);gap:2px;user-select:none"></div>
     <div class="nl-msg"></div>
     <button class="crane-btn nl-reset" style="margin-top:0.75rem">↺ reset</button>
   </div>`;
@@ -2515,100 +2517,100 @@ const PROJECT_KB = {
 const PROJECT_WORKFLOW = {
   '001': { // LOCATR — multi-agent AI
     nodes: [
-      { id:0, name:'Next.js',   role:'Frontend',      ox:-50, oy: 35 },
-      { id:1, name:'FastAPI',   role:'Backend',        ox:  0, oy: 52 },
-      { id:2, name:'LangGraph', role:'AI_ML',          ox: 48, oy: 20 },
-      { id:3, name:'Snowflake', role:'Data',           ox: 52, oy:-25 },
-      { id:4, name:'Redis',     role:'Data',           ox: -8, oy:-52 },
+      { id:0, name:'Next.js',   role:'Frontend',      ox:-50, oy: 35, desc:'Chat UI — user enters trip preferences' },
+      { id:1, name:'FastAPI',   role:'Backend',        ox:  0, oy: 52, desc:'REST orchestrator routing tasks to agents' },
+      { id:2, name:'LangGraph', role:'AI_ML',          ox: 48, oy: 20, desc:'Multi-agent graph coordinating hotel/flight/activity planners' },
+      { id:3, name:'Snowflake', role:'Data',           ox: 52, oy:-25, desc:'Structured itinerary storage and retrieval' },
+      { id:4, name:'Redis',     role:'Data',           ox: -8, oy:-52, desc:'Session cache for in-progress planning state' },
     ],
     edges:[[0,1],[1,2],[2,3],[3,2],[2,4],[4,2],[2,1],[1,0]],
   },
   '002': { // ECO-PULSE — heat mapping
     nodes: [
-      { id:0, name:'React',     role:'Frontend',      ox:-48, oy: 28 },
-      { id:1, name:'FastAPI',   role:'Backend',        ox:  0, oy: 52 },
-      { id:2, name:'Python ML', role:'AI_ML',          ox: 48, oy: 28 },
-      { id:3, name:'Gemini',    role:'AI_ML',          ox: 52, oy:-18 },
-      { id:4, name:'Leaflet',   role:'Infrastructure', ox:-15, oy:-52 },
+      { id:0, name:'React',     role:'Frontend',      ox:-48, oy: 28, desc:'Interactive dashboard with real-time heatmap layer' },
+      { id:1, name:'FastAPI',   role:'Backend',        ox:  0, oy: 52, desc:'API ingesting environmental sensor data' },
+      { id:2, name:'Python ML', role:'AI_ML',          ox: 48, oy: 28, desc:'LightGBM + XGBoost ensemble heat-risk models' },
+      { id:3, name:'Gemini',    role:'AI_ML',          ox: 52, oy:-18, desc:'LLM generating natural-language health advisories' },
+      { id:4, name:'Leaflet',   role:'Infrastructure', ox:-15, oy:-52, desc:'Map tiles rendering choropleth overlays' },
     ],
     edges:[[0,1],[1,2],[2,3],[3,1],[1,0],[0,4]],
   },
   '003': { // INTERPREFY — real-time translation
     nodes: [
-      { id:0, name:'VB-Cable',  role:'Infrastructure', ox:-52, oy: 10 },
-      { id:1, name:'Python',    role:'Backend',        ox:-25, oy: 48 },
-      { id:2, name:'DeepGram',  role:'AI_ML',          ox: 25, oy: 48 },
-      { id:3, name:'DeepL',     role:'AI_ML',          ox: 52, oy: 10 },
-      { id:4, name:'PyQt5',     role:'Frontend',       ox:  0, oy:-52 },
+      { id:0, name:'VB-Cable',  role:'Infrastructure', ox:-52, oy: 10, desc:'Virtual audio cable capturing system audio stream' },
+      { id:1, name:'Python',    role:'Backend',        ox:-25, oy: 48, desc:'Core pipeline orchestrating audio capture and routing' },
+      { id:2, name:'DeepGram',  role:'AI_ML',          ox: 25, oy: 48, desc:'ASR converting audio chunks to text in real time' },
+      { id:3, name:'DeepL',     role:'AI_ML',          ox: 52, oy: 10, desc:'Neural MT translating transcribed text' },
+      { id:4, name:'PyQt5',     role:'Frontend',       ox:  0, oy:-52, desc:'Desktop overlay displaying translated subtitles' },
     ],
     edges:[[0,1],[1,2],[2,3],[3,4],[1,4]],
   },
   '004': { // MASTERINGENZ — slang autocomplete
     nodes: [
-      { id:0, name:'React',     role:'Frontend',      ox:-52, oy: 18 },
-      { id:1, name:'FastAPI',   role:'Backend',        ox:-15, oy: 52 },
-      { id:2, name:'GAT',       role:'AI_ML',          ox: 40, oy: 35 },
-      { id:3, name:'GRU',       role:'AI_ML',          ox: 52, oy:-15 },
-      { id:4, name:'Gemini',    role:'AI_ML',          ox: 15, oy:-52 },
+      { id:0, name:'React',     role:'Frontend',      ox:-52, oy: 18, desc:'Editor UI with inline autocomplete suggestions' },
+      { id:1, name:'FastAPI',   role:'Backend',        ox:-15, oy: 52, desc:'API coordinating model inference and context retrieval' },
+      { id:2, name:'GAT',       role:'AI_ML',          ox: 40, oy: 35, desc:'Graph Attention Network encoding slang relationships' },
+      { id:3, name:'GRU',       role:'AI_ML',          ox: 52, oy:-15, desc:'Recurrent model predicting next-token completions' },
+      { id:4, name:'Gemini',    role:'AI_ML',          ox: 15, oy:-52, desc:'LLM reranking and explaining completions in context' },
     ],
     edges:[[0,1],[1,2],[2,3],[3,4],[4,1],[1,0]],
   },
   '005': { // IFYSHOP — shopping AI
     nodes: [
-      { id:0, name:'React',     role:'Frontend',      ox:-52, oy: 18 },
-      { id:1, name:'FastAPI',   role:'Backend',        ox:  0, oy: 52 },
-      { id:2, name:'Gemini',    role:'AI_ML',          ox: 52, oy: 18 },
-      { id:3, name:'Snowflake', role:'Data',           ox: 38, oy:-40 },
-      { id:4, name:'Tavily',    role:'Infrastructure', ox:-20, oy:-52 },
+      { id:0, name:'React',     role:'Frontend',      ox:-52, oy: 18, desc:'Conversational shopping UI with product carousel' },
+      { id:1, name:'FastAPI',   role:'Backend',        ox:  0, oy: 52, desc:'Agentic API routing queries to retrieval and AI' },
+      { id:2, name:'Gemini',    role:'AI_ML',          ox: 52, oy: 18, desc:'Vision + language model for product understanding' },
+      { id:3, name:'Snowflake', role:'Data',           ox: 38, oy:-40, desc:'Product catalog and purchase history store' },
+      { id:4, name:'Tavily',    role:'Infrastructure', ox:-20, oy:-52, desc:'Web search grounding product queries in live data' },
     ],
     edges:[[0,1],[1,2],[1,3],[3,2],[1,4],[4,1],[2,1],[1,0]],
   },
   '006': { // OPENSCORE — credit scoring
     nodes: [
-      { id:0, name:'React',     role:'Frontend',      ox:-52, oy: 20 },
-      { id:1, name:'FastAPI',   role:'Backend',        ox:  0, oy: 52 },
-      { id:2, name:'Plaid API', role:'Infrastructure', ox:-32, oy:-45 },
-      { id:3, name:'Extractors',role:'AI_ML',          ox: 45, oy: 30 },
-      { id:4, name:'Gemini',    role:'AI_ML',          ox: 52, oy:-20 },
+      { id:0, name:'React',     role:'Frontend',      ox:-52, oy: 20, desc:'Dashboard visualising alternative credit score factors' },
+      { id:1, name:'FastAPI',   role:'Backend',        ox:  0, oy: 52, desc:'API orchestrating Plaid ingestion and model scoring' },
+      { id:2, name:'Plaid API', role:'Infrastructure', ox:-32, oy:-45, desc:'Bank connection layer fetching transaction history' },
+      { id:3, name:'Extractors',role:'AI_ML',          ox: 45, oy: 30, desc:'Feature engineers extracting spending pattern signals' },
+      { id:4, name:'Gemini',    role:'AI_ML',          ox: 52, oy:-20, desc:'LLM generating human-readable score explanations' },
     ],
     edges:[[0,1],[1,2],[2,1],[1,3],[3,4],[4,1],[1,0]],
   },
   '007': { // FIXMYFEED — social media filter
     nodes: [
-      { id:0, name:'Extension', role:'Infrastructure', ox:-52, oy: 20 },
-      { id:1, name:'TypeScript',role:'Frontend',       ox:-20, oy: 52 },
-      { id:2, name:'Lava LLM',  role:'AI_ML',          ox: 45, oy: 28 },
-      { id:3, name:'FastAPI',   role:'Backend',        ox: 52, oy:-20 },
-      { id:4, name:'Supabase',  role:'Data',           ox:  0, oy:-52 },
+      { id:0, name:'Extension', role:'Infrastructure', ox:-52, oy: 20, desc:'Chrome extension injecting filter hooks into social feeds' },
+      { id:1, name:'TypeScript',role:'Frontend',       ox:-20, oy: 52, desc:'Content-script UI controls rendered in-page' },
+      { id:2, name:'Lava LLM',  role:'AI_ML',          ox: 45, oy: 28, desc:'On-device LLM classifying post sentiment/toxicity' },
+      { id:3, name:'FastAPI',   role:'Backend',        ox: 52, oy:-20, desc:'Cloud endpoint for heavy re-ranking tasks' },
+      { id:4, name:'Supabase',  role:'Data',           ox:  0, oy:-52, desc:'User preferences and filter rule persistence' },
     ],
     edges:[[0,1],[1,2],[2,3],[3,4],[4,3],[3,1],[1,0]],
   },
   '008': { // SPOTLIGHT — product placement
     nodes: [
-      { id:0, name:'TypeScript',role:'Frontend',       ox:-52, oy: 20 },
-      { id:1, name:'FastAPI',   role:'Backend',        ox:  0, oy: 52 },
-      { id:2, name:'Gemini',    role:'AI_ML',          ox: 48, oy: 25 },
-      { id:3, name:'FFmpeg',    role:'Infrastructure', ox: 52, oy:-20 },
-      { id:4, name:'Backboard', role:'Data',           ox:-15, oy:-52 },
+      { id:0, name:'TypeScript',role:'Frontend',       ox:-52, oy: 20, desc:'Upload UI for video ingestion and results gallery' },
+      { id:1, name:'FastAPI',   role:'Backend',        ox:  0, oy: 52, desc:'Video processing pipeline coordinator' },
+      { id:2, name:'Gemini',    role:'AI_ML',          ox: 48, oy: 25, desc:'Vision model detecting and annotating product regions' },
+      { id:3, name:'FFmpeg',    role:'Infrastructure', ox: 52, oy:-20, desc:'Frame extraction and video re-encoding' },
+      { id:4, name:'Backboard', role:'Data',           ox:-15, oy:-52, desc:'Annotation store with bounding box metadata' },
     ],
     edges:[[0,1],[1,3],[3,2],[2,3],[3,1],[1,4],[4,1],[1,0]],
   },
   '009': { // BWF PREDICTOR — ML pipeline
     nodes: [
-      { id:0, name:'Streamlit', role:'Frontend',      ox:-52, oy: 15 },
-      { id:1, name:'Pandas',    role:'Backend',        ox:-15, oy: 52 },
-      { id:2, name:'LightGBM',  role:'AI_ML',          ox: 45, oy: 30 },
-      { id:3, name:'XGBoost',   role:'AI_ML',          ox: 52, oy:-15 },
-      { id:4, name:'SHAP',      role:'AI_ML',          ox: 15, oy:-52 },
+      { id:0, name:'Streamlit', role:'Frontend',      ox:-52, oy: 15, desc:'Interactive dashboard for prediction inputs and result visualization' },
+      { id:1, name:'Pandas',    role:'Backend',        ox:-15, oy: 52, desc:'Feature engineering pipeline cleaning and transforming match data' },
+      { id:2, name:'LightGBM',  role:'AI_ML',          ox: 45, oy: 30, desc:'Gradient boosting model trained on historical BWF rankings' },
+      { id:3, name:'XGBoost',   role:'AI_ML',          ox: 52, oy:-15, desc:'Ensemble member providing complementary prediction signal' },
+      { id:4, name:'SHAP',      role:'AI_ML',          ox: 15, oy:-52, desc:'Shapley values explaining which features drove each prediction' },
     ],
     edges:[[1,2],[1,3],[2,4],[3,4],[4,0],[0,1]],
   },
   '010': { // HEALTH ASSISTANT
     nodes: [
-      { id:0, name:'HTML/CSS',  role:'Frontend',      ox:-50, oy: 35 },
-      { id:1, name:'GPT-3.5',   role:'AI_ML',          ox: 35, oy: 45 },
-      { id:2, name:'localStorage',role:'Data',         ox: 52, oy:-15 },
-      { id:3, name:'Notify API',role:'Infrastructure', ox:  0, oy:-52 },
+      { id:0, name:'HTML/CSS',  role:'Frontend',      ox:-50, oy: 35, desc:'Responsive web UI for health queries and daily reminders' },
+      { id:1, name:'GPT-3.5',   role:'AI_ML',          ox: 35, oy: 45, desc:'LLM interpreting health questions and generating safe advice' },
+      { id:2, name:'localStorage',role:'Data',         ox: 52, oy:-15, desc:'Client-side storage for user preferences and symptom history' },
+      { id:3, name:'Notify API',role:'Infrastructure', ox:  0, oy:-52, desc:'Browser notifications for medication and wellness reminders' },
     ],
     edges:[[0,1],[1,0],[0,2],[2,0],[0,3]],
   },
@@ -2736,10 +2738,13 @@ function initProjectGraph() {
 
   // Workflow visualization — shows per-project architecture with directed data flow
   let satObjects = [];
+  let wfMeshes  = [];   // { mesh, wn } — workflow spheres, raycaster-hittable
+  let wfAnimStart = 0; // timestamp when workflow appeared (for scale-in animation)
 
   function clearSatellites() {
     satObjects.forEach(o => group.remove(o));
     satObjects = [];
+    wfMeshes = [];
   }
 
   function showWorkflow(nd) {
@@ -2747,9 +2752,11 @@ function initProjectGraph() {
     const wf = PROJECT_WORKFLOW[nd.p.id];
     if (!wf) return;
 
+    wfAnimStart = Date.now();
+
     // Build world positions for each workflow node
     const wfPos = {}; // id → { pos: Vector3, color: string }
-    wf.nodes.forEach(wn => {
+    wf.nodes.forEach((wn, wIdx) => {
       const wx = nd.x + wn.ox;
       const wy = nd.y + wn.oy;
       const wz = nd.z;
@@ -2764,18 +2771,21 @@ function initProjectGraph() {
       group.add(lLine);
       satObjects.push(lLine);
 
-      // Workflow component sphere
-      const sGeo = new THREE.SphereGeometry(5.5, 12, 12);
-      const sMat = new THREE.MeshPhongMaterial({ color: new THREE.Color(color), shininess: 70, transparent: true, opacity: 0.95 });
+      // Workflow component sphere — starts at scale 0, animates in
+      const sGeo = new THREE.SphereGeometry(6.5, 14, 14);
+      const sMat = new THREE.MeshPhongMaterial({ color: new THREE.Color(color), shininess: 80, transparent: true, opacity: 0.95, emissive: new THREE.Color(color), emissiveIntensity: 0.12 });
       const sMesh = new THREE.Mesh(sGeo, sMat);
       sMesh.position.set(wx, wy, wz);
+      sMesh.scale.setScalar(0); // starts hidden, scale-in via animate loop
+      sMesh.userData.wfIdx = wIdx;
       group.add(sMesh);
       satObjects.push(sMesh);
+      wfMeshes.push({ mesh: sMesh, wn, nd, stagger: wIdx * 70 });
 
       // Component label
       const lbl = makeLabel(wn.name, color, 17);
       lbl.scale.set(66, 16, 1);
-      lbl.position.set(wx, wy + 10, wz);
+      lbl.position.set(wx, wy + 12, wz);
       group.add(lbl);
       satObjects.push(lbl);
 
@@ -2826,6 +2836,35 @@ function initProjectGraph() {
   const mouse2D = new THREE.Vector2();
   let activeIdx = -1;
 
+  // Show detail for a clicked workflow component (non-project sphere)
+  function showWorkflowDetail(wfItem) {
+    if (!infoEl) return;
+    const { wn, nd } = wfItem;
+    const color = LAYER_COLORS[wn.role] || '#7ab87a';
+    const p = nd.p;
+
+    // Find which workflow edges touch this node
+    const wf = PROJECT_WORKFLOW[p.id];
+    const inbound  = wf?.edges.filter(([, t]) => t === wn.id).map(([f]) => f) ?? [];
+    const outbound = wf?.edges.filter(([f]) => f === wn.id).map(([, t]) => t) ?? [];
+    const edgeNodes = wf?.nodes ?? [];
+    const nameOf = id => edgeNodes.find(n => n.id === id)?.name ?? id;
+
+    infoEl.innerHTML = `
+      <div class="gi-header" style="border-left-color:${color};margin-bottom:0.5rem">
+        <span class="gi-name" style="color:${color}">${wn.name}</span>
+        <span class="gi-award">${wn.role}</span>
+      </div>
+      <p class="gi-tagline">${wn.desc || 'Component of ' + p.name}</p>
+      ${inbound.length  ? `<div class="gi-conns-label" style="margin-top:0.75rem">receives from</div><div class="gi-conns">${inbound.map(id=>`<div class="gi-conn-row"><span class="gi-conn-name">${nameOf(id)}</span></div>`).join('')}</div>` : ''}
+      ${outbound.length ? `<div class="gi-conns-label" style="margin-top:0.5rem">sends to</div><div class="gi-conns">${outbound.map(id=>`<div class="gi-conn-row"><span class="gi-conn-name">${nameOf(id)}</span></div>`).join('')}</div>` : ''}
+      <div style="margin-top:1rem">
+        <button class="gi-link" id="gi-back-btn">← ${p.name}</button>
+      </div>`;
+
+    document.getElementById('gi-back-btn')?.addEventListener('click', () => showInfo(activeIdx));
+  }
+
   function showInfo(idx) {
     if (!infoEl) return;
     activeIdx = idx;
@@ -2835,13 +2874,21 @@ function initProjectGraph() {
     if (idx < 0) {
       clearSatellites();
       targetCamZ = 500;
+      focusNode = false;
       infoEl.innerHTML = '<p class="gi-hint">Click a node to explore a project</p>';
       window._graphChatDeactivate?.();
       return;
     }
 
     showWorkflow(nodeData[idx]);
-    targetCamZ = 290;
+    targetCamZ = 270;
+
+    // Auto-rotate group to face the selected node
+    const nd = nodeData[idx];
+    const dist = Math.sqrt(nd.x * nd.x + nd.z * nd.z);
+    targetRotY = -Math.atan2(nd.x, nd.z);
+    targetRotX = Math.atan2(-nd.y, dist > 1 ? dist : 1);
+    focusNode = true;
 
     const p = PROJECTS[idx];
     const connNames = edges.filter(e => e.i===idx||e.j===idx).map(e => {
@@ -2869,8 +2916,12 @@ function initProjectGraph() {
   // Orbit controls
   let isDragging = false, lastX = 0, lastY = 0;
   let rotX = 0, rotY = 0, autoRot = true;
+  let targetRotX = 0, targetRotY = 0, focusNode = false;
 
-  canvas.addEventListener('mousedown', e => { isDragging = true; lastX = e.clientX; lastY = e.clientY; autoRot = false; });
+  canvas.addEventListener('mousedown', e => {
+    isDragging = true; lastX = e.clientX; lastY = e.clientY;
+    autoRot = false; focusNode = false; // user takes manual control
+  });
   window.addEventListener('mouseup', () => { isDragging = false; });
   canvas.addEventListener('mousemove', e => {
     if (isDragging) {
@@ -2883,7 +2934,8 @@ function initProjectGraph() {
     mouse2D.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
     raycaster.setFromCamera(mouse2D, camera);
     const hits = raycaster.intersectObjects(spheres);
-    canvas.style.cursor = hits.length ? 'pointer' : 'grab';
+    const wfHover = !hits.length && raycaster.intersectObjects(wfMeshes.map(w => w.mesh)).length;
+    canvas.style.cursor = (hits.length || wfHover) ? 'pointer' : 'grab';
   });
 
   canvas.addEventListener('click', e => {
@@ -2891,14 +2943,25 @@ function initProjectGraph() {
     mouse2D.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1;
     mouse2D.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
     raycaster.setFromCamera(mouse2D, camera);
+
+    // Check project nodes first
     const hits = raycaster.intersectObjects(spheres);
     if (hits.length) {
       const idx = hits[0].object.userData.idx;
       showInfo(idx);
       ring.position.copy(hits[0].object.position);
-    } else {
-      showInfo(-1);
+      return;
     }
+
+    // Then check workflow component spheres
+    const wfHits = raycaster.intersectObjects(wfMeshes.map(w => w.mesh));
+    if (wfHits.length) {
+      const hit = wfMeshes.find(w => w.mesh === wfHits[0].object);
+      if (hit) showWorkflowDetail(hit);
+      return;
+    }
+
+    showInfo(-1);
   });
 
   canvas.addEventListener('wheel', e => {
@@ -2937,9 +3000,29 @@ function initProjectGraph() {
   function animate() {
     requestAnimationFrame(animate);
     if (autoRot) rotY += 0.003;
+
+    // Lerp group rotation toward selected node (camera auto-focus)
+    if (focusNode) {
+      rotX += (targetRotX - rotX) * 0.04;
+      rotY += (targetRotY - rotY) * 0.04;
+    }
+
     group.rotation.x = rotX;
     group.rotation.y = rotY;
     camera.position.z += (targetCamZ - camera.position.z) * 0.06;
+
+    // Scale-in animation for workflow spheres (staggered pop-in)
+    if (wfMeshes.length) {
+      const now = Date.now();
+      const elapsed = now - wfAnimStart;
+      wfMeshes.forEach(({ mesh, stagger }) => {
+        const t = Math.min(1, Math.max(0, (elapsed - stagger) / 320));
+        // Ease out cubic
+        const s = 1 - Math.pow(1 - t, 3);
+        mesh.scale.setScalar(s);
+      });
+    }
+
     renderer.render(scene, camera);
   }
   animate();
@@ -3048,7 +3131,12 @@ function initGamesHub() {
   function loadGame(g) {
     if (currentCleanup) { currentCleanup(); currentCleanup = null; }
     arena.innerHTML = '';
-    currentCleanup = GameRegistry[g]?.(arena) ?? null;
+    try {
+      currentCleanup = GameRegistry[g]?.(arena) ?? null;
+    } catch (err) {
+      arena.innerHTML = `<div style="padding:2rem;font-family:var(--font-sketch);color:var(--rouge)">⚠ ${g} failed to load.</div>`;
+      console.error('[Game] load error:', g, err);
+    }
   }
 
   // Lazy init — only when games tab becomes active

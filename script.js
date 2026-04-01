@@ -2142,9 +2142,8 @@ function initSpelling(arena) {
     if (allLetters.includes(l)) { word+=l; renderWord(); }
   };
   document.addEventListener('keydown', keyH);
-  return () => document.removeEventListener('keydown', keyH);
-  
   renderWord();
+  return () => document.removeEventListener('keydown', keyH);
 }
 
 // ---- Mini Crossword ----
@@ -2173,10 +2172,12 @@ function initCrossword(arena) {
       <button class="crane-btn cw-across active">→ Across</button>
       <button class="crane-btn cw-down">↓ Down</button>
     </div>
-    <div class="cw-board" style="display:grid;grid-template-columns:repeat(5,1fr);gap:2px;max-width:280px"></div>
-    <div class="cw-clues">
-      <div class="cw-clue-group"><div class="cw-clue-head">Across</div>${CLUES.across.map(c=>`<div class="cw-clue">${c}</div>`).join('')}</div>
-      <div class="cw-clue-group"><div class="cw-clue-head">Down</div>${CLUES.down.map(c=>`<div class="cw-clue">${c}</div>`).join('')}</div>
+    <div class="cw-body">
+      <div class="cw-board" style="display:grid;grid-template-columns:repeat(5,1fr);gap:2px"></div>
+      <div class="cw-clues">
+        <div class="cw-clue-group"><div class="cw-clue-head">Across</div>${CLUES.across.map(c=>`<div class="cw-clue">${c}</div>`).join('')}</div>
+        <div class="cw-clue-group"><div class="cw-clue-head">Down</div>${CLUES.down.map(c=>`<div class="cw-clue">${c}</div>`).join('')}</div>
+      </div>
     </div>
     <div class="cw-actions"><button class="crane-btn primary cw-check">Check</button><button class="crane-btn cw-reset">↺ reset</button></div>
     <div class="cw-msg"></div>
@@ -2495,6 +2496,109 @@ const PROJECT_KB = {
   },
 };
 
+// Per-project workflow graphs: nodes = components, edges = directed data flow
+const PROJECT_WORKFLOW = {
+  '001': { // LOCATR — multi-agent AI
+    nodes: [
+      { id:0, name:'Next.js',   role:'Frontend',      ox:-50, oy: 35 },
+      { id:1, name:'FastAPI',   role:'Backend',        ox:  0, oy: 52 },
+      { id:2, name:'LangGraph', role:'AI_ML',          ox: 48, oy: 20 },
+      { id:3, name:'Snowflake', role:'Data',           ox: 52, oy:-25 },
+      { id:4, name:'Redis',     role:'Data',           ox: -8, oy:-52 },
+    ],
+    edges:[[0,1],[1,2],[2,3],[3,2],[2,4],[4,2],[2,1],[1,0]],
+  },
+  '002': { // ECO-PULSE — heat mapping
+    nodes: [
+      { id:0, name:'React',     role:'Frontend',      ox:-48, oy: 28 },
+      { id:1, name:'FastAPI',   role:'Backend',        ox:  0, oy: 52 },
+      { id:2, name:'Python ML', role:'AI_ML',          ox: 48, oy: 28 },
+      { id:3, name:'Gemini',    role:'AI_ML',          ox: 52, oy:-18 },
+      { id:4, name:'Leaflet',   role:'Infrastructure', ox:-15, oy:-52 },
+    ],
+    edges:[[0,1],[1,2],[2,3],[3,1],[1,0],[0,4]],
+  },
+  '003': { // INTERPREFY — real-time translation
+    nodes: [
+      { id:0, name:'VB-Cable',  role:'Infrastructure', ox:-52, oy: 10 },
+      { id:1, name:'Python',    role:'Backend',        ox:-25, oy: 48 },
+      { id:2, name:'DeepGram',  role:'AI_ML',          ox: 25, oy: 48 },
+      { id:3, name:'DeepL',     role:'AI_ML',          ox: 52, oy: 10 },
+      { id:4, name:'PyQt5',     role:'Frontend',       ox:  0, oy:-52 },
+    ],
+    edges:[[0,1],[1,2],[2,3],[3,4],[1,4]],
+  },
+  '004': { // MASTERINGENZ — slang autocomplete
+    nodes: [
+      { id:0, name:'React',     role:'Frontend',      ox:-52, oy: 18 },
+      { id:1, name:'FastAPI',   role:'Backend',        ox:-15, oy: 52 },
+      { id:2, name:'GAT',       role:'AI_ML',          ox: 40, oy: 35 },
+      { id:3, name:'GRU',       role:'AI_ML',          ox: 52, oy:-15 },
+      { id:4, name:'Gemini',    role:'AI_ML',          ox: 15, oy:-52 },
+    ],
+    edges:[[0,1],[1,2],[2,3],[3,4],[4,1],[1,0]],
+  },
+  '005': { // IFYSHOP — shopping AI
+    nodes: [
+      { id:0, name:'React',     role:'Frontend',      ox:-52, oy: 18 },
+      { id:1, name:'FastAPI',   role:'Backend',        ox:  0, oy: 52 },
+      { id:2, name:'Gemini',    role:'AI_ML',          ox: 52, oy: 18 },
+      { id:3, name:'Snowflake', role:'Data',           ox: 38, oy:-40 },
+      { id:4, name:'Tavily',    role:'Infrastructure', ox:-20, oy:-52 },
+    ],
+    edges:[[0,1],[1,2],[1,3],[3,2],[1,4],[4,1],[2,1],[1,0]],
+  },
+  '006': { // OPENSCORE — credit scoring
+    nodes: [
+      { id:0, name:'React',     role:'Frontend',      ox:-52, oy: 20 },
+      { id:1, name:'FastAPI',   role:'Backend',        ox:  0, oy: 52 },
+      { id:2, name:'Plaid API', role:'Infrastructure', ox:-32, oy:-45 },
+      { id:3, name:'Extractors',role:'AI_ML',          ox: 45, oy: 30 },
+      { id:4, name:'Gemini',    role:'AI_ML',          ox: 52, oy:-20 },
+    ],
+    edges:[[0,1],[1,2],[2,1],[1,3],[3,4],[4,1],[1,0]],
+  },
+  '007': { // FIXMYFEED — social media filter
+    nodes: [
+      { id:0, name:'Extension', role:'Infrastructure', ox:-52, oy: 20 },
+      { id:1, name:'TypeScript',role:'Frontend',       ox:-20, oy: 52 },
+      { id:2, name:'Lava LLM',  role:'AI_ML',          ox: 45, oy: 28 },
+      { id:3, name:'FastAPI',   role:'Backend',        ox: 52, oy:-20 },
+      { id:4, name:'Supabase',  role:'Data',           ox:  0, oy:-52 },
+    ],
+    edges:[[0,1],[1,2],[2,3],[3,4],[4,3],[3,1],[1,0]],
+  },
+  '008': { // SPOTLIGHT — product placement
+    nodes: [
+      { id:0, name:'TypeScript',role:'Frontend',       ox:-52, oy: 20 },
+      { id:1, name:'FastAPI',   role:'Backend',        ox:  0, oy: 52 },
+      { id:2, name:'Gemini',    role:'AI_ML',          ox: 48, oy: 25 },
+      { id:3, name:'FFmpeg',    role:'Infrastructure', ox: 52, oy:-20 },
+      { id:4, name:'Backboard', role:'Data',           ox:-15, oy:-52 },
+    ],
+    edges:[[0,1],[1,3],[3,2],[2,3],[3,1],[1,4],[4,1],[1,0]],
+  },
+  '009': { // BWF PREDICTOR — ML pipeline
+    nodes: [
+      { id:0, name:'Streamlit', role:'Frontend',      ox:-52, oy: 15 },
+      { id:1, name:'Pandas',    role:'Backend',        ox:-15, oy: 52 },
+      { id:2, name:'LightGBM',  role:'AI_ML',          ox: 45, oy: 30 },
+      { id:3, name:'XGBoost',   role:'AI_ML',          ox: 52, oy:-15 },
+      { id:4, name:'SHAP',      role:'AI_ML',          ox: 15, oy:-52 },
+    ],
+    edges:[[1,2],[1,3],[2,4],[3,4],[4,0],[0,1]],
+  },
+  '010': { // HEALTH ASSISTANT
+    nodes: [
+      { id:0, name:'HTML/CSS',  role:'Frontend',      ox:-50, oy: 35 },
+      { id:1, name:'GPT-3.5',   role:'AI_ML',          ox: 35, oy: 45 },
+      { id:2, name:'localStorage',role:'Data',         ox: 52, oy:-15 },
+      { id:3, name:'Notify API',role:'Infrastructure', ox:  0, oy:-52 },
+    ],
+    edges:[[0,1],[1,0],[0,2],[2,0],[0,3]],
+  },
+};
+
 function initProjectGraph() {
   const canvas = document.getElementById('graph-canvas');
   if (!canvas || typeof THREE === 'undefined') return;
@@ -2615,7 +2719,7 @@ function initProjectGraph() {
   };
   const getTechLayer = t => TECH_LAYER_MAP[t] || 'Infrastructure';
 
-  // Satellite nodes — tech layer visualization around selected node
+  // Workflow visualization — shows per-project architecture with directed data flow
   let satObjects = [];
 
   function clearSatellites() {
@@ -2623,41 +2727,71 @@ function initProjectGraph() {
     satObjects = [];
   }
 
-  function showSatellites(nd) {
+  function showWorkflow(nd) {
     clearSatellites();
-    const techs = nd.p.tech;
-    const count = techs.length;
-    const SAT_R = 48;
-    techs.forEach((tech, i) => {
-      const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
-      const sx = nd.x + SAT_R * Math.cos(angle);
-      const sy = nd.y + SAT_R * Math.sin(angle);
-      const sz = nd.z;
-      const color = LAYER_COLORS[getTechLayer(tech)];
+    const wf = PROJECT_WORKFLOW[nd.p.id];
+    if (!wf) return;
 
-      // Connector line from node to satellite
+    // Build world positions for each workflow node
+    const wfPos = {}; // id → { pos: Vector3, color: string }
+    wf.nodes.forEach(wn => {
+      const wx = nd.x + wn.ox;
+      const wy = nd.y + wn.oy;
+      const wz = nd.z;
+      const color = LAYER_COLORS[wn.role] || '#7ab87a';
+
+      // Thin anchor line from parent node to this workflow node
       const lGeo = new THREE.BufferGeometry().setFromPoints([
         new THREE.Vector3(nd.x, nd.y, nd.z),
-        new THREE.Vector3(sx, sy, sz),
+        new THREE.Vector3(wx, wy, wz),
       ]);
-      const lLine = new THREE.Line(lGeo, new THREE.LineBasicMaterial({ color: new THREE.Color(color), transparent: true, opacity: 0.35 }));
+      const lLine = new THREE.Line(lGeo, new THREE.LineBasicMaterial({ color: new THREE.Color(color), transparent: true, opacity: 0.18 }));
       group.add(lLine);
       satObjects.push(lLine);
 
-      // Satellite sphere
-      const sGeo = new THREE.SphereGeometry(5, 10, 10);
-      const sMat = new THREE.MeshPhongMaterial({ color: new THREE.Color(color), shininess: 60 });
+      // Workflow component sphere
+      const sGeo = new THREE.SphereGeometry(5.5, 12, 12);
+      const sMat = new THREE.MeshPhongMaterial({ color: new THREE.Color(color), shininess: 70, transparent: true, opacity: 0.95 });
       const sMesh = new THREE.Mesh(sGeo, sMat);
-      sMesh.position.set(sx, sy, sz);
+      sMesh.position.set(wx, wy, wz);
       group.add(sMesh);
       satObjects.push(sMesh);
 
-      // Satellite label
-      const sLabel = makeLabel(tech, color, 18);
-      sLabel.scale.set(62, 15, 1);
-      sLabel.position.set(sx, sy + 9, sz);
-      group.add(sLabel);
-      satObjects.push(sLabel);
+      // Component label
+      const lbl = makeLabel(wn.name, color, 17);
+      lbl.scale.set(66, 16, 1);
+      lbl.position.set(wx, wy + 10, wz);
+      group.add(lbl);
+      satObjects.push(lbl);
+
+      wfPos[wn.id] = { pos: new THREE.Vector3(wx, wy, wz), color };
+    });
+
+    // Directed data-flow arrows between workflow nodes
+    wf.edges.forEach(([fromId, toId]) => {
+      const from = wfPos[fromId]; const to = wfPos[toId];
+      if (!from || !to) return;
+      const dir = to.pos.clone().sub(from.pos);
+      const dist = dir.length();
+      if (dist < 2) return;
+      dir.normalize();
+
+      const startOffset = 9;  // clear of source sphere
+      const endOffset   = 12; // clear of target sphere + arrowhead
+      const arrowLen = dist - startOffset - endOffset;
+      if (arrowLen <= 4) return;
+
+      const origin = from.pos.clone().add(dir.clone().multiplyScalar(startOffset));
+      const midColor = new THREE.Color(from.color).lerp(new THREE.Color(to.color), 0.5);
+      const headLen   = Math.min(9, arrowLen * 0.22);
+      const headWidth = headLen * 0.55;
+
+      const arrow = new THREE.ArrowHelper(dir, origin, arrowLen, midColor.getHex(), headLen, headWidth);
+      // Make the line part slightly transparent
+      arrow.line.material.transparent = true;
+      arrow.line.material.opacity = 0.75;
+      group.add(arrow);
+      satObjects.push(arrow);
     });
   }
 
@@ -2691,8 +2825,8 @@ function initProjectGraph() {
       return;
     }
 
-    showSatellites(nodeData[idx]);
-    targetCamZ = 320;
+    showWorkflow(nodeData[idx]);
+    targetCamZ = 290;
 
     const p = PROJECTS[idx];
     const connNames = edges.filter(e => e.i===idx||e.j===idx).map(e => {

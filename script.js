@@ -553,7 +553,7 @@ function initCursor() {
 // GATE GAMES
 // ================================================================
 
-const GATEKEEPER_GAMES = ['mathlab', 'connections', 'tictactoe', 'connect4'];
+const GATEKEEPER_GAMES = ['mathlab', 'connections', 'tictactoe', 'connect4', 'rps'];
 
 function unlockPortfolio() {
   const win = document.getElementById('gate-win');
@@ -1842,6 +1842,11 @@ function initTTTGame(arena, onWin = null) {
     return best;
   }
   function aiMove() {
+    if (Math.random() < 0.25) {
+      let empty = [];
+      for (let i=0;i<9;i++) if (!board[i]) empty.push(i);
+      if (empty.length > 0) return empty[Math.floor(Math.random() * empty.length)];
+    }
     let best=-Infinity, move=null;
     for (let i=0;i<9;i++) { if (!board[i]) { board[i]='O'; const s=minimax(board,false,0); board[i]=''; if(s>best){best=s;move=i;} } }
     return move;
@@ -1950,10 +1955,8 @@ function initConnect4(arena, onWin = null) {
     setStatus('Your turn (🔴)'); render();
   }
 
-  arena.querySelector('.c4-col-btns').addEventListener('click', e => {
-    const btn=e.target.closest('.c4-col-btn'); if(!btn||over) return;
-    const col=+btn.dataset.c;
-    if (!drop(grid,col,1)) return;
+  function handlePlay(col) {
+    if (over || !drop(grid,col,1)) return;
     render();
     if (checkWin(grid,1)) { setStatus('You win! 🎉'); over=true; render(); if (onWin) setTimeout(onWin, 700); return; }
     if (grid[0].every(c=>c)) { setStatus("Draw!"); over=true; return; }
@@ -1965,6 +1968,18 @@ function initConnect4(arena, onWin = null) {
       else if (grid[0].every(c=>c)) { setStatus("Draw!"); over=true; }
       else setStatus('Your turn (🔴)');
     }, 400);
+  }
+
+  arena.querySelector('.c4-col-btns').addEventListener('click', e => {
+    const btn=e.target.closest('.c4-col-btn'); if(!btn) return;
+    handlePlay(+btn.dataset.c);
+  });
+
+  arena.querySelector('.c4-board').addEventListener('click', e => {
+    const cell = e.target.closest('.c4-cell'); if(!cell) return;
+    const cells = Array.from(arena.querySelectorAll('.c4-cell'));
+    const index = cells.indexOf(cell);
+    if (index !== -1) handlePlay(index % COLS);
   });
 
   arena.querySelector('.c4-reset').addEventListener('click', reset);

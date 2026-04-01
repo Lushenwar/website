@@ -2442,6 +2442,59 @@ function initNumberlink(arena) {
 // 3D PROJECT GRAPH
 // ================================================================
 
+const PROJECT_KB = {
+  '001': {
+    stack_detail: 'LOCATR uses LangGraph at its core — five specialized agents (Commander, Scout, Vibe Matcher, Cost Analyst, Critic) communicate via a shared graph state. FastAPI serves the backend, Next.js the frontend. Snowflake powers persistent memory with RAG; Redis caches short-term agent context.',
+    architecture: 'Multi-agent LangGraph workflow: Commander decomposes the user request, Scout fetches venue candidates, Vibe Matcher scores cultural fit, Cost Analyst evaluates pricing, Critic synthesizes a final ranked list. All agents share a Snowflake-backed memory layer for cross-session context.',
+    challenge: 'Coordinating five agents without them talking over each other was the core problem. LangGraph\'s graph state made messaging deterministic, but tuning the Critic\'s weighting function to balance vibe vs. cost required iterative prompt engineering under hackathon time pressure.',
+  },
+  '002': {
+    stack_detail: 'Python ML pipeline generates heat priority zones from satellite data; FastAPI exposes them; React + Leaflet + Google Maps renders the interactive map; Gemini generates the intervention blueprints including candidate planting sites and cost/benefit breakdowns.',
+    architecture: 'Two-phase pipeline: offline (train ML model on Montreal urban heat data, store zone predictions) and online (user request → FastAPI → Gemini blueprint generation → Leaflet map overlay). The Gemini prompt includes zone priority score, neighborhood context, and cost constraints.',
+    challenge: 'Aligning ML-predicted heat zones with real map coordinates required careful CRS (coordinate reference system) transforms. Getting Gemini to produce structured JSON blueprints reliably needed a detailed system prompt with an explicit output schema.',
+  },
+  '003': {
+    stack_detail: 'VB-Cable creates a virtual audio device capturing system output. Python reads the audio stream, sends chunks to DeepGram for streaming transcription, Whisper cross-checks accuracy. DeepL translates on the fly. PyQt5 renders the always-on-top subtitle overlay.',
+    architecture: 'Real-time pipeline: audio capture (VB-Cable) → chunked streaming to DeepGram → DeepL translation → PyQt5 overlay rendering. Whisper runs as a periodic accuracy validator on longer segments. Full conversation is logged to a local SQLite file.',
+    challenge: 'Audio latency was the core challenge — VB-Cable introduces ~80ms buffer delay. Tuning DeepGram\'s endpointing sensitivity to avoid cutting off sentences mid-word while keeping the overlay snappy required extensive testing across audio sources and languages.',
+  },
+  '004': {
+    stack_detail: 'Custom Sparse Graph Attention Network (GAT) + GRU pipeline in PyTorch and PyTorch Geometric for slang autocomplete. FastAPI serves predictions. Gemini re-ranks top-k suggestions by sentence context and generates full Gen-Z replies. React handles the frontend.',
+    architecture: 'Input token → GAT encodes semantic neighborhood graph → GRU decodes sequence → top-k autocomplete candidates → Gemini context re-ranking → final suggestion + full reply. The GAT is trained on a custom slang co-occurrence graph built from scraped Twitter/Reddit data.',
+    challenge: 'Building the slang co-occurrence graph required heavy deduplication and normalization of scraped data. The GAT attention heads needed careful regularization to avoid overfitting on rare slang terms that appeared only a few times in training.',
+  },
+  '005': {
+    stack_detail: 'Gemini Vision identifies products from screenshots. Tavily scrapes live reviews and prices in parallel. Snowflake vector search stores product embeddings for similarity lookup. FastAPI backend, React frontend, Auth0 handles authentication.',
+    architecture: 'Screenshot → Gemini Vision identification → parallel Tavily scraping (reviews + prices) → Snowflake vector search for similar past products → Eco Score generation via Gemini → unified product card returned to React UI. Hybrid exact-match + embedding similarity for known vs. novel products.',
+    challenge: 'Making Snowflake vector search return useful results for novel products required a hybrid approach: exact-match for known items, embedding similarity for unknowns. Eco Score calculation needed a rubric that Gemini could apply consistently across very different product categories.',
+  },
+  '006': {
+    stack_detail: 'Plaid API ingests real banking transaction history. FastAPI processes it through a scoring pipeline. Gemini evaluates a weighted score across rent regularity, income stability, cash flow, and education credentials. React + JavaScript frontend.',
+    architecture: 'Plaid webhook → transaction normalization → four parallel feature extractors (rent, income, cashflow, education) → Gemini-powered weighted scoring → credit score output with plain-language explanation. No traditional credit bureau data used at any step.',
+    challenge: 'Normalizing transactions across different banks was the hardest problem — merchant names, categories, and amounts vary wildly. Plaid\'s category taxonomy helped but custom heuristics were still needed to reliably distinguish rent payments from other large recurring transfers.',
+  },
+  '007': {
+    stack_detail: 'Chrome Extension intercepts Instagram reels in real time. TypeScript applies grayscale as a friction mechanism. A multi-agent LLM pipeline (Lava Models) triages each reel. FastAPI + Python backend logs behavioral analytics to Supabase.',
+    architecture: 'Reel detected → Lava LLM pipeline scores content quality vs. user goals → decision: SKIP (auto-scroll), WAIT (grayscale delay), or LIKE_AND_STAY (full color). Analytics dashboard shows a neural map of behavioral patterns. Users set intention goals that inform the scoring.',
+    challenge: 'Getting reliable LLM decisions on video content in real time was the main challenge. Lava models run inference on extracted frames, introducing latency. Batching frames and caching decisions for repeated content got response time under 200ms.',
+  },
+  '008': {
+    stack_detail: 'Gemini Vision detects natural placement surfaces in video frames (tables, shelves, billboards, handheld items). FFmpeg composites the product insertion. TypeScript + FastAPI handle the pipeline. Backboard provides persistent campaign memory for brand-creator matching.',
+    architecture: 'Video upload → FFmpeg frame extraction → Gemini Vision scene analysis → placement candidate detection → brand asset compositing with FFmpeg → reconstructed video output. Backboard stores brand campaign briefs and matches them semantically to creator content.',
+    challenge: 'Seamless compositing was the hardest part — inserted products need to look naturally lit. The team estimated scene lighting from surrounding pixel values and applied a simple color grade. Getting Gemini to return consistent bounding box coordinates across frames required extensive prompt tuning.',
+  },
+  '009': {
+    stack_detail: 'Python data pipeline parses BWF match CSVs. Glicko-2 skill ratings and point-by-point momentum features are computed per match. LightGBM and XGBoost ensembles are trained and tuned with Optuna. SHAP explains feature importance. Streamlit dashboard visualizes predictions and tournament brackets.',
+    architecture: 'Raw match data → feature engineering (Glicko-2 ratings, momentum, surface, fatigue index) → LightGBM + XGBoost stacked ensemble (logistic regression meta-learner) → prediction with calibrated confidence → Streamlit visualization. SHAP values highlight which features drove each individual prediction.',
+    challenge: 'Glicko-2 initialization was tricky — early-career players had high uncertainty intervals that inflated ensemble variance. Using world ranking as a prior for initial ratings stabilized predictions for new players within ~5 matches.',
+  },
+  '010': {
+    stack_detail: 'Plain JavaScript frontend with multi-tab UI. OpenAI GPT-3.5 API powers the mental health chat with a mood-aware system prompt and offline fallback responses. Web APIs (Notifications API, Audio API) handle reminders and alerts. localStorage persists chat history and reminders across sessions.',
+    architecture: 'Three tabs: Chat (GPT-3.5 with offline fallback), Reminders (priority queue with Notifications API alerts), Calendar (event grid with audio cues). Fully client-side — no backend. Built as a first hackathon project at Hack404.',
+    challenge: 'The offline fallback system was the most thoughtful part — when the API is unavailable, a curated set of pattern-matched responses handles common mental health check-ins without any API call. Ensuring these fallback responses felt empathetic rather than clinical took careful writing.',
+  },
+};
+
 function initProjectGraph() {
   const canvas = document.getElementById('graph-canvas');
   if (!canvas || typeof THREE === 'undefined') return;
@@ -2456,15 +2509,14 @@ function initProjectGraph() {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(55, W/H, 0.1, 2000);
   camera.position.set(0, 0, 500);
+  let targetCamZ = 500;
 
-  // Ambient + directional light
   scene.add(new THREE.AmbientLight(0xf0e8d5, 0.4));
   const dLight = new THREE.DirectionalLight(0xf0e8d5, 0.8);
   dLight.position.set(1, 1, 1);
   scene.add(dLight);
 
-  // Node positions — arranged in a loose 3D sphere layout
-  const angleStep = (Math.PI * 2) / PROJECTS.length;
+  // Node positions — loose 3D sphere layout
   const nodeData = PROJECTS.map((p, i) => {
     const phi   = Math.acos(-1 + (2 * i) / PROJECTS.length);
     const theta = Math.sqrt(PROJECTS.length * Math.PI) * phi;
@@ -2474,11 +2526,10 @@ function initProjectGraph() {
       x: R * Math.sin(phi) * Math.cos(theta),
       y: R * Math.sin(phi) * Math.sin(theta),
       z: R * Math.cos(phi),
-      vx: 0, vy: 0, vz: 0,
     };
   });
 
-  // Edges: connect projects sharing >= 2 technologies
+  // Edges: projects sharing >= 1 technology
   const edges = [];
   for (let i = 0; i < PROJECTS.length; i++) {
     for (let j = i+1; j < PROJECTS.length; j++) {
@@ -2487,10 +2538,10 @@ function initProjectGraph() {
     }
   }
 
-  // Create node meshes
+  // Node meshes
   const spheres = nodeData.map(nd => {
     const geo = new THREE.SphereGeometry(10, 20, 20);
-    const mat = new THREE.MeshPhongMaterial({ color: new THREE.Color(nd.p.color), shininess: 80 });
+    const mat = new THREE.MeshPhongMaterial({ color: new THREE.Color(nd.p.color), shininess: 80, transparent: true, opacity: 1 });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(nd.x, nd.y, nd.z);
     mesh.userData = { nd, idx: nodeData.indexOf(nd) };
@@ -2505,8 +2556,9 @@ function initProjectGraph() {
   ring.visible = false;
   scene.add(ring);
 
-  // Create edge lines
-  const lineMat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.4 });
+  // Edge lines — shared material for global dimming
+  const edgeMat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.4 });
+  const edgeLines = [];
   edges.forEach(e => {
     const pts = [
       new THREE.Vector3(nodeData[e.i].x, nodeData[e.i].y, nodeData[e.i].z),
@@ -2518,14 +2570,16 @@ function initProjectGraph() {
     colors.push(c1.r, c1.g, c1.b, c2.r, c2.g, c2.b);
     const geo = new THREE.BufferGeometry().setFromPoints(pts);
     geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    scene.add(new THREE.Line(geo, lineMat));
+    const line = new THREE.Line(geo, edgeMat);
+    scene.add(line);
+    edgeLines.push(line);
   });
 
-  // Labels (canvas textures)
-  function makeLabel(text, color) {
+  // Label sprites
+  function makeLabel(text, color, fontSize = 24) {
     const c = document.createElement('canvas'); c.width = 256; c.height = 64;
     const ctx = c.getContext('2d');
-    ctx.font = 'bold 24px Caveat, cursive';
+    ctx.font = `bold ${fontSize}px Caveat, cursive`;
     ctx.fillStyle = color;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -2533,21 +2587,92 @@ function initProjectGraph() {
     const tex = new THREE.CanvasTexture(c);
     const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
     const sprite = new THREE.Sprite(mat);
-    sprite.scale.set(80, 20, 1);
     return sprite;
   }
 
   const labels = nodeData.map(nd => {
     const sprite = makeLabel(nd.p.name, nd.p.color);
+    sprite.scale.set(80, 20, 1);
     sprite.position.set(nd.x, nd.y + 18, nd.z);
     scene.add(sprite);
     return sprite;
   });
 
-  // Info panel
-  const infoEl = document.getElementById('graph-info');
+  // Tech layer colors for satellite visualization
+  const LAYER_COLORS = {
+    Frontend: '#60a5d4', Backend: '#f0984e', AI_ML: '#c08fff',
+    Data: '#4ecdc4', Infrastructure: '#7ab87a',
+  };
+  const TECH_LAYER_MAP = {
+    'React':'Frontend','Next.js':'Frontend','TypeScript':'Frontend',
+    'JavaScript':'Frontend','HTML/CSS':'Frontend','PyQt5':'Frontend','Streamlit':'Frontend',
+    'FastAPI':'Backend','Python':'Backend',
+    'LangGraph':'AI_ML','Gemini':'AI_ML','OpenAI GPT-3.5':'AI_ML','DeepGram':'AI_ML',
+    'Whisper':'AI_ML','DeepL':'AI_ML','LightGBM':'AI_ML','XGBoost':'AI_ML',
+    'PyTorch':'AI_ML','PyTorch Geometric':'AI_ML','GAT + GRU':'AI_ML',
+    'SHAP':'AI_ML','Optuna':'AI_ML','Lava Models':'AI_ML',
+    'Snowflake':'Data','Redis':'Data','Supabase':'Data','Pandas':'Data',
+  };
+  const getTechLayer = t => TECH_LAYER_MAP[t] || 'Infrastructure';
 
-  // Raycaster
+  // Satellite nodes — tech layer visualization around selected node
+  let satObjects = [];
+
+  function clearSatellites() {
+    satObjects.forEach(o => group.remove(o));
+    satObjects = [];
+  }
+
+  function showSatellites(nd) {
+    clearSatellites();
+    const techs = nd.p.tech;
+    const count = techs.length;
+    const SAT_R = 48;
+    techs.forEach((tech, i) => {
+      const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
+      const sx = nd.x + SAT_R * Math.cos(angle);
+      const sy = nd.y + SAT_R * Math.sin(angle);
+      const sz = nd.z;
+      const color = LAYER_COLORS[getTechLayer(tech)];
+
+      // Connector line from node to satellite
+      const lGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(nd.x, nd.y, nd.z),
+        new THREE.Vector3(sx, sy, sz),
+      ]);
+      const lLine = new THREE.Line(lGeo, new THREE.LineBasicMaterial({ color: new THREE.Color(color), transparent: true, opacity: 0.35 }));
+      group.add(lLine);
+      satObjects.push(lLine);
+
+      // Satellite sphere
+      const sGeo = new THREE.SphereGeometry(5, 10, 10);
+      const sMat = new THREE.MeshPhongMaterial({ color: new THREE.Color(color), shininess: 60 });
+      const sMesh = new THREE.Mesh(sGeo, sMat);
+      sMesh.position.set(sx, sy, sz);
+      group.add(sMesh);
+      satObjects.push(sMesh);
+
+      // Satellite label
+      const sLabel = makeLabel(tech, color, 18);
+      sLabel.scale.set(62, 15, 1);
+      sLabel.position.set(sx, sy + 9, sz);
+      group.add(sLabel);
+      satObjects.push(sLabel);
+    });
+  }
+
+  // Node dimming — fade non-selected nodes and edges
+  function dimNodes(activeIdx) {
+    spheres.forEach((s, i) => {
+      s.material.opacity = (activeIdx < 0 || i === activeIdx) ? 1.0 : 0.18;
+    });
+    labels.forEach((l, i) => {
+      l.material.opacity = (activeIdx < 0 || i === activeIdx) ? 1.0 : 0.12;
+    });
+    edgeMat.opacity = activeIdx < 0 ? 0.4 : 0.08;
+  }
+
+  const infoEl = document.getElementById('graph-info');
   const raycaster = new THREE.Raycaster();
   const mouse2D = new THREE.Vector2();
   let activeIdx = -1;
@@ -2556,7 +2681,19 @@ function initProjectGraph() {
     if (!infoEl) return;
     activeIdx = idx;
     ring.visible = idx >= 0;
-    if (idx < 0) { infoEl.innerHTML = '<p class="gi-hint">Click a node to explore a project</p>'; return; }
+    dimNodes(idx);
+
+    if (idx < 0) {
+      clearSatellites();
+      targetCamZ = 500;
+      infoEl.innerHTML = '<p class="gi-hint">Click a node to explore a project</p>';
+      window._graphChatDeactivate?.();
+      return;
+    }
+
+    showSatellites(nodeData[idx]);
+    targetCamZ = 320;
+
     const p = PROJECTS[idx];
     const connNames = edges.filter(e => e.i===idx||e.j===idx).map(e => {
       const other = e.i===idx ? e.j : e.i;
@@ -2576,9 +2713,11 @@ function initProjectGraph() {
         ${p.devpost ? `<a href="${p.devpost}" target="_blank" class="gi-link">DevPost ↗</a>` : ''}
         ${p.demo ? `<a href="${p.demo}" target="_blank" class="gi-link">Demo ↗</a>` : ''}
       </div>`;
+
+    window._graphChatActivate?.(p.id, p.name);
   }
 
-  // Orbit controls (manual implementation)
+  // Orbit controls
   let isDragging = false, lastX = 0, lastY = 0;
   let rotX = 0, rotY = 0, autoRot = true;
 
@@ -2590,7 +2729,6 @@ function initProjectGraph() {
       rotX += (e.clientY - lastY) * 0.008;
       lastX = e.clientX; lastY = e.clientY;
     }
-    // Hover highlight
     const rect = canvas.getBoundingClientRect();
     mouse2D.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1;
     mouse2D.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
@@ -2615,7 +2753,7 @@ function initProjectGraph() {
   });
 
   canvas.addEventListener('wheel', e => {
-    camera.position.z = Math.max(200, Math.min(800, camera.position.z + e.deltaY * 0.5));
+    targetCamZ = Math.max(200, Math.min(800, targetCamZ + e.deltaY * 0.5));
   });
 
   // Touch support
@@ -2632,7 +2770,7 @@ function initProjectGraph() {
   const group = new THREE.Group();
   spheres.forEach(s => { scene.remove(s); group.add(s); });
   labels.forEach(l => { scene.remove(l); group.add(l); });
-  scene.children.filter(o => o.isLine).forEach(l => { scene.remove(l); group.add(l); });
+  edgeLines.forEach(l => { scene.remove(l); group.add(l); });
   scene.remove(ring); group.add(ring);
   scene.add(group);
 
@@ -2644,6 +2782,7 @@ function initProjectGraph() {
   scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xf0e8d5, size: 1.5, transparent: true, opacity: 0.3 })));
 
   showInfo(-1);
+  initGraphChatbot();
 
   // Animate
   function animate() {
@@ -2651,9 +2790,82 @@ function initProjectGraph() {
     if (autoRot) rotY += 0.003;
     group.rotation.x = rotX;
     group.rotation.y = rotY;
+    camera.position.z += (targetCamZ - camera.position.z) * 0.06;
     renderer.render(scene, camera);
   }
   animate();
+}
+
+// ================================================================
+// GRAPH CHATBOT
+// ================================================================
+
+function initGraphChatbot() {
+  const chatEl  = document.getElementById('graph-chat');
+  const msgsEl  = document.getElementById('gc-messages');
+  const inputEl = document.getElementById('gc-input');
+  const sendBtn = document.getElementById('gc-send');
+  if (!chatEl || !msgsEl || !inputEl || !sendBtn) return;
+
+  let currentProjectId = null;
+
+  function addMsg(text, role) {
+    const div = document.createElement('div');
+    div.className = `gc-msg gc-${role}`;
+    div.textContent = text;
+    msgsEl.appendChild(div);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
+
+  function respond(query) {
+    const kb = PROJECT_KB[currentProjectId];
+    if (!kb) { addMsg('No data for this project yet.', 'bot'); return; }
+    const q = query.toLowerCase();
+    let response;
+    if (/stack|tech|built|language|framework|tool|use|library/.test(q)) {
+      response = kb.stack_detail;
+    } else if (/architect|system|how does|how do|work|flow|pipeline|design|structure/.test(q)) {
+      response = kb.architecture;
+    } else if (/challenge|hard|difficult|problem|issue|tricky|struggle|fix/.test(q)) {
+      response = kb.challenge;
+    } else if (/link|github|demo|devpost|code|repo|project page/.test(q)) {
+      const p = PROJECTS.find(pr => pr.id === currentProjectId);
+      const links = [
+        p.github  && `GitHub: ${p.github}`,
+        p.devpost && `DevPost: ${p.devpost}`,
+        p.demo    && `Demo: ${p.demo}`,
+      ].filter(Boolean);
+      response = links.length ? links.join('\n') : 'No external links for this project.';
+    } else if (/what|about|describe|tell|overview|summary|explain/.test(q)) {
+      response = PROJECTS.find(pr => pr.id === currentProjectId)?.description || '';
+    } else {
+      response = 'Try asking about the tech stack, architecture, challenges, or links.';
+    }
+    addMsg(response, 'bot');
+  }
+
+  function onSend() {
+    const val = inputEl.value.trim();
+    if (!val || !currentProjectId) return;
+    addMsg(val, 'user');
+    inputEl.value = '';
+    respond(val);
+  }
+
+  sendBtn.addEventListener('click', onSend);
+  inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') onSend(); });
+
+  window._graphChatActivate = (projectId, projectName) => {
+    currentProjectId = projectId;
+    chatEl.hidden = false;
+    msgsEl.innerHTML = '';
+    addMsg(`${projectName} loaded — ask about the stack, architecture, or challenges.`, 'bot');
+  };
+
+  window._graphChatDeactivate = () => {
+    currentProjectId = null;
+    chatEl.hidden = true;
+  };
 }
 
 // ================================================================

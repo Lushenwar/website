@@ -516,8 +516,18 @@
         <p class="graph-desc">Nodes = projects · Edges = shared technology stack · Drag to rotate · Scroll to zoom · Click a node to explore</p>
         <div class="graph-layout">
           <canvas id="graph-canvas" class="graph-canvas"></canvas>
-          <div id="graph-info" class="graph-info">
-            <p class="gi-hint">Click a node to explore a project</p>
+          <div class="graph-sidebar">
+            <div id="graph-info" class="graph-info">
+              <p class="gi-hint">Click a node to explore a project</p>
+            </div>
+            <div id="graph-chat" class="graph-chat" hidden>
+              <div class="gc-header">ask about this project</div>
+              <div class="gc-messages" id="gc-messages"></div>
+              <div class="gc-input-row">
+                <input type="text" id="gc-input" class="gc-input" placeholder="tech stack, architecture, challenges…" autocomplete="off">
+                <button id="gc-send" class="gc-send">↵</button>
+              </div>
+            </div>
           </div>
         </div>
       </section>

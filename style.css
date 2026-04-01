@@ -500,6 +500,42 @@ body:has(a:hover, button:hover, .project-card:hover) #cursor {
   pointer-events: none;
   transform-origin: center center;
   will-change: top, left, transform;
+  transition: top 0.3s ease, left 0.3s ease;
+}
+
+/* Astronaut intercepting state */
+#faller.astro-intercepting {
+  top: 12vh !important;
+  left: 50vw !important;
+  transform: translate(-50%, 0) rotate(-8deg) !important;
+}
+
+#faller.astro-intercepting::after {
+  content: "Block your path, I will.";
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: var(--font-sketch);
+  font-size: 0.85rem;
+  color: var(--ink);
+  background: rgba(13,12,9,0.9);
+  border: 1.5px solid var(--ink-faint);
+  padding: 0.4rem 0.75rem;
+  pointer-events: none;
+}
+
+/* Astronaut defeated state */
+@keyframes astro-defeat {
+  0%   { transform: translate(-50%, 0) rotate(-8deg) scale(1); opacity: 1; }
+  30%  { transform: translate(-50%, 0) rotate(40deg) scale(1.15); opacity: 1; }
+  60%  { transform: translate(-50%, 20vh) rotate(180deg) scale(0.6); opacity: 0.5; }
+  100% { transform: translate(-50%, 60vh) rotate(360deg) scale(0); opacity: 0; }
+}
+
+#faller.astro-defeated {
+  animation: astro-defeat 0.7s ease-in forwards;
 }
 
 .faller-trail {

@@ -212,10 +212,7 @@ function renderProjects(filter = 'hackathon') {
       if (beaten) {
         toggleCard(card);
       } else {
-        showMiniGate(p.id, p.name, () => {
-          sessionStorage.setItem(`proj_${p.id}`, '1');
-          toggleCard(card);
-        });
+        AstronautGate.intercept(p.id, p.name, () => toggleCard(card));
       }
     });
 
@@ -517,6 +514,7 @@ function initFaller() {
 
   (function loop() {
     requestAnimationFrame(loop);
+    if (typeof AstronautGate !== 'undefined' && AstronautGate.isPaused()) return;
     const vel = scrollY - prev; prev = scrollY;
     const prog = Math.min(scrollY / Math.max(document.body.scrollHeight - window.innerHeight, 1), 1);
 
@@ -555,335 +553,121 @@ function initCursor() {
 // GATE GAMES
 // ================================================================
 
-const GAMES = ['rps', 'tictactoe', 'math'];
-const SELECTED_GAME = GAMES[Math.floor(Math.random() * GAMES.length)];
+const GATEKEEPER_GAMES = ['mathlab', 'connections', 'tictactoe', 'connect4'];
 
 function unlockPortfolio() {
   const win = document.getElementById('gate-win');
   win.classList.add('show');
-
   setTimeout(() => {
     const gate = document.getElementById('gate');
     const portfolio = document.getElementById('portfolio');
     gate.classList.add('unlocking');
     portfolio.classList.add('visible');
     sessionStorage.setItem('unlocked', '1');
-
     setTimeout(() => { gate.style.display = 'none'; }, 900);
   }, 1800);
 }
 
-// ---- ROCK PAPER SCISSORS ----
-function initRPS(container) {
-  let you = 0, ai = 0;
+// ================================================================
+// ASTRONAUT GATE — unified gatekeeper state machine
+// ================================================================
 
-  container.innerHTML = `
-    <div class="game-label">challenge · rock paper scissors</div>
-    <div class="game-title">Beat the Machine</div>
-    <p class="game-desc">Best of 3 — win 2 rounds to enter.</p>
-    <div class="score-display">
-      <div><span class="score-you">${you}</span><span class="score-label">you</span></div>
-      <span class="score-vs">vs</span>
-      <div><span class="score-ai">${ai}</span><span class="score-label">AI</span></div>
-    </div>
-    <div class="rps-grid">
-      <button class="rps-btn" data-choice="rock"><span class="rps-emoji">✊</span>Rock</button>
-      <button class="rps-btn" data-choice="paper"><span class="rps-emoji">✋</span>Paper</button>
-      <button class="rps-btn" data-choice="scissors"><span class="rps-emoji">✌️</span>Scissors</button>
-    </div>
-    <div class="round-result" id="rps-result">pick your move</div>
-  `;
+const AstronautGate = (() => {
+  let state = 'idle';
+  let fallerPaused = false;
+  let currentCleanup = null;
 
-  const updateScore = () => {
-    container.querySelector('.score-you').textContent = you;
-    container.querySelector('.score-ai').textContent = ai;
+  function closeModal() {
+    const modal = document.getElementById('mini-gate');
+    const container = document.getElementById('mini-game-container');
+    if (modal) modal.style.display = 'none';
+    if (container) container.innerHTML = '';
+    if (currentCleanup) { currentCleanup(); currentCleanup = null; }
+  }
+
+  function setDefeated(onDone) {
+    state = 'defeated';
+    const f = document.getElementById('faller');
+    if (f) {
+      f.classList.remove('astro-intercepting');
+      f.classList.add('astro-defeated');
+      setTimeout(() => {
+        f.classList.remove('astro-defeated');
+        state = 'idle';
+        fallerPaused = false;
+        if (onDone) onDone();
+      }, 700);
+    } else {
+      state = 'idle';
+      fallerPaused = false;
+      if (onDone) onDone();
+    }
+  }
+
+  return {
+    isPaused() { return fallerPaused; },
+
+    unlock(mode, payload = {}) {
+      if (mode === 'global') {
+        unlockPortfolio();
+      } else if (mode === 'project') {
+        closeModal();
+        setDefeated(() => {
+          if (payload.projectId) sessionStorage.setItem(`proj_${payload.projectId}`, '1');
+          if (payload.onProjectOpen) payload.onProjectOpen();
+        });
+      }
+    },
+
+    intercept(projectId, projectName, onProjectOpen) {
+      state = 'intercepting';
+      fallerPaused = true;
+      const f = document.getElementById('faller');
+      if (f) f.classList.add('astro-intercepting');
+
+      const modal = document.getElementById('mini-gate');
+      const container = document.getElementById('mini-game-container');
+      const titleEl = document.getElementById('mini-gate-title');
+      if (!modal || !container) return;
+
+      if (titleEl) titleEl.textContent = `defeat the Astronaut to unlock "${projectName}"`;
+      modal.style.display = 'flex';
+
+      // refresh close button listener
+      const oldBtn = modal.querySelector('.mini-gate-close');
+      const newBtn = oldBtn.cloneNode(true);
+      oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+      newBtn.addEventListener('click', () => {
+        closeModal();
+        if (f) f.classList.remove('astro-intercepting');
+        state = 'idle'; fallerPaused = false;
+      });
+      modal.onclick = e => {
+        if (e.target === modal) {
+          closeModal();
+          if (f) f.classList.remove('astro-intercepting');
+          state = 'idle'; fallerPaused = false;
+        }
+      };
+
+      const gameId = GATEKEEPER_GAMES[Math.floor(Math.random() * GATEKEEPER_GAMES.length)];
+      const onWin = () => AstronautGate.unlock('project', { projectId, onProjectOpen });
+      currentCleanup = GameRegistry[gameId](container, onWin);
+    },
   };
-
-  container.querySelectorAll('.rps-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const choices = ['rock', 'paper', 'scissors'];
-      const player = btn.dataset.choice;
-      const machine = choices[Math.floor(Math.random() * 3)];
-      const res = container.querySelector('#rps-result');
-
-      let outcome;
-      if (player === machine) {
-        outcome = 'tie'; res.textContent = `Tie! AI also picked ${machine}`; res.className = 'round-result tie';
-      } else if (
-        (player === 'rock' && machine === 'scissors') ||
-        (player === 'paper' && machine === 'rock') ||
-        (player === 'scissors' && machine === 'paper')
-      ) {
-        outcome = 'win'; you++; res.textContent = `You win! AI picked ${machine}`; res.className = 'round-result win';
-      } else {
-        outcome = 'lose'; ai++; res.textContent = `AI wins! It picked ${machine}`; res.className = 'round-result lose';
-      }
-
-      updateScore();
-
-      if (you === 2) { setTimeout(unlockPortfolio, 500); }
-      else if (ai === 2) {
-        setTimeout(() => {
-          you = 0; ai = 0; updateScore();
-          res.textContent = 'AI wins the match! Try again.'; res.className = 'round-result lose';
-        }, 800);
-      }
-    });
-  });
-}
-
-// ---- TIC TAC TOE ----
-function initTTT(container) {
-  let board = Array(9).fill(null);
-  let locked = false;
-  let isFirstGame = true; // first game uses perfect minimax
-
-  const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-  const wins = (b, p) => WINS.some(([a,c,d]) => b[a]===p && b[c]===p && b[d]===p);
-
-  // Perfect minimax — AI never loses
-  function minimax(b, isMax, depth) {
-    if (wins(b, 'O')) return 10 - depth;
-    if (wins(b, 'X')) return depth - 10;
-    const empty = b.map((v,i) => v===null?i:null).filter(v=>v!==null);
-    if (!empty.length) return 0;
-    let best = isMax ? -Infinity : Infinity;
-    for (const i of empty) {
-      b[i] = isMax ? 'O' : 'X';
-      const score = minimax(b, !isMax, depth + 1);
-      b[i] = null;
-      best = isMax ? Math.max(best, score) : Math.min(best, score);
-    }
-    return best;
-  }
-
-  function perfectMove(b) {
-    const empty = b.map((v,i) => v===null?i:null).filter(v=>v!==null);
-    let best = -Infinity, move = empty[0];
-    for (const i of empty) {
-      b[i] = 'O';
-      const score = minimax(b, false, 0);
-      b[i] = null;
-      if (score > best) { best = score; move = i; }
-    }
-    return move;
-  }
-
-  // Medium AI — 62% optimal, 38% random (beatable)
-  function mediumMove(b) {
-    const empty = b.map((v,i) => v===null?i:null).filter(v=>v!==null);
-    if (!empty.length) return -1;
-    if (Math.random() < 0.62) {
-      for (const i of empty) { b[i]='O'; if (wins(b,'O')) { b[i]=null; return i; } b[i]=null; }
-      for (const i of empty) { b[i]='X'; if (wins(b,'X')) { b[i]=null; return i; } b[i]=null; }
-      if (b[4]===null) return 4;
-      for (const i of [0,2,6,8]) if (b[i]===null) return i;
-    }
-    return empty[Math.floor(Math.random() * empty.length)];
-  }
-
-  function aiMove(b) {
-    return isFirstGame ? perfectMove(b) : mediumMove(b);
-  }
-
-  function render() {
-    const cells = container.querySelectorAll('.ttt-cell');
-    cells.forEach((c, i) => {
-      c.textContent = board[i] || '';
-      c.dataset.val = board[i] || '';
-      c.disabled = !!board[i] || locked;
-    });
-  }
-
-  function setStatus(msg) {
-    container.querySelector('.ttt-status').textContent = msg;
-  }
-
-  const firstGameNote = () => isFirstGame
-    ? '<span style="color:var(--rouge);font-size:0.8rem"> — (the AI is unbeatable this round)</span>'
-    : '';
-
-  container.innerHTML = `
-    <div class="game-label">challenge · tic tac toe</div>
-    <div class="game-title">Beat the AI</div>
-    <p class="game-desc">You're X. Win — draws don't count.</p>
-    <div class="ttt-grid">
-      ${Array(9).fill(0).map((_,i) => `<button class="ttt-cell" data-index="${i}"></button>`).join('')}
-    </div>
-    <div class="ttt-status">your turn${firstGameNote()}</div>
-    <button class="game-reset">reset board</button>
-  `;
-
-  function reset() {
-    isFirstGame = false; // subsequent games use medium AI
-    board = Array(9).fill(null);
-    locked = false;
-    render();
-    setStatus('your turn — good luck this time');
-  }
-
-  container.querySelector('.game-reset').addEventListener('click', reset);
-
-  container.querySelectorAll('.ttt-cell').forEach(cell => {
-    cell.addEventListener('click', () => {
-      const i = +cell.dataset.index;
-      if (board[i] || locked) return;
-
-      board[i] = 'X';
-      render();
-
-      if (wins(board, 'X')) {
-        locked = true;
-        render();
-        setStatus('🎉 You win!');
-        setTimeout(unlockPortfolio, 600);
-        return;
-      }
-      if (board.every(Boolean)) {
-        setStatus('Draw! Try again.');
-        setTimeout(reset, 1200);
-        return;
-      }
-
-      locked = true;
-      setStatus('AI thinking...');
-
-      setTimeout(() => {
-        const m = aiMove(board);
-        if (m < 0) return;
-        board[m] = 'O';
-
-        if (wins(board, 'O')) {
-          locked = true;
-          render();
-          setStatus('AI wins! Try again.');
-          setTimeout(reset, 1400);
-          return;
-        }
-        if (board.every(Boolean)) {
-          locked = false;
-          render();
-          setStatus('Draw! Try again.');
-          setTimeout(reset, 1200);
-          return;
-        }
-
-        // Unlock BEFORE render so disabled state reflects correctly
-        locked = false;
-        render();
-        setStatus('your turn');
-      }, 450);
-    });
-  });
-}
-
-// ---- MATH QUIZ ----
-function initMath(container) {
-  let correct = 0, total = 0, answered = 0, answer = 0;
-  const ROUNDS = 3, NEEDED = 2;
-
-  const ops = [
-    () => { const a = ri(15,60), b = ri(10,50); return { q: `${a} + ${b}`, a: a+b }; },
-    () => { const a = ri(30,80), b = ri(5,30);  return { q: `${a} − ${b}`, a: a-b }; },
-    () => { const a = ri(2,12),  b = ri(2,12);  return { q: `${a} × ${b}`, a: a*b }; },
-  ];
-
-  function ri(lo, hi) { return Math.floor(Math.random() * (hi - lo + 1)) + lo; }
-
-  function newQ() {
-    const o = ops[Math.floor(Math.random() * ops.length)]();
-    answer = o.a;
-    container.querySelector('.math-problem').textContent = `${o.q} = ?`;
-    container.querySelector('.math-input').value = '';
-    container.querySelector('.math-input').focus();
-    container.querySelector('.math-feedback').textContent = '';
-    container.querySelector('.math-feedback').className = 'math-feedback';
-  }
-
-  function updateDots() {
-    const dots = container.querySelectorAll('.math-dot');
-    dots.forEach((d, i) => {
-      d.className = 'math-dot';
-      if (i < answered) d.classList.add(i < correct ? 'correct' : 'wrong');
-    });
-  }
-
-  container.innerHTML = `
-    <div class="game-label">challenge · math quiz</div>
-    <div class="game-title">Solve ${ROUNDS}, Win ${NEEDED}</div>
-    <p class="game-desc">Get ${NEEDED} out of ${ROUNDS} correct to enter.</p>
-    <div class="math-progress">
-      ${Array(ROUNDS).fill(0).map(() => '<div class="math-dot"></div>').join('')}
-    </div>
-    <div class="math-problem">loading...</div>
-    <div class="math-input-row">
-      <div class="math-input-wrap">
-        <input class="math-input" type="number" placeholder="?" autocomplete="off"/>
-      </div>
-      <button class="math-submit">→</button>
-    </div>
-    <div class="math-feedback"></div>
-  `;
-
-  newQ();
-
-  function submit() {
-    if (answered >= ROUNDS) return;
-    const val = parseInt(container.querySelector('.math-input').value, 10);
-    if (isNaN(val)) return;
-
-    const fb = container.querySelector('.math-feedback');
-    answered++;
-    total++;
-
-    if (val === answer) {
-      correct++;
-      fb.textContent = 'Correct! ✓';
-      fb.className = 'math-feedback correct';
-    } else {
-      fb.textContent = `Not quite — answer was ${answer}`;
-      fb.className = 'math-feedback wrong';
-    }
-
-    updateDots();
-
-    if (answered === ROUNDS) {
-      setTimeout(() => {
-        if (correct >= NEEDED) {
-          unlockPortfolio();
-        } else {
-          // Reset
-          correct = 0; total = 0; answered = 0;
-          updateDots();
-          fb.textContent = `${correct}/${ROUNDS} — not enough. Try again!`;
-          fb.className = 'math-feedback wrong';
-          setTimeout(newQ, 1000);
-        }
-      }, 800);
-    } else {
-      setTimeout(newQ, 700);
-    }
-  }
-
-  container.querySelector('.math-submit').addEventListener('click', submit);
-  container.querySelector('.math-input').addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
-}
+})();
 
 // ================================================================
 // INIT GATE
 // ================================================================
 
 function initGate() {
-  // Check session
   if (sessionStorage.getItem('unlocked') === '1') {
     document.getElementById('gate').style.display = 'none';
     document.getElementById('portfolio').classList.add('visible');
     return;
   }
-
   const container = document.getElementById('game-container');
-
-  // Add win overlay
   container.insertAdjacentHTML('afterend', `
     <div id="gate-win">
       <div style="font-size:3rem">🎉</div>
@@ -891,131 +675,8 @@ function initGate() {
       <div class="win-sub">welcome to the portfolio</div>
     </div>
   `);
-
-  if (SELECTED_GAME === 'rps') initRPS(container);
-  else if (SELECTED_GAME === 'tictactoe') initTTT(container);
-  else initMath(container);
-}
-
-// ================================================================
-// MINI GATE — per-project challenge
-// ================================================================
-
-function showMiniGate(projectId, projectName, onWin) {
-  const modal = document.getElementById('mini-gate');
-  const container = document.getElementById('mini-game-container');
-  const titleEl = document.getElementById('mini-gate-title');
-  if (!modal || !container) return;
-
-  if (titleEl) titleEl.textContent = `unlock "${projectName}"`;
-  modal.style.display = 'flex';
-
-  const games = ['rps', 'math'];
-  const game = games[Math.floor(Math.random() * games.length)];
-
-  function close() {
-    modal.style.display = 'none';
-    container.innerHTML = '';
-  }
-
-  function win() {
-    close();
-    onWin();
-  }
-
-  const closeBtn = modal.querySelector('.mini-gate-close');
-  const newCloseBtn = closeBtn.cloneNode(true);
-  closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
-  newCloseBtn.addEventListener('click', close);
-
-  function backdropClose(e) { if (e.target === modal) { close(); modal.removeEventListener('click', backdropClose); } }
-  modal.addEventListener('click', backdropClose);
-
-  if (game === 'rps') initMiniRPS(container, win);
-  else initMiniMath(container, win);
-}
-
-function initMiniRPS(container, onWin) {
-  container.innerHTML = `
-    <p class="mini-game-desc">Win one round of rock paper scissors.</p>
-    <div class="mini-rps-grid">
-      <button class="mini-rps-btn" data-choice="rock"><span>✊</span>rock</button>
-      <button class="mini-rps-btn" data-choice="paper"><span>✋</span>paper</button>
-      <button class="mini-rps-btn" data-choice="scissors"><span>✌️</span>scissors</button>
-    </div>
-    <div class="mini-result" id="mini-result"></div>
-  `;
-
-  container.querySelectorAll('.mini-rps-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const choices = ['rock','paper','scissors'];
-      const player = btn.dataset.choice;
-      const ai = choices[Math.floor(Math.random()*3)];
-      const result = document.getElementById('mini-result');
-      if (player === ai) {
-        result.textContent = `Tie — AI also picked ${ai}. Try again.`;
-        result.className = 'mini-result tie';
-      } else if ((player==='rock'&&ai==='scissors')||(player==='paper'&&ai==='rock')||(player==='scissors'&&ai==='paper')) {
-        result.textContent = `You win! AI picked ${ai}. Unlocking…`;
-        result.className = 'mini-result win';
-        setTimeout(onWin, 700);
-      } else {
-        result.textContent = `AI picked ${ai} — you lose. Try again.`;
-        result.className = 'mini-result lose';
-      }
-    });
-  });
-}
-
-function initMiniMath(container, onWin) {
-  function ri(lo,hi) { return Math.floor(Math.random()*(hi-lo+1))+lo; }
-  const ops = [
-    () => { const a=ri(10,60),b=ri(5,40); return {q:`${a} + ${b}`,a:a+b}; },
-    () => { const a=ri(20,80),b=ri(5,30); return {q:`${a} − ${b}`,a:a-b}; },
-    () => { const a=ri(2,9), b=ri(2,9);  return {q:`${a} × ${b}`,a:a*b}; },
-  ];
-  let current = ops[Math.floor(Math.random()*ops.length)]();
-
-  container.innerHTML = `
-    <p class="mini-game-desc">Solve the equation to unlock.</p>
-    <div class="mini-math-problem" id="mini-math-q">${current.q} = ?</div>
-    <div class="mini-math-row">
-      <input class="mini-math-input" id="mini-math-in" type="number" placeholder="?" autocomplete="off"/>
-      <button class="mini-math-submit" id="mini-math-btn">→</button>
-    </div>
-    <div class="mini-result" id="mini-result"></div>
-  `;
-
-  setTimeout(() => document.getElementById('mini-math-in')?.focus(), 50);
-
-  function newQ() {
-    current = ops[Math.floor(Math.random()*ops.length)]();
-    const q = document.getElementById('mini-math-q');
-    const inp = document.getElementById('mini-math-in');
-    const res = document.getElementById('mini-result');
-    if (q) q.textContent = `${current.q} = ?`;
-    if (inp) inp.value = '';
-    if (res) res.textContent = '';
-    setTimeout(() => inp?.focus(), 50);
-  }
-
-  function submit() {
-    const val = parseInt(document.getElementById('mini-math-in')?.value, 10);
-    const result = document.getElementById('mini-result');
-    if (isNaN(val) || !result) return;
-    if (val === current.a) {
-      result.textContent = 'Correct! ✓ Unlocking…';
-      result.className = 'mini-result win';
-      setTimeout(onWin, 700);
-    } else {
-      result.textContent = `Not quite — answer was ${current.a}. New question!`;
-      result.className = 'mini-result lose';
-      setTimeout(newQ, 1300);
-    }
-  }
-
-  document.getElementById('mini-math-btn')?.addEventListener('click', submit);
-  document.getElementById('mini-math-in')?.addEventListener('keydown', e => { if(e.key==='Enter') submit(); });
+  const gameId = GATEKEEPER_GAMES[Math.floor(Math.random() * GATEKEEPER_GAMES.length)];
+  GameRegistry[gameId](container, () => AstronautGate.unlock('global'));
 }
 
 // ================================================================
@@ -1790,8 +1451,8 @@ function initWordle(arena) {
     else if (/^[A-Z]$/.test(k)) handleKey(k);
   }
   document.addEventListener('keydown', onKey);
-  arena._cleanup = () => document.removeEventListener('keydown', onKey);
   drawRow();
+  return () => document.removeEventListener('keydown', onKey);
 }
 
 // ---- Connections ----
@@ -1810,7 +1471,7 @@ const CONN_PUZZLES = [
   ]},
 ];
 
-function initConnections(arena) {
+function initConnections(arena, onWin = null) {
   const puzzle = CONN_PUZZLES[Math.floor(Date.now() / 86400000) % CONN_PUZZLES.length];
   let selected = [], solved = [], lives = 4;
   const allWords = puzzle.groups.flatMap(g => g.words).sort(() => Math.random() - 0.5);
@@ -1865,7 +1526,9 @@ function initConnections(arena) {
     const match = puzzle.groups.find(g => !solved.includes(g) && g.words.every(w => selected.includes(w)) && selected.every(w => g.words.includes(w)));
     if (match) {
       solved.push(match); selected = [];
-      msgEl.textContent = solved.length === puzzle.groups.length ? '🎉 Solved them all!' : `✓ ${match.name}!`;
+      const allSolved = solved.length === puzzle.groups.length;
+      msgEl.textContent = allSolved ? '🎉 Solved them all!' : `✓ ${match.name}!`;
+      if (allSolved && onWin) setTimeout(onWin, 800);
       submitEl.disabled = true;
     } else {
       lives--;
@@ -1879,6 +1542,7 @@ function initConnections(arena) {
   });
 
   renderBoard();
+  return () => {};
 }
 
 // ---- Pinpoint ----
@@ -1949,6 +1613,7 @@ function initPinpoint(arena) {
 
   renderClues();
   setTimeout(() => arena.querySelector('.pinpoint-input')?.focus(), 50);
+  return () => {};
 }
 
 // ---- Queens ----
@@ -2026,10 +1691,11 @@ function initQueens(arena) {
   });
 
   renderGrid();
+  return () => {};
 }
 
 // ---- Math Lab ----
-function initMathLab(arena) {
+function initMathLab(arena, onWin = null) {
   let level = 0, score = 0;
   function ri(lo,hi){return Math.floor(Math.random()*(hi-lo+1))+lo;}
 
@@ -2086,7 +1752,7 @@ function initMathLab(arena) {
       if (sc) sc.textContent = score;
       fb.textContent = '✓ Correct!'; fb.className = 'mathlab-feedback win';
       if (level < LEVELS.length - 1) { level++; renderLevels(); setTimeout(newQ, 700); }
-      else { fb.textContent = `🏆 All ${LEVELS.length} levels complete! Score: ${score}/${LEVELS.length}`; }
+      else { fb.textContent = `🏆 All ${LEVELS.length} levels complete! Score: ${score}/${LEVELS.length}`; if (onWin) setTimeout(onWin, 900); }
     } else {
       fb.textContent = `✗ Answer was ${current.a}`; fb.className = 'mathlab-feedback lose';
       setTimeout(newQ, 1100);
@@ -2097,6 +1763,7 @@ function initMathLab(arena) {
   arena.querySelector('.mathlab-input').addEventListener('keydown', e => { if(e.key==='Enter') submit(); });
 
   renderLevels(); newQ();
+  return () => {};
 }
 
 // ---- RPS (standalone) ----
@@ -2151,10 +1818,11 @@ function initRPSGame(arena) {
     arena.querySelector('.rps-hub-result').textContent = 'Pick your move';
     arena.querySelector('.rps-hub-result').className = 'rps-hub-result';
   });
+  return () => {};
 }
 
 // ---- Tic Tac Toe (standalone) ----
-function initTTTGame(arena) {
+function initTTTGame(arena, onWin = null) {
   let board = Array(9).fill('');
   let over = false;
 
@@ -2199,7 +1867,12 @@ function initTTTGame(arena) {
     const i = +cell.dataset.i; if (board[i]) return;
     board[i] = 'X'; render();
     const w = winner(board);
-    if (w) { setStatus(w==='X'?'You win! 🎉':'AI wins!'); over=true; return; }
+    if (w) {
+      over = true;
+      if (w === 'X') { setStatus('You win! 🎉'); if (onWin) setTimeout(onWin, 700); }
+      else setStatus('AI wins!');
+      return;
+    }
     if (board.every(c=>c)) { setStatus("It's a draw!"); over=true; return; }
     setStatus('AI thinking…');
     setTimeout(() => {
@@ -2214,10 +1887,11 @@ function initTTTGame(arena) {
 
   arena.querySelector('.ttt-hub-reset').addEventListener('click', reset);
   render();
+  return () => {};
 }
 
 // ---- Connect 4 ----
-function initConnect4(arena) {
+function initConnect4(arena, onWin = null) {
   const ROWS=6, COLS=7;
   let grid = Array.from({length:ROWS},()=>Array(COLS).fill(0)); // 0=empty 1=player 2=ai
   let over = false;
@@ -2281,7 +1955,7 @@ function initConnect4(arena) {
     const col=+btn.dataset.c;
     if (!drop(grid,col,1)) return;
     render();
-    if (checkWin(grid,1)) { setStatus('You win! 🎉'); over=true; render(); return; }
+    if (checkWin(grid,1)) { setStatus('You win! 🎉'); over=true; render(); if (onWin) setTimeout(onWin, 700); return; }
     if (grid[0].every(c=>c)) { setStatus("Draw!"); over=true; return; }
     setStatus('AI thinking…');
     setTimeout(() => {
@@ -2295,6 +1969,7 @@ function initConnect4(arena) {
 
   arena.querySelector('.c4-reset').addEventListener('click', reset);
   render();
+  return () => {};
 }
 
 // ---- Sudoku ----
@@ -2384,9 +2059,8 @@ function initSudoku(arena) {
     else if (e.key==='Backspace'||e.key==='Delete'||e.key==='0') { grid[selected[0]][selected[1]]=0; render(); }
   };
   document.addEventListener('keydown', keyHandler);
-  arena._cleanup = () => document.removeEventListener('keydown', keyHandler);
-
   render();
+  return () => document.removeEventListener('keydown', keyHandler);
 }
 
 // ---- Spelling Bee ----
@@ -2468,8 +2142,8 @@ function initSpelling(arena) {
     if (allLetters.includes(l)) { word+=l; renderWord(); }
   };
   document.addEventListener('keydown', keyH);
-  arena._cleanup = () => document.removeEventListener('keydown', keyH);
-
+  return () => document.removeEventListener('keydown', keyH);
+  
   renderWord();
 }
 
@@ -2558,7 +2232,6 @@ function initCrossword(arena) {
     render();
   };
   document.addEventListener('keydown', keyH);
-  arena._cleanup = () => document.removeEventListener('keydown', keyH);
 
   arena.querySelector('.cw-check').addEventListener('click', () => {
     const msg=arena.querySelector('.cw-msg');
@@ -2575,6 +2248,7 @@ function initCrossword(arena) {
   });
 
   render();
+  return () => document.removeEventListener('keydown', keyH);
 }
 
 // ---- Tango ----
@@ -2650,6 +2324,7 @@ function initTango(arena) {
   });
 
   render();
+  return () => {};
 }
 
 // ---- Numberlink ----
@@ -2747,7 +2422,8 @@ function initNumberlink(arena) {
     const cell=e.target.closest('.nl-cell'); if(!cell) return;
     extendPath(+cell.dataset.r,+cell.dataset.c);
   });
-  document.addEventListener('mouseup', ()=>{ mouseDown=false; if(drawing){paths[drawing.idx]=[...drawing.path];drawing=null;} });
+  const onMouseUp = ()=>{ mouseDown=false; if(drawing){paths[drawing.idx]=[...drawing.path];drawing=null;} };
+  document.addEventListener('mouseup', onMouseUp);
 
   arena.querySelector('.nl-reset').addEventListener('click', ()=>{
     paths=Array.from({length:PAIRS.length},()=>[]);
@@ -2759,6 +2435,7 @@ function initNumberlink(arena) {
   });
 
   render();
+  return () => document.removeEventListener('mouseup', onMouseUp);
 }
 
 // ================================================================
@@ -2979,39 +2656,59 @@ function initProjectGraph() {
   animate();
 }
 
+// ================================================================
+// GAME REGISTRY — single source of truth for all 13 games
+// ================================================================
+
+const GameRegistry = {
+  wordle:      (c, w) => initWordle(c, w),
+  connections: (c, w) => initConnections(c, w),
+  spelling:    (c, w) => initSpelling(c, w),
+  crossword:   (c, w) => initCrossword(c, w),
+  pinpoint:    (c, w) => initPinpoint(c, w),
+  tango:       (c, w) => initTango(c, w),
+  numberlink:  (c, w) => initNumberlink(c, w),
+  queens:      (c, w) => initQueens(c, w),
+  sudoku:      (c, w) => initSudoku(c, w),
+  mathlab:     (c, w) => initMathLab(c, w),
+  rps:         (c, w) => initRPSGame(c, w),
+  tictactoe:   (c, w) => initTTTGame(c, w),
+  connect4:    (c, w) => initConnect4(c, w),
+};
+
 function initGamesHub() {
   const arena = document.getElementById('games-arena');
   if (!arena) return;
 
-  const INIT_MAP = {
-    wordle: initWordle,
-    connections: initConnections,
-    spelling: initSpelling,
-    crossword: initCrossword,
-    pinpoint: initPinpoint,
-    tango: initTango,
-    numberlink: initNumberlink,
-    queens: initQueens,
-    sudoku: initSudoku,
-    mathlab: initMathLab,
-    rps: initRPSGame,
-    tictactoe: initTTTGame,
-    connect4: initConnect4,
-  };
   let current = 'wordle';
+  let currentCleanup = null;
+  let hubInited = false;
 
-  INIT_MAP[current](arena);
+  function loadGame(g) {
+    if (currentCleanup) { currentCleanup(); currentCleanup = null; }
+    arena.innerHTML = '';
+    currentCleanup = GameRegistry[g]?.(arena) ?? null;
+  }
+
+  // Lazy init — only when games tab becomes active
+  document.querySelectorAll('.top-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      if (tab.dataset.section === 'sec-games' && !hubInited) {
+        hubInited = true;
+        loadGame(current);
+      }
+    });
+  });
 
   document.querySelectorAll('.game-card').forEach(card => {
     card.addEventListener('click', () => {
       const g = card.dataset.game;
-      if (g === current) return;
+      if (g === current && hubInited) return;
       current = g;
+      hubInited = true;
       document.querySelectorAll('.game-card').forEach(c => c.classList.remove('active'));
       card.classList.add('active');
-      if (typeof arena._cleanup === 'function') { arena._cleanup(); arena._cleanup = null; }
-      arena.innerHTML = '';
-      INIT_MAP[g]?.(arena);
+      loadGame(g);
     });
   });
 }

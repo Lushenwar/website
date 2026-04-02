@@ -3,6 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+    }
+  }
+  </script>
   <title>Ryan Qi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -90,95 +98,66 @@
       <div class="top-nav-brand" style="display:flex; align-items:center; gap: 0.8rem; cursor:pointer;" onclick="window.scrollTo({top:0,behavior:'smooth'})">
     <div id="faller" aria-hidden="true">
       <svg id="astronaut-svg" width="120" height="160" viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Helmet — big round bubble helmet -->
-        <path d="M 60 8 C 84 7, 102 22, 101 48 C 100 74, 82 88, 60 88 C 38 88, 20 74, 19 48 C 18 22, 36 9, 60 8 Z"
-              stroke="var(--ink)" stroke-width="2.5" fill="rgba(240,232,213,0.04)" stroke-linecap="round" filter="url(#pencil-glow)"/>
-        <!-- Helmet highlight arc (top-left sheen) -->
-        <path d="M 28 24 C 32 16, 44 10, 58 10" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.3"/>
-        <!-- Sketch overrun ticks -->
-        <path d="M 101 48 L 107 46" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
-        <path d="M 19 48 L 13 46" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+  <defs>
+    <linearGradient id="visor-gradient" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#4F93E4" />
+      <stop offset="50%" stop-color="#2a5298" />
+      <stop offset="100%" stop-color="#1e3c72" />
+    </linearGradient>
+    <linearGradient id="visor-glare" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8" />
+      <stop offset="30%" stop-color="#ffffff" stop-opacity="0.0" />
+    </linearGradient>
+    <linearGradient id="suit-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(240,232,213,0.12)" />
+      <stop offset="100%" stop-color="rgba(240,232,213,0.0)" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
 
-        <!-- Visor — large rounded rect, slightly tilted -->
-        <path d="M 34 28 C 36 22, 84 22, 86 28 C 88 34, 88 62, 86 68 C 84 74, 36 74, 34 68 C 32 62, 32 34, 34 28 Z"
-              fill="rgba(96,165,212,0.10)" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round"/>
-        <!-- Visor glare streaks -->
-        <path d="M 38 30 C 40 35, 40 42, 38 48" stroke="var(--ink)" stroke-width="1.4" stroke-linecap="round" opacity="0.35" fill="none"/>
-        <path d="M 44 27 C 45 30, 45 35, 44 39" stroke="var(--ink)" stroke-width="1" stroke-linecap="round" opacity="0.2" fill="none"/>
+  <!-- Shoulders / Suit -->
+  <path d="M 20 150 C 20 115, 35 100, 60 100 C 85 100, 100 115, 100 150 Z" fill="url(#suit-gradient)" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/>
+  
+  <!-- Suit Collar -->
+  <rect x="38" y="88" width="44" height="16" rx="8" fill="#1a1915" stroke="var(--ink)" stroke-width="2.5" />
 
-        <!-- Face inside visor — cute expression -->
-        <!-- Eyes -->
-        <path d="M 46 44 C 47 42, 50 42, 51 44 C 52 46, 50 48, 48 48 C 46 48, 45 46, 46 44 Z"
-              fill="var(--ink)" stroke="none" opacity="0.85"/>
-        <path d="M 70 44 C 71 42, 74 42, 75 44 C 76 46, 74 48, 72 48 C 70 48, 69 46, 70 44 Z"
-              fill="var(--ink)" stroke="none" opacity="0.85"/>
-        <!-- Eye shine -->
-        <circle cx="50" cy="43" r="1.2" fill="rgba(240,232,213,0.9)"/>
-        <circle cx="74" cy="43" r="1.2" fill="rgba(240,232,213,0.9)"/>
-        <!-- Smile -->
-        <path d="M 48 56 C 52 61, 68 61, 72 56" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.8"/>
+  <!-- Main Helmet Outer -->
+  <circle cx="60" cy="52" r="42" fill="#111" stroke="var(--ink)" stroke-width="2.5" />
+  
+  <!-- Helmet inner cutout / shadow -->
+  <path d="M 24 52 C 24 32, 40 16, 60 16 C 80 16, 96 32, 96 52 C 96 72, 80 88, 60 88 C 40 88, 24 72, 24 52 Z" fill="#1a1a1a" />
 
-        <!-- Neck ring -->
-        <path d="M 44 88 C 44 93, 76 93, 76 88" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/>
-        <path d="M 43 93 L 43 100 M 60 93 L 60 100 M 77 93 L 77 100" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- Visor Background -->
+  <path d="M 30 54 C 30 38, 90 38, 90 54 C 90 70, 30 70, 30 54 Z" fill="#0d1b2a" />
+  <!-- Visor Gradient -->
+  <path d="M 30 54 C 30 38, 90 38, 90 54 C 90 70, 30 70, 30 54 Z" fill="url(#visor-gradient)" opacity="0.9" />
+  
+  <!-- Visor Reflection / Glare -->
+  <path d="M 36 48 C 50 42, 70 42, 84 48 C 75 52, 45 52, 36 48 Z" fill="url(#visor-glare)" opacity="0.6" />
+  
+  <!-- Sleek Visor Outline -->
+  <path d="M 30 54 C 30 38, 90 38, 90 54 C 90 70, 30 70, 30 54 Z" stroke="#111" stroke-width="3" fill="none"/>
+  
+  <!-- Side modules / earpieces -->
+  <rect x="12" y="46" width="10" height="24" rx="4" fill="#222" stroke="var(--ink)" stroke-width="2.5" />
+  <rect x="98" y="46" width="10" height="24" rx="4" fill="#222" stroke="var(--ink)" stroke-width="2.5" />
+  <!-- Module lights -->
+  <rect x="15" y="55" width="4" height="6" rx="2" fill="var(--orange)" filter="url(#glow)"/>
+  <rect x="101" y="55" width="4" height="6" rx="2" fill="var(--cobalt)" filter="url(#glow)"/>
 
-        <!-- Body suit — puffy rounded shape -->
-        <path d="M 26 104 C 22 102, 18 118, 20 136 C 21 150, 34 158, 60 158 C 86 158, 99 150, 100 136 C 102 118, 98 102, 94 104 Z"
-              stroke="var(--ink)" stroke-width="2.2" fill="rgba(240,232,213,0.03)" stroke-linejoin="round"/>
-        <!-- Suit horizontal segment lines (EVA suit ribbing) -->
-        <path d="M 22 122 C 35 120, 85 120, 98 122" stroke="var(--ink)" stroke-width="0.9" stroke-linecap="round" fill="none" opacity="0.25"/>
-        <path d="M 20 136 C 34 134, 86 134, 100 136" stroke="var(--ink)" stroke-width="0.9" stroke-linecap="round" fill="none" opacity="0.25"/>
-
-        <!-- Chest patch / badge -->
-        <path d="M 46 108 L 46 126 L 74 126 L 74 108 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
-        <!-- Overshoot corners on patch -->
-        <path d="M 46 108 L 43 105" stroke="var(--ink)" stroke-width="1" stroke-linecap="round" opacity="0.4"/>
-        <path d="M 74 108 L 77 105" stroke="var(--ink)" stroke-width="1" stroke-linecap="round" opacity="0.4"/>
-        <!-- Status LEDs on patch -->
-        <circle cx="54" cy="117" r="2.5" fill="var(--rouge)" opacity="0.9"/>
-        <circle cx="61" cy="117" r="2.5" fill="var(--pencil)" opacity="0.9"/>
-        <circle cx="68" cy="117" r="2.5" fill="var(--sage)" opacity="0.9"/>
-
-        <!-- Left arm — floating/waving up -->
-        <path d="M 26 112 C 16 108, 5 104, -2 98" stroke="var(--ink)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-        <!-- Left glove — chunky mitten -->
-        <path d="M -4 95 C -12 90, -16 96, -12 103 C -8 110, 0 112, 6 108 C 10 104, 6 96, -4 95 Z"
-              stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
-
-        <!-- Right arm — relaxed, floating down-right -->
-        <path d="M 94 112 C 104 116, 112 120, 118 116" stroke="var(--ink)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-        <!-- Right glove -->
-        <path d="M 120 113 C 128 108, 132 114, 128 121 C 124 128, 116 128, 112 124 C 108 120, 112 112, 120 113 Z"
-              stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
-
-        <!-- Legs — floating / crossed slightly -->
-        <path d="M 44 158 C 40 164, 36 152, 32 148" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
-        <path d="M 76 158 C 82 163, 88 152, 90 148" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
-        <!-- Boots -->
-        <path d="M 26 145 C 20 144, 16 150, 20 155 C 24 160, 36 160, 38 155 C 40 150, 34 144, 26 145 Z"
-              stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
-        <path d="M 94 145 C 100 144, 104 150, 100 155 C 96 160, 84 160, 82 155 C 80 150, 86 144, 94 145 Z"
-              stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,232,213,0.04)" stroke-linejoin="round"/>
-
-        <!-- Backpack thruster -->
-        <path d="M 92 106 L 96 104 L 114 108 L 112 136 L 92 132 Z"
-              stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,232,213,0.025)" stroke-linejoin="round"/>
-        <!-- Thruster nozzles -->
-        <path d="M 98 131 L 96 142" stroke="var(--rouge)" stroke-width="2" stroke-linecap="round"/>
-        <path d="M 108 132 L 110 143" stroke="var(--rouge)" stroke-width="2" stroke-linecap="round"/>
-        <!-- Thruster flame -->
-        <path d="M 93 143 C 96 150, 100 154, 98 160 C 96 155, 94 150, 97 146" stroke="var(--pencil)" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.75"/>
-        <path d="M 109 143 C 111 150, 114 155, 112 161 C 110 156, 109 151, 112 147" stroke="var(--pencil)" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.75"/>
-
-        <!-- Floating sparkles / stars -->
-        <path d="M 14 70 L 15 74 M 14 70 L 18 71 M 14 70 L 15 66 M 14 70 L 10 71" stroke="var(--pencil)" stroke-width="1.4" stroke-linecap="round" opacity="0.65"/>
-        <path d="M 108 55 L 109 58 M 108 55 L 111 56 M 108 55 L 109 52 M 108 55 L 105 56" stroke="var(--cobalt)" stroke-width="1.2" stroke-linecap="round" opacity="0.55"/>
-        <path d="M 6 40 L 7 43 M 6 40 L 9 41 M 6 40 L 7 37 M 6 40 L 3 41" stroke="var(--rouge)" stroke-width="1" stroke-linecap="round" opacity="0.4"/>
-        <!-- Small dots -->
-        <circle cx="110" cy="90" r="1.5" fill="var(--pencil)" opacity="0.4"/>
-        <circle cx="5" cy="88" r="1" fill="var(--cobalt)" opacity="0.35"/>
-        <circle cx="100" cy="28" r="1.2" fill="var(--sage)" opacity="0.4"/>
-      </svg>
+  <!-- Floating geometric accents -->
+  <circle cx="14" cy="22" r="2.5" fill="var(--orange)" filter="url(#glow)"/>
+  <circle cx="108" cy="18" r="1.5" fill="var(--cobalt)" />
+  <circle cx="10" cy="95" r="2" fill="var(--rouge)" filter="url(#glow)"/>
+  <circle cx="105" cy="120" r="1.5" fill="var(--pencil)" />
+  
+  <!-- A minimal star -->
+  <path d="M 20 28 L 22 35 L 29 35 L 23 39 L 26 46 L 20 41 L 14 46 L 17 39 L 11 35 L 18 35 Z" fill="var(--sage)" opacity="0.8" transform="scale(0.6) translate(140, 20)" />
+  
+</svg>
       <div class="faller-trail"></div>
     </div>
 

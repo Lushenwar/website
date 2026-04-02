@@ -97,67 +97,69 @@
     <nav class="top-nav" id="top-nav">
       <div class="top-nav-brand" style="display:flex; align-items:center; gap: 0.8rem; cursor:pointer;" onclick="window.scrollTo({top:0,behavior:'smooth'})">
     <div id="faller" aria-hidden="true">
-      <svg id="astronaut-svg" width="120" height="160" viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="visor-gradient" x1="20%" y1="0%" x2="80%" y2="100%">
-      <stop offset="0%" stop-color="#4F93E4" />
-      <stop offset="50%" stop-color="#2a5298" />
-      <stop offset="100%" stop-color="#1e3c72" />
-    </linearGradient>
-    <linearGradient id="visor-glare" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8" />
-      <stop offset="30%" stop-color="#ffffff" stop-opacity="0.0" />
-    </linearGradient>
-    <linearGradient id="suit-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="rgba(240,232,213,0.12)" />
-      <stop offset="100%" stop-color="rgba(240,232,213,0.0)" />
-    </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="3" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
-  </defs>
+      <svg id="astronaut-svg" width="200" height="210" viewBox="0 0 200 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Hard hat -->
+              <path d="M 62 82 L 64 62 C 65 44 80 36 100 35 C 120 34 136 44 137 62 L 139 82 Z"
+                    stroke="var(--pencil)" stroke-width="2.2" stroke-linecap="round" fill="rgba(245,196,48,0.08)"/>
+              <path d="M 54 84 L 148 84" stroke="var(--pencil)" stroke-width="3" stroke-linecap="round"/>
+              <!-- hat brim shadow -->
+              <path d="M 56 87 L 146 87" stroke="var(--pencil)" stroke-width="1" stroke-linecap="round" opacity="0.25"/>
 
-  <!-- Shoulders / Suit -->
-  <path d="M 20 150 C 20 115, 35 100, 60 100 C 85 100, 100 115, 100 150 Z" fill="url(#suit-gradient)" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/>
-  
-  <!-- Suit Collar -->
-  <rect x="38" y="88" width="44" height="16" rx="8" fill="#1a1915" stroke="var(--ink)" stroke-width="2.5" />
+              <!-- Helmet bubble -->
+              <path d="M 65 84 C 64 105 68 128 100 130 C 132 132 137 108 137 84"
+                    stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" fill="rgba(240,232,213,0.025)"/>
+              <!-- Visor -->
+              <path d="M 76 90 C 75 104 78 120 100 121 C 122 122 126 105 125 90 C 125 86 122 84 100 84 C 78 84 76 86 76 90 Z"
+                    fill="rgba(96,165,212,0.07)" stroke="var(--cobalt)" stroke-width="1.8" stroke-linecap="round"/>
+              <!-- Visor glare -->
+              <path d="M 81 92 C 82 99 82 108 81 114" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" opacity="0.28" fill="none"/>
 
-  <!-- Main Helmet Outer -->
-  <circle cx="60" cy="52" r="42" fill="#111" stroke="var(--ink)" stroke-width="2.5" />
-  
-  <!-- Helmet inner cutout / shadow -->
-  <path d="M 24 52 C 24 32, 40 16, 60 16 C 80 16, 96 32, 96 52 C 96 72, 80 88, 60 88 C 40 88, 24 72, 24 52 Z" fill="#1a1a1a" />
+              <!-- Body / suit torso -->
+              <rect x="74" y="129" width="52" height="28" rx="5"
+                    stroke="var(--ink)" stroke-width="1.8" fill="none"/>
+              <!-- chest control panel squiggles -->
+              <line x1="82" y1="138" x2="94" y2="138" stroke="var(--ink)" stroke-width="1.1" stroke-linecap="round" opacity="0.4"/>
+              <line x1="82" y1="143" x2="118" y2="143" stroke="var(--ink)" stroke-width="1.1" stroke-linecap="round" opacity="0.4"/>
+              <circle cx="112" cy="135" r="3.5" stroke="var(--rouge)" stroke-width="1.2" fill="none" opacity="0.6"/>
 
-  <!-- Visor Background -->
-  <path d="M 30 54 C 30 38, 90 38, 90 54 C 90 70, 30 70, 30 54 Z" fill="#0d1b2a" />
-  <!-- Visor Gradient -->
-  <path d="M 30 54 C 30 38, 90 38, 90 54 C 90 70, 30 70, 30 54 Z" fill="url(#visor-gradient)" opacity="0.9" />
-  
-  <!-- Visor Reflection / Glare -->
-  <path d="M 36 48 C 50 42, 70 42, 84 48 C 75 52, 45 52, 36 48 Z" fill="url(#visor-glare)" opacity="0.6" />
-  
-  <!-- Sleek Visor Outline -->
-  <path d="M 30 54 C 30 38, 90 38, 90 54 C 90 70, 30 70, 30 54 Z" stroke="#111" stroke-width="3" fill="none"/>
-  
-  <!-- Side modules / earpieces -->
-  <rect x="12" y="46" width="10" height="24" rx="4" fill="#222" stroke="var(--ink)" stroke-width="2.5" />
-  <rect x="98" y="46" width="10" height="24" rx="4" fill="#222" stroke="var(--ink)" stroke-width="2.5" />
-  <!-- Module lights -->
-  <rect x="15" y="55" width="4" height="6" rx="2" fill="var(--orange)" filter="url(#glow)"/>
-  <rect x="101" y="55" width="4" height="6" rx="2" fill="var(--cobalt)" filter="url(#glow)"/>
+              <!-- Left arm — holds blueprint -->
+              <path d="M 74 140 L 44 130" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
+              <!-- Blueprint scroll in left hand -->
+              <rect x="18" y="118" width="32" height="22" rx="3" stroke="var(--lavender)" stroke-width="1.6" fill="rgba(192,143,255,0.06)"/>
+              <line x1="24" y1="125" x2="44" y2="125" stroke="var(--lavender)" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
+              <line x1="24" y1="130" x2="38" y2="130" stroke="var(--lavender)" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+              <line x1="24" y1="135" x2="40" y2="135" stroke="var(--lavender)" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+              <!-- WIP label on blueprint -->
+              <text x="22" y="123" font-family="sans-serif" font-size="5" fill="rgba(192,143,255,0.9)" letter-spacing="1">W·I·P</text>
 
-  <!-- Floating geometric accents -->
-  <circle cx="14" cy="22" r="2.5" fill="var(--orange)" filter="url(#glow)"/>
-  <circle cx="108" cy="18" r="1.5" fill="var(--cobalt)" />
-  <circle cx="10" cy="95" r="2" fill="var(--rouge)" filter="url(#glow)"/>
-  <circle cx="105" cy="120" r="1.5" fill="var(--pencil)" />
-  
-  <!-- A minimal star -->
-  <path d="M 20 28 L 22 35 L 29 35 L 23 39 L 26 46 L 20 41 L 14 46 L 17 39 L 11 35 L 18 35 Z" fill="var(--sage)" opacity="0.8" transform="scale(0.6) translate(140, 20)" />
-  
-</svg>
+              <!-- Right arm — holds wrench -->
+              <path d="M 126 140 L 156 128" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
+              <!-- Wrench head -->
+              <path d="M 155 115 C 157 109 165 109 167 115 C 169 121 164 128 159 125 C 154 122 153 118 155 115 Z"
+                    stroke="var(--orange)" stroke-width="2" fill="none"/>
+              <!-- Wrench handle -->
+              <path d="M 160 122 L 172 138" stroke="var(--orange)" stroke-width="3" stroke-linecap="round"/>
+
+              <!-- Legs -->
+              <path d="M 82 157 L 78 180" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
+              <path d="M 118 157 L 122 180" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
+              <!-- Boots -->
+              <path d="M 70 180 L 86 180" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+              <path d="M 116 180 L 132 180" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+
+              <!-- Sparkle stars around -->
+              <path d="M 155 60 L 156 55 L 157 60 L 162 61 L 157 62 L 156 67 L 155 62 L 150 61 Z"
+                    stroke="var(--pencil)" stroke-width="1.1" fill="none" opacity="0.7"/>
+              <circle cx="44" cy="68" r="2.5" stroke="var(--cobalt)" stroke-width="1.2" opacity="0.55"/>
+              <path d="M 38 105 L 39 101 L 40 105 L 44 106 L 40 107 L 39 111 L 38 107 L 34 106 Z"
+                    stroke="var(--lavender)" stroke-width="1" fill="none" opacity="0.5"/>
+              <circle cx="168" cy="85" r="3" stroke="var(--orange)" stroke-width="1.2" opacity="0.45"/>
+              <path d="M 170 50 L 171 47 L 172 50 L 175 51 L 172 52 L 171 55 L 170 52 L 167 51 Z"
+                    stroke="var(--rouge)" stroke-width="1" fill="none" opacity="0.4"/>
+              <!-- small dashes / construction marks -->
+              <path d="M 22 152 L 26 152 M 24 150 L 24 154" stroke="var(--ink-faint)" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+              <path d="M 170 162 L 174 162 M 172 160 L 172 164" stroke="var(--ink-faint)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+            </svg>
       <div class="faller-trail"></div>
     </div>
 

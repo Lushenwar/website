@@ -187,6 +187,7 @@
         <button class="top-tab" data-section="sec-origami">origami</button>
         <button class="top-tab" data-section="sec-graph">graph</button>
         <button class="top-tab" data-section="sec-games">games</button>
+        <button class="top-tab" data-section="sec-models">models</button>
       </div>
     </nav>
 
@@ -285,10 +286,7 @@
           <h2 class="about-heading">Building at the<br><em>intersection</em> of<br>ML &amp; experience.</h2>
           <div class="about-right">
             <p class="about-text">
-              CS student at the University of Toronto obsessed with hackathons,
-              machine learning, and shipping things that shouldn't exist yet.
-              I've competed at DeerHacks, JAMHacks, GenAI Genesis, DeltaHacks, CxC, Hack404,
-              and more — always chasing the 24-hour deadline rush.
+              math student at the University of Waterloo obsessed with hackathons, machine learning, and shipping things that shouldn't exist yet. I've competed at GenAI Genesis, Yhacks and more. Connect if you're interested
             </p>
             <div class="about-stats">
               <div class="stat">
@@ -537,33 +535,116 @@
          GAMES SECTION
          ============================================================ -->
     <div class="top-section" id="sec-games">
-      <div class="games-hub">
-        <div class="section-header" style="padding: 3rem 5vw 0;">
-          <svg class="section-squiggle" width="60" height="14" viewBox="0 0 60 14" fill="none">
-            <path d="M 2 7 C 10 2, 18 12, 30 7 C 42 2, 50 12, 58 7" stroke="var(--lavender)" stroke-width="2" stroke-linecap="round" fill="none"/>
-          </svg>
-          <span class="section-eyebrow">games · play to explore</span>
+      <div class="games-wip" aria-label="Games section — work in progress">
+
+        <!-- caution tape strips -->
+        <div class="wip-tape wip-tape-top" aria-hidden="true"></div>
+        <div class="wip-tape wip-tape-bottom" aria-hidden="true"></div>
+
+        <!-- floating background dots -->
+        <div class="wip-particles" aria-hidden="true">
+          <span class="wip-dot" style="--x:12%;--y:22%;--dur:3.8s;--del:0s"></span>
+          <span class="wip-dot" style="--x:78%;--y:18%;--dur:4.6s;--del:0.8s"></span>
+          <span class="wip-dot" style="--x:88%;--y:65%;--dur:5.1s;--del:0.3s"></span>
+          <span class="wip-dot" style="--x:5%;--y:72%;--dur:3.4s;--del:1.2s"></span>
+          <span class="wip-dot" style="--x:50%;--y:88%;--dur:4.2s;--del:0.6s"></span>
+          <span class="wip-dot" style="--x:35%;--y:10%;--dur:5.5s;--del:1.5s"></span>
+          <span class="wip-dot wip-dot--lg" style="--x:92%;--y:40%;--dur:6s;--del:0s"></span>
+          <span class="wip-dot wip-dot--lg" style="--x:8%;--y:48%;--dur:5.2s;--del:2s"></span>
         </div>
-        <div class="games-hub-inner">
-          <p class="games-hub-desc">These also cycle in as challenges for unlocking projects.</p>
-          <div class="games-selector">
-            <button class="game-card active" data-game="wordle"><span class="game-card-icon">🟩</span><span class="game-card-name">Wordle</span><span class="game-card-desc">5-letter word</span></button>
-            <button class="game-card" data-game="connections"><span class="game-card-icon">🔗</span><span class="game-card-name">Connections</span><span class="game-card-desc">Group 16 words</span></button>
-            <button class="game-card" data-game="spelling"><span class="game-card-icon">🐝</span><span class="game-card-name">Spelling Bee</span><span class="game-card-desc">Make words from 7 letters</span></button>
-            <button class="game-card" data-game="crossword"><span class="game-card-icon">✏️</span><span class="game-card-name">Mini Crossword</span><span class="game-card-desc">5×5 puzzle</span></button>
-            <button class="game-card" data-game="pinpoint"><span class="game-card-icon">📍</span><span class="game-card-name">Pinpoint</span><span class="game-card-desc">Guess the category</span></button>
-            <button class="game-card" data-game="tango"><span class="game-card-icon">☯</span><span class="game-card-name">Tango</span><span class="game-card-desc">Sun & moon balance</span></button>
-            <button class="game-card" data-game="numberlink"><span class="game-card-icon">🔗</span><span class="game-card-name">Numberlink</span><span class="game-card-desc">Connect the pairs</span></button>
-            <button class="game-card" data-game="queens"><span class="game-card-icon">♛</span><span class="game-card-name">Queens</span><span class="game-card-desc">One queen per region</span></button>
-            <button class="game-card" data-game="sudoku"><span class="game-card-icon">🔢</span><span class="game-card-name">Sudoku</span><span class="game-card-desc">Classic 9×9</span></button>
-            <button class="game-card" data-game="mathlab"><span class="game-card-icon">∫</span><span class="game-card-name">Math Lab</span><span class="game-card-desc">Arithmetic → calculus</span></button>
-            <button class="game-card" data-game="rps"><span class="game-card-icon">✊</span><span class="game-card-name">RPS</span><span class="game-card-desc">Best of 3</span></button>
-            <button class="game-card" data-game="tictactoe"><span class="game-card-icon">✕</span><span class="game-card-name">Tic Tac Toe</span><span class="game-card-desc">Beat the AI</span></button>
-            <button class="game-card" data-game="connect4"><span class="game-card-icon">🔴</span><span class="game-card-name">Connect 4</span><span class="game-card-desc">Drop to win</span></button>
+
+        <!-- central content -->
+        <div class="wip-inner">
+
+          <!-- hand-drawn astronaut-with-blueprint SVG -->
+          <div class="wip-illo-wrap" aria-hidden="true">
+            <svg class="wip-illo" width="200" height="210" viewBox="0 0 200 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Hard hat -->
+              <path d="M 62 82 L 64 62 C 65 44 80 36 100 35 C 120 34 136 44 137 62 L 139 82 Z"
+                    stroke="var(--pencil)" stroke-width="2.2" stroke-linecap="round" fill="rgba(245,196,48,0.08)"/>
+              <path d="M 54 84 L 148 84" stroke="var(--pencil)" stroke-width="3" stroke-linecap="round"/>
+              <!-- hat brim shadow -->
+              <path d="M 56 87 L 146 87" stroke="var(--pencil)" stroke-width="1" stroke-linecap="round" opacity="0.25"/>
+
+              <!-- Helmet bubble -->
+              <path d="M 65 84 C 64 105 68 128 100 130 C 132 132 137 108 137 84"
+                    stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" fill="rgba(240,232,213,0.025)"/>
+              <!-- Visor -->
+              <path d="M 76 90 C 75 104 78 120 100 121 C 122 122 126 105 125 90 C 125 86 122 84 100 84 C 78 84 76 86 76 90 Z"
+                    fill="rgba(96,165,212,0.07)" stroke="var(--cobalt)" stroke-width="1.8" stroke-linecap="round"/>
+              <!-- Visor glare -->
+              <path d="M 81 92 C 82 99 82 108 81 114" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" opacity="0.28" fill="none"/>
+
+              <!-- Body / suit torso -->
+              <rect x="74" y="129" width="52" height="28" rx="5"
+                    stroke="var(--ink)" stroke-width="1.8" fill="none"/>
+              <!-- chest control panel squiggles -->
+              <line x1="82" y1="138" x2="94" y2="138" stroke="var(--ink)" stroke-width="1.1" stroke-linecap="round" opacity="0.4"/>
+              <line x1="82" y1="143" x2="118" y2="143" stroke="var(--ink)" stroke-width="1.1" stroke-linecap="round" opacity="0.4"/>
+              <circle cx="112" cy="135" r="3.5" stroke="var(--rouge)" stroke-width="1.2" fill="none" opacity="0.6"/>
+
+              <!-- Left arm — holds blueprint -->
+              <path d="M 74 140 L 44 130" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
+              <!-- Blueprint scroll in left hand -->
+              <rect x="18" y="118" width="32" height="22" rx="3" stroke="var(--lavender)" stroke-width="1.6" fill="rgba(192,143,255,0.06)"/>
+              <line x1="24" y1="125" x2="44" y2="125" stroke="var(--lavender)" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
+              <line x1="24" y1="130" x2="38" y2="130" stroke="var(--lavender)" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+              <line x1="24" y1="135" x2="40" y2="135" stroke="var(--lavender)" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+              <!-- WIP label on blueprint -->
+              <text x="22" y="123" font-family="sans-serif" font-size="5" fill="rgba(192,143,255,0.9)" letter-spacing="1">W·I·P</text>
+
+              <!-- Right arm — holds wrench -->
+              <path d="M 126 140 L 156 128" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
+              <!-- Wrench head -->
+              <path d="M 155 115 C 157 109 165 109 167 115 C 169 121 164 128 159 125 C 154 122 153 118 155 115 Z"
+                    stroke="var(--orange)" stroke-width="2" fill="none"/>
+              <!-- Wrench handle -->
+              <path d="M 160 122 L 172 138" stroke="var(--orange)" stroke-width="3" stroke-linecap="round"/>
+
+              <!-- Legs -->
+              <path d="M 82 157 L 78 180" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
+              <path d="M 118 157 L 122 180" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
+              <!-- Boots -->
+              <path d="M 70 180 L 86 180" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+              <path d="M 116 180 L 132 180" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+
+              <!-- Sparkle stars around -->
+              <path d="M 155 60 L 156 55 L 157 60 L 162 61 L 157 62 L 156 67 L 155 62 L 150 61 Z"
+                    stroke="var(--pencil)" stroke-width="1.1" fill="none" opacity="0.7"/>
+              <circle cx="44" cy="68" r="2.5" stroke="var(--cobalt)" stroke-width="1.2" opacity="0.55"/>
+              <path d="M 38 105 L 39 101 L 40 105 L 44 106 L 40 107 L 39 111 L 38 107 L 34 106 Z"
+                    stroke="var(--lavender)" stroke-width="1" fill="none" opacity="0.5"/>
+              <circle cx="168" cy="85" r="3" stroke="var(--orange)" stroke-width="1.2" opacity="0.45"/>
+              <path d="M 170 50 L 171 47 L 172 50 L 175 51 L 172 52 L 171 55 L 170 52 L 167 51 Z"
+                    stroke="var(--rouge)" stroke-width="1" fill="none" opacity="0.4"/>
+              <!-- small dashes / construction marks -->
+              <path d="M 22 152 L 26 152 M 24 150 L 24 154" stroke="var(--ink-faint)" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+              <path d="M 170 162 L 174 162 M 172 160 L 172 164" stroke="var(--ink-faint)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+            </svg>
           </div>
-          <div class="games-arena" id="games-arena"></div>
+
+          <!-- text block -->
+          <div class="wip-copy">
+            <div class="wip-eyebrow">games · play to explore</div>
+            <h2 class="wip-heading">getting a<br><em>proper rebuild.</em></h2>
+            <p class="wip-sub">new puzzles, tighter code, better vibes.<br>still usable as portfolio unlock challenges — check back soon.</p>
+
+            <!-- fake progress bar -->
+            <div class="wip-progress-outer">
+              <div class="wip-progress-label">
+                <span>rebuild progress</span>
+                <span class="wip-pct" id="wip-pct">—</span>
+              </div>
+              <div class="wip-progress-track">
+                <div class="wip-progress-fill" id="wip-fill"></div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </div><!-- /.games-wip -->
+
+      <!-- Keep arena in DOM (hidden) so initGamesHub() doesn't crash -->
+      <div id="games-arena" style="display:none" aria-hidden="true"></div>
     </div><!-- /#sec-games -->
 
   </div><!-- /#portfolio -->

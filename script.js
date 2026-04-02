@@ -555,7 +555,7 @@ function initCursor() {
 // GATE GAMES
 // ================================================================
 
-const GATEKEEPER_GAMES = ['mathlab', 'connections', 'tictactoe', 'connect4', 'rps'];
+const GATEKEEPER_GAMES = ['mathlab', 'tictactoe', 'connect4', 'rps'];
 
 function unlockPortfolio() {
   const win = document.getElementById('gate-win');
@@ -1702,13 +1702,8 @@ function initMathLab(arena, onWin = null) {
   function ri(lo,hi){return Math.floor(Math.random()*(hi-lo+1))+lo;}
 
   const LEVELS = [
-    {name:'Addition',      gen:()=>{const a=ri(5,99),b=ri(5,99);return{q:`${a} + ${b}`,a:a+b};}},
     {name:'Subtraction',   gen:()=>{const a=ri(50,200),b=ri(10,50);return{q:`${a} − ${b}`,a:a-b};}},
-    {name:'Multiplication',gen:()=>{const a=ri(2,15),b=ri(2,15);return{q:`${a} × ${b}`,a:a*b};}},
-    {name:'Division',      gen:()=>{const b=ri(2,12),a=b*ri(2,10);return{q:`${a} ÷ ${b}`,a:a/b};}},
-    {name:'Exponents',     gen:()=>{const b=ri(2,9),e=ri(2,4);return{q:`${b}^${e}`,a:Math.pow(b,e)};}},
     {name:'Modulo',        gen:()=>{const a=ri(20,99),b=ri(3,12);return{q:`${a} mod ${b}`,a:a%b};}},
-    {name:'Square Roots',  gen:()=>{const ns=[4,9,16,25,36,49,64,81,100,121,144];const n=ns[ri(0,ns.length-1)];return{q:`√${n}`,a:Math.round(Math.sqrt(n))};}},
     {name:'Derivatives',   gen:()=>{const qs=[{q:'d/dx[x²] at x=3',a:6},{q:'d/dx[3x²+4x] at x=1',a:10},{q:'d/dx[x³] at x=2',a:12},{q:'d/dx[2x³] at x=2',a:24},{q:'d/dx[x⁴] at x=1',a:4}];return qs[ri(0,qs.length-1)];}},
   ];
 
@@ -1769,7 +1764,7 @@ function initMathLab(arena, onWin = null) {
 }
 
 // ---- RPS (standalone) ----
-function initRPSGame(arena) {
+function initRPSGame(arena, onWin = null) {
   let you = 0, ai = 0, rounds = 0;
   const choices = ['rock','paper','scissors'];
   const emoji = {rock:'✊',paper:'✋',scissors:'✌️'};
@@ -1802,7 +1797,7 @@ function initRPSGame(arena) {
     resEl.className = 'rps-hub-result ' + res;
     if (rounds >= 3) {
       setTimeout(() => {
-        if (you > ai) resEl.textContent = `🏆 You win ${you}–${ai}!`;
+        if (you > ai) { resEl.textContent = `🏆 You win ${you}–${ai}!`; if (onWin) onWin(); }
         else if (ai > you) resEl.textContent = `AI wins ${ai}–${you}. Try again!`;
         else resEl.textContent = `Draw ${you}–${ai}!`;
       }, 800);

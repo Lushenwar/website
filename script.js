@@ -2627,7 +2627,7 @@ function initProjectGraph() {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(55, W/H, 0.1, 2000);
   camera.position.set(0, 0, 500);
-  let targetCamZ = 1200;
+  let targetCamZ = 2000;
 
   scene.add(new THREE.AmbientLight(0x111133, 0.7));
   const dLight = new THREE.DirectionalLight(0xffffff, 0.9);
@@ -2638,7 +2638,7 @@ function initProjectGraph() {
   const nodeData = PROJECTS.map((p, i) => {
     const phi   = Math.acos(-1 + (2 * i) / PROJECTS.length);
     const theta = Math.sqrt(PROJECTS.length * Math.PI) * phi;
-    const R = 420;
+    const R = 800;
     const rx = R * Math.sin(phi) * Math.cos(theta);
     const ry = R * Math.sin(phi) * Math.sin(theta);
     const rz = R * Math.cos(phi);
@@ -2941,21 +2941,21 @@ function initProjectGraph() {
 
     if (idx < 0) {
       clearSatellites();
-      targetCamZ = 500;
+      targetCamZ = 2000;
       focusNode = false;
+
       infoEl.innerHTML = '<p class="gi-hint">Click a node to explore a project</p>';
       window._graphChatDeactivate?.();
       return;
     }
 
     showWorkflow(nodeData[idx]);
-    targetCamZ = 270;
+    targetCamZ = 750; // Pull camera neatly out to witness the orbit
 
     const nd = nodeData[idx];
-    const dist = Math.sqrt(nd.x * nd.x + nd.z * nd.z);
-    targetRotY = -Math.atan2(nd.x, nd.z);
-    targetRotX = Math.atan2(-nd.y, dist > 1 ? dist : 1);
-    focusNode = true;
+    focusNode = false; // Disable group rotation snap, since physics pulls it to origin
+    targetRotY = 0; targetRotX = 0; // smoothly rest manual rotation
+
 
     const p = PROJECTS[idx];
     const connNames = edges.filter(e => e.i===idx||e.j===idx).map(e => {
@@ -3086,7 +3086,7 @@ function initProjectGraph() {
 
   // ── Physics constants ─────────────────────────────────────────
   const K_SPRING  = 0.014;  // pull toward rest position
-  const K_REPEL   = 11000;   // node-node repulsion
+  const K_REPEL   = 35000;   // node-node repulsion
   const K_EDGE    = 0.005;  // edge spring attraction
   const K_GRAVITY = 0.005;  // hover gravity well strength
   const DAMPING   = 0.80;   // velocity damping per frame
@@ -3109,32 +3109,65 @@ function initProjectGraph() {
 
     // ── Force-directed physics ─────────────────────────────────
     nodeData.forEach((nd, i) => {
-      // Spring toward rest (golden spiral) position
-      let fx = (nd.rx - nd.x) * K_SPRING;
-      let fy = (nd.ry - nd.y) * K_SPRING;
-      let fz = (nd.rz - nd.z) * K_SPRING;
+         let fx = 0, fy = 0, fz = 0;
+      
+      if (activeIdx >= 0) {
+        if (i === activeIdx) {
+          // Pull the active node powerfully into the absolute center point
+          fx = (0 - nd.x) * 0.08;
+          fy = (0 - nd.y) * 0.08;
+          fz = (0 - nd.z) * 0.08;
+        } else {
+          // Other nodes form an elegant orbiting galaxy around the active center
+          const dist = Math.sqrt(nd.x*nd.x + nd.y*nd.y + nd.z*nd.z + 0.1);
+          const targetR = 900; // Orbiting rim
+          const radial = (targetR - dist) * 0.012;
+          fx = (nd.x / dist) * radial;
+          fy = (nd.y / dist) * radial;
+          fz = (nd.z / dist) * radial;
+          
+          // Tangential orbital spin (calm animation)
+          fx += nd.z * 0.0025;
+          fz -= nd.x * 0.0025;
+          
+          // Micro-repulsion so orbiting nodes don't clump
+          nodeData.forEach((other, j) => {
+            if (i === j || j === activeIdx) return;
+            const ox = nd.x - other.x, oy = nd.y - other.y, oz = nd.z - other.z;
+            const d2 = ox*ox + oy*oy + oz*oz + 0.1;
+            if (d2 < 60000) {
+               const f = 10000 / d2;
+               fx += ox * f; fy += oy * f; fz += oz * f;
+            }
+          });
+        }
+      } else {
+        // Standard force-directed physics
+        fx = (nd.rx - nd.x) * K_SPRING;
+        fy = (nd.ry - nd.y) * K_SPRING;
+        fz = (nd.rz - nd.z) * K_SPRING;
 
-      // Repulsion from every other node
-      nodeData.forEach((other, j) => {
-        if (i === j) return;
-        const dx = nd.x - other.x, dy = nd.y - other.y, dz = nd.z - other.z;
-        const d2 = dx*dx + dy*dy + dz*dz + 0.01;
-        const d  = Math.sqrt(d2);
-        if (d > 350) return;
-        const f = K_REPEL / d2;
-        fx += (dx / d) * f; fy += (dy / d) * f; fz += (dz / d) * f;
-      });
+        // Repulsion
+        nodeData.forEach((other, j) => {
+          if (i === j) return;
+          const ox = nd.x - other.x, oy = nd.y - other.y, oz = nd.z - other.z;
+          const d2 = ox*ox + oy*oy + oz*oz + 0.01;
+          const d  = Math.sqrt(d2);
+          if (d > 600) return;
+          const f = K_REPEL / d2;
+          fx += (ox / d) * f; fy += (oy / d) * f; fz += (oz / d) * f;
+        });
 
-      // Edge attraction — pull connected nodes toward each other
-      edges.forEach(e => {
-        if (e.i !== i && e.j !== i) return;
-        const oi = e.i === i ? e.j : e.i;
-        const o  = nodeData[oi];
-        const dx = o.x - nd.x, dy = o.y - nd.y, dz = o.z - nd.z;
-        fx += dx * K_EDGE * e.strength;
-        fy += dy * K_EDGE * e.strength;
-        fz += dz * K_EDGE * e.strength;
-      });
+        // Edge attraction
+        edges.forEach(e => {
+          if (e.i !== i && e.j !== i) return;
+          const oi = e.i === i ? e.j : e.i;
+          const o  = nodeData[oi];
+          fx += (o.x - nd.x) * K_EDGE * e.strength;
+          fy += (o.y - nd.y) * K_EDGE * e.strength;
+          fz += (o.z - nd.z) * K_EDGE * e.strength;
+        });
+      }
 
       // Hover gravity well — hovered node gently attracts neighbours
       if (hoveredIdx >= 0 && hoveredIdx !== i) {

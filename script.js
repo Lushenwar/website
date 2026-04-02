@@ -392,6 +392,7 @@ function initScene() {
   const shockwaves = [];
 
   canvas.addEventListener('click', e => {
+    if (hasDragged) { hasDragged = false; return; }
     const w = screenToWorld(e.clientX, e.clientY);
     shockwaves.push({ pos: w, age: 0 });
     // ripple: push wireframe shapes slightly
@@ -1187,6 +1188,7 @@ function initSimulator() {
   });
   canvas.addEventListener('mouseleave', () => { mouse=null; snapPt=null; render(); });
   canvas.addEventListener('click', e => {
+    if (hasDragged) { hasDragged = false; return; }
     if (animating) return;
     const wp=toWorld(e), eff=findSnap(wp)||wp;
     if (!pending) {
@@ -2625,7 +2627,7 @@ function initProjectGraph() {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(55, W/H, 0.1, 2000);
   camera.position.set(0, 0, 500);
-  let targetCamZ = 900;
+  let targetCamZ = 1200;
 
   scene.add(new THREE.AmbientLight(0x111133, 0.7));
   const dLight = new THREE.DirectionalLight(0xffffff, 0.9);
@@ -2636,7 +2638,7 @@ function initProjectGraph() {
   const nodeData = PROJECTS.map((p, i) => {
     const phi   = Math.acos(-1 + (2 * i) / PROJECTS.length);
     const theta = Math.sqrt(PROJECTS.length * Math.PI) * phi;
-    const R = 320;
+    const R = 420;
     const rx = R * Math.sin(phi) * Math.cos(theta);
     const ry = R * Math.sin(phi) * Math.sin(theta);
     const rz = R * Math.cos(phi);
@@ -2978,11 +2980,12 @@ function initProjectGraph() {
   }
 
   // ── Orbit controls ────────────────────────────────────────────
-  let isDragging = false, lastX = 0, lastY = 0;
+  let isDragging = false, lastX = 0, lastY = 0, hasDragged = false;
   let rotX = 0, rotY = 0, autoRot = true;
   let targetRotX = 0, targetRotY = 0, focusNode = false;
 
   canvas.addEventListener('mousedown', e => {
+    hasDragged = false;
     isDragging = true; lastX = e.clientX; lastY = e.clientY;
     autoRot = false; focusNode = false;
   });
@@ -2990,8 +2993,9 @@ function initProjectGraph() {
 
   canvas.addEventListener('mousemove', e => {
     if (isDragging) {
-      rotY += (e.clientX - lastX) * 0.008;
-      rotX += (e.clientY - lastY) * 0.008;
+      if (Math.abs(e.clientX - lastX) > 2 || Math.abs(e.clientY - lastY) > 2) hasDragged = true;
+      rotY += (e.clientX - lastX) * 0.003;
+      rotX += (e.clientY - lastY) * 0.003;
       lastX = e.clientX; lastY = e.clientY;
     }
     const rect = canvas.getBoundingClientRect();
@@ -3005,6 +3009,7 @@ function initProjectGraph() {
   });
 
   canvas.addEventListener('click', e => {
+    if (hasDragged) { hasDragged = false; return; }
     const rect = canvas.getBoundingClientRect();
     mouse2D.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1;
     mouse2D.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
@@ -3031,15 +3036,16 @@ function initProjectGraph() {
 
   canvas.addEventListener('wheel', e => {
     e.preventDefault();
-    targetCamZ = Math.max(250, Math.min(1800, targetCamZ + e.deltaY * 0.5));
+    targetCamZ = Math.max(300, Math.min(2600, targetCamZ + e.deltaY * 1.5));
   }, { passive: false });
 
   let lastTouch = null;
-  canvas.addEventListener('touchstart', e => { lastTouch = e.touches[0]; autoRot = false; }, { passive: true });
+  canvas.addEventListener('touchstart', e => { lastTouch = e.touches[0]; autoRot = false; hasDragged = false; }, { passive: true });
   canvas.addEventListener('touchmove', e => {
     if (!lastTouch) return;
-    rotY += (e.touches[0].clientX - lastTouch.clientX) * 0.01;
-    rotX += (e.touches[0].clientY - lastTouch.clientY) * 0.01;
+    if (Math.abs(e.touches[0].clientX - lastTouch.clientX) > 2 || Math.abs(e.touches[0].clientY - lastTouch.clientY) > 2) hasDragged = true;
+    rotY += (e.touches[0].clientX - lastTouch.clientX) * 0.004;
+    rotX += (e.touches[0].clientY - lastTouch.clientY) * 0.004;
     lastTouch = e.touches[0];
   }, { passive: true });
 
@@ -3080,7 +3086,7 @@ function initProjectGraph() {
 
   // ── Physics constants ─────────────────────────────────────────
   const K_SPRING  = 0.014;  // pull toward rest position
-  const K_REPEL   = 5500;   // node-node repulsion
+  const K_REPEL   = 11000;   // node-node repulsion
   const K_EDGE    = 0.005;  // edge spring attraction
   const K_GRAVITY = 0.005;  // hover gravity well strength
   const DAMPING   = 0.80;   // velocity damping per frame
@@ -3114,7 +3120,7 @@ function initProjectGraph() {
         const dx = nd.x - other.x, dy = nd.y - other.y, dz = nd.z - other.z;
         const d2 = dx*dx + dy*dy + dz*dz + 0.01;
         const d  = Math.sqrt(d2);
-        if (d > 240) return;
+        if (d > 350) return;
         const f = K_REPEL / d2;
         fx += (dx / d) * f; fy += (dy / d) * f; fz += (dz / d) * f;
       });

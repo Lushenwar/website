@@ -3167,9 +3167,60 @@ document.addEventListener('DOMContentLoaded', () => {
   initProjectTabs();
   initTopNav();
   initGamesHub();
+  initWipProgress();
 
   initScene();
   initFaller();
   initCursor();
   initOrigami();
 });
+
+// ================================================================
+// GAMES WIP — animated fake progress bar
+// ================================================================
+function initWipProgress() {
+  const fill  = document.getElementById('wip-fill');
+  const label = document.getElementById('wip-pct');
+  if (!fill || !label) return;
+
+  // Targets the bar crawls toward before resetting — comedically stuck
+  const STOPS = [11, 23, 37, 37, 37, 42, 37, 37];
+  let stopIdx = 0;
+  let current = 0;
+  let target  = STOPS[0];
+
+  function step() {
+    const diff = target - current;
+    if (Math.abs(diff) < 0.5) {
+      current = target;
+      label.textContent = Math.round(current) + '%';
+      fill.style.width  = current + '%';
+
+      stopIdx = (stopIdx + 1) % STOPS.length;
+      const next = STOPS[stopIdx];
+      // If next target is lower, flash to 0 and restart
+      if (next < current) {
+        setTimeout(() => {
+          fill.style.transition = 'none';
+          current = 0;
+          fill.style.width = '0%';
+          label.textContent = '0%';
+          target = STOPS[0];
+          stopIdx = 1;
+          requestAnimationFrame(() => { fill.style.transition = ''; });
+          setTimeout(step, 400);
+        }, 2200);
+        return;
+      }
+      target = next;
+      setTimeout(step, 900);
+    } else {
+      current += diff * 0.04;
+      label.textContent = Math.round(current) + '%';
+      fill.style.width  = current + '%';
+      requestAnimationFrame(step);
+    }
+  }
+
+  setTimeout(step, 600);
+}

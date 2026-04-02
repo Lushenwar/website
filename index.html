@@ -80,6 +80,14 @@
     <canvas id="bg"></canvas>
 
     <!-- Hand-drawn astronaut -->
+    <!-- Grain overlay -->
+    <div class="grain-overlay" aria-hidden="true"></div>
+
+    <!-- Custom cursor -->
+    <div id="cursor" aria-hidden="true"></div>
+
+    <nav class="top-nav" id="top-nav">
+      <div class="top-nav-brand" style="display:flex; align-items:center; gap: 0.8rem; cursor:pointer;" onclick="window.scrollTo({top:0,behavior:'smooth'})">
     <div id="faller" aria-hidden="true">
       <svg id="astronaut-svg" width="120" height="160" viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg">
         <!-- Helmet — big round bubble helmet -->
@@ -174,14 +182,8 @@
       <div class="faller-trail"></div>
     </div>
 
-    <!-- Grain overlay -->
-    <div class="grain-overlay" aria-hidden="true"></div>
-
-    <!-- Custom cursor -->
-    <div id="cursor" aria-hidden="true"></div>
-
-    <nav class="top-nav" id="top-nav">
-      <span class="top-nav-brand">ryan qi</span>
+        <span>ryan qi</span>
+      </div>
       <div class="top-nav-tabs">
         <button class="top-tab active" data-section="sec-portfolio">portfolio</button>
         <button class="top-tab" data-section="sec-origami">origami</button>
@@ -647,9 +649,53 @@
       <div id="games-arena" style="display:none" aria-hidden="true"></div>
     </div><!-- /#sec-games -->
 
+    <!-- ============================================================
+         3D MODELS VIEWER
+         ============================================================ -->
+    <div class="top-section" id="sec-models">
+      <div class="models-viewer">
+        <canvas id="models-canvas"></canvas>
+
+        <div class="models-ui" aria-label="Model viewer controls">
+
+          <!-- top-left: section label + current model name -->
+          <div class="models-title-block">
+            <span class="models-eyebrow">OBJECT VIEWER</span>
+            <div class="models-name" id="models-label">—</div>
+          </div>
+
+          <!-- loading dot (top-right) -->
+          <div class="models-loading-dot" id="models-loading" aria-label="Loading"></div>
+
+          <!-- bottom-center: model selector tabs -->
+          <nav class="models-selector" aria-label="Select 3D model">
+            <button class="model-tab active" data-model="0" aria-pressed="true">
+              <span class="mtab-num">01</span>
+              <span class="mtab-name">Che</span>
+            </button>
+            <span class="models-divider" aria-hidden="true"></span>
+            <button class="model-tab" data-model="1" aria-pressed="false">
+              <span class="mtab-num">02</span>
+              <span class="mtab-name">Cat Dispenser</span>
+            </button>
+            <span class="models-divider" aria-hidden="true"></span>
+            <button class="model-tab" data-model="2" aria-pressed="false">
+              <span class="mtab-num">03</span>
+              <span class="mtab-name">Painterly Cottage</span>
+            </button>
+          </nav>
+
+          <!-- bottom-right: interaction hint -->
+          <div class="models-hint" aria-hidden="true">drag · scroll · pinch</div>
+        </div><!-- /.models-ui -->
+      </div><!-- /.models-viewer -->
+    </div><!-- /#sec-models -->
+
   </div><!-- /#portfolio -->
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="script.js"></script>
+  <!-- 3D viewer (ES module, deferred by default) -->
+  <script type="module" src="models.js"></script>
 </body>
 </html>

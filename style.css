@@ -495,20 +495,26 @@ body:has(a:hover, button:hover, .project-card:hover) #cursor {
    ================================================================ */
 
 #faller {
-  position: fixed;
-  top: 8vh;
-  left: 50%;
+  position: relative;
+  width: 42px;
+  height: 56px;
   z-index: 50;
   pointer-events: none;
   transform-origin: center center;
-  will-change: transform;
-  transform: translate(-50%, 0) rotate(-15deg);
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+#faller svg {
+  width: 100%;
+  height: 100%;
 }
 
 /* Astronaut intercepting state — pause JS transform, snap to center */
 #faller.astro-intercepting {
-  transform: translate(-50%, 0) rotate(-8deg) !important;
-  transition: transform 0.3s ease;
+  position: fixed !important;
+  top: 50% !important; left: 50% !important;
+  transform: translate(-50%, -50%) scale(3.5) !important;
+  transition: all 0.4s ease !important;
+  z-index: 9999;
 }
 
 #faller.astro-intercepting::after {
@@ -539,7 +545,7 @@ body:has(a:hover, button:hover, .project-card:hover) #cursor {
   animation: astro-defeat 0.7s ease-in forwards;
 }
 
-.faller-trail {
+.faller-trail { display: none;
   position: absolute;
   top: 60%;
   left: 50%;
@@ -1687,6 +1693,7 @@ main { position: relative; z-index: 5; }
 
 #sec-portfolio { padding-top: 52px; }
 #sec-games, #sec-origami, #sec-graph { padding-top: 52px; }
+#sec-models { padding-top: 0; overflow: hidden; }
 
 /* ================================================================
    ORIGAMI SIDE-PANEL LAYOUT
@@ -2620,4 +2627,310 @@ main { position: relative; z-index: 5; }
 @media (max-width: 860px) {
   .graph-layout { grid-template-columns: 1fr; }
   .graph-canvas { height: 380px; }
+}
+
+/* ================================================================
+   GAMES — WORK IN PROGRESS
+   ================================================================ */
+
+.games-wip {
+  position: relative;
+  min-height: calc(100vh - 52px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 5vw 5rem;
+  overflow: hidden;
+}
+
+/* caution-tape strips */
+.wip-tape {
+  position: absolute;
+  left: 0; right: 0;
+  height: 26px;
+  background: repeating-linear-gradient(
+    -50deg,
+    var(--pencil)              0px,
+    var(--pencil)              12px,
+    rgba(13,12,9,0.85)         12px,
+    rgba(13,12,9,0.85)         24px
+  );
+  opacity: 0.45;
+  pointer-events: none;
+}
+.wip-tape-top    { top: 0; }
+.wip-tape-bottom { bottom: 0; }
+
+/* floating background dots */
+.wip-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.wip-dot {
+  position: absolute;
+  left: var(--x);
+  top:  var(--y);
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+  animation: wip-float var(--dur, 4s) ease-in-out infinite var(--del, 0s);
+}
+.wip-dot--lg {
+  width: 7px; height: 7px;
+  background: transparent;
+  border: 1.5px solid var(--ink-faint);
+}
+@keyframes wip-float {
+  0%, 100% { transform: translateY(0) scale(1);   opacity: 0.25; }
+  50%       { transform: translateY(-18px) scale(1.3); opacity: 0.7;  }
+}
+
+/* central flex container */
+.wip-inner {
+  display: flex;
+  align-items: center;
+  gap: 5vw;
+  max-width: 900px;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* astronaut illustration */
+.wip-illo-wrap {
+  flex-shrink: 0;
+}
+.wip-illo {
+  display: block;
+  animation: wip-bob 3.4s ease-in-out infinite;
+  filter: url(#roughen);
+}
+@keyframes wip-bob {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50%       { transform: translateY(-14px) rotate(1deg); }
+}
+
+/* text block */
+.wip-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 420px;
+}
+
+.wip-eyebrow {
+  font-family: var(--font-sketch);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+}
+
+.wip-heading {
+  font-family: var(--font-sketch);
+  font-size: clamp(2.6rem, 6vw, 4.2rem);
+  line-height: 1.05;
+  color: var(--ink);
+  filter: url(#roughen-heavy);
+}
+.wip-heading em {
+  font-style: italic;
+  color: var(--lavender);
+}
+
+.wip-sub {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+
+/* fake progress bar */
+.wip-progress-outer {
+  margin-top: 0.5rem;
+}
+.wip-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-sketch);
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  margin-bottom: 0.4rem;
+}
+.wip-pct { color: var(--lavender); }
+
+.wip-progress-track {
+  width: 100%;
+  max-width: 260px;
+  height: 3px;
+  background: rgba(240,232,213,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.wip-progress-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--lavender), var(--cobalt));
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+@media (max-width: 680px) {
+  .wip-inner { flex-direction: column; gap: 2rem; }
+  .wip-illo  { width: 140px; height: 147px; }
+}
+
+/* ================================================================
+   3D MODELS VIEWER
+   ================================================================ */
+
+.models-viewer {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #050505;
+}
+
+#models-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  cursor: grab;
+}
+#models-canvas:active { cursor: grabbing; }
+
+/* overlay — pointer-events none by default, re-enabled on interactive children */
+.models-ui {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* title block — top-left, below the fixed nav */
+.models-title-block {
+  position: absolute;
+  top: 5.2rem;
+  left: 5vw;
+}
+.models-eyebrow {
+  display: block;
+  font-family: 'Courier New', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.28em;
+  color: rgba(255,255,255,0.2);
+  margin-bottom: 0.6rem;
+}
+.models-name {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(2rem, 5vw, 3.8rem);
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.82);
+  line-height: 1;
+  transition: opacity 0.5s ease;
+}
+
+/* pulsing loading dot — top-right */
+.models-loading-dot {
+  position: absolute;
+  top: 5.5rem;
+  right: 5vw;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  animation: models-pulse 1s ease-in-out infinite;
+}
+.models-loading-dot.visible { opacity: 1; }
+@keyframes models-pulse {
+  0%, 100% { transform: scale(1);   opacity: 0.4; }
+  50%       { transform: scale(1.6); opacity: 1;   }
+}
+
+/* model selector — bottom-center */
+.models-selector {
+  position: absolute;
+  bottom: 3.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  pointer-events: auto;
+}
+
+.models-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255,255,255,0.12);
+  flex-shrink: 0;
+}
+
+.model-tab {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.6rem 1rem;
+  opacity: 0.3;
+  transition: opacity 0.35s ease;
+  position: relative;
+  pointer-events: auto;   /* explicit override of parent pointer-events:none */
+}
+.model-tab:hover  { opacity: 0.65; }
+.model-tab.active { opacity: 1; }
+
+.mtab-num {
+  font-family: 'Courier New', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  color: rgba(255,255,255,0.4);
+  display: block;
+}
+.mtab-name {
+  font-family: 'Courier New', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.9);
+  text-transform: uppercase;
+  display: block;
+}
+/* active indicator dot */
+.model-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.75);
+}
+
+/* interaction hint — bottom-right */
+.models-hint {
+  position: absolute;
+  bottom: 3.8rem;
+  right: 5vw;
+  font-family: 'Courier New', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.18);
+  pointer-events: none;
+}
+
+@media (max-width: 580px) {
+  .models-selector { gap: 1.6rem; bottom: 2.5rem; }
+  .mtab-name       { font-size: 0.6rem; }
+  .models-name     { font-size: 1.8rem; }
 }

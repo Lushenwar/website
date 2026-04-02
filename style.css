@@ -2406,6 +2406,7 @@ main { position: relative; z-index: 5; }
 }
 
 .graph-canvas {
+  touch-action: none;
   width: 100%;
   height: 520px;
   display: block;
@@ -2933,4 +2934,70 @@ main { position: relative; z-index: 5; }
   .models-selector { gap: 1.6rem; bottom: 2.5rem; }
   .mtab-name       { font-size: 0.6rem; }
   .models-name     { font-size: 1.8rem; }
+}
+
+/* ----------------------------------------------------------------
+   HUD overlay — hold-to-inspect elements (Task 2 / 3)
+   opacity + scale managed entirely by GSAP; no CSS transform here
+   ---------------------------------------------------------------- */
+
+/* 1. Coord readout — top-right, below loading dot (which sits at top: 5.5rem) */
+#hud-coords {
+  position: absolute;
+  top: 7.2rem;
+  right: 5vw;
+  font-family: 'Courier New', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.45);
+  text-align: right;
+  pointer-events: none;
+}
+
+/* 2. Technical spec line — bottom-left, above selector tabs */
+#hud-spec {
+  position: absolute;
+  bottom: 8rem;
+  left: 5vw;
+  pointer-events: none;
+}
+.hud-rule {
+  width: 4rem;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.18);
+  margin-bottom: 0.45rem;
+}
+.hud-spec-text {
+  display: block;
+  font-family: 'Courier New', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* 3. Centre reticle — absolute-centred + symbol */
+#hud-reticle {
+  position: absolute;
+  /* centre with calc so GSAP scale doesn't conflict with a translate() */
+  top: calc(50% - 0.6em);
+  left: calc(50% - 0.35em);
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.28);
+  pointer-events: none;
+}
+
+/* 4. Corner brackets */
+#hud-bracket-tl {
+  position: absolute;
+  top: 5.2rem;
+  left: 5vw;
+  pointer-events: none;
+}
+#hud-bracket-br {
+  position: absolute;
+  bottom: 3.2rem;
+  right: 5vw;
+  pointer-events: none;
 }

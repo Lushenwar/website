@@ -2620,32 +2620,36 @@ function initProjectGraph() {
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setSize(W, H);
-  renderer.setClearColor(0x0d0c09, 1);
+  renderer.setClearColor(0x05040e, 1);
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(55, W/H, 0.1, 2000);
   camera.position.set(0, 0, 500);
-  let targetCamZ = 500;
+  let targetCamZ = 900;
 
-  scene.add(new THREE.AmbientLight(0xf0e8d5, 0.4));
-  const dLight = new THREE.DirectionalLight(0xf0e8d5, 0.8);
-  dLight.position.set(1, 1, 1);
+  scene.add(new THREE.AmbientLight(0x111133, 0.7));
+  const dLight = new THREE.DirectionalLight(0xffffff, 0.9);
+  dLight.position.set(2, 1, 2);
   scene.add(dLight);
 
-  // Node positions — loose 3D sphere layout
+  // ── Node positions — golden spiral on sphere, with physics state ──
   const nodeData = PROJECTS.map((p, i) => {
     const phi   = Math.acos(-1 + (2 * i) / PROJECTS.length);
     const theta = Math.sqrt(PROJECTS.length * Math.PI) * phi;
-    const R = 180;
+    const R = 320;
+    const rx = R * Math.sin(phi) * Math.cos(theta);
+    const ry = R * Math.sin(phi) * Math.sin(theta);
+    const rz = R * Math.cos(phi);
     return {
       p,
-      x: R * Math.sin(phi) * Math.cos(theta),
-      y: R * Math.sin(phi) * Math.sin(theta),
-      z: R * Math.cos(phi),
+      x: rx, y: ry, z: rz,   // live position (physics moves this)
+      rx, ry, rz,              // rest position (spring target)
+      vx: 0, vy: 0, vz: 0,   // velocity
+      pulse: Math.random() * Math.PI * 2, // per-node breathing phase
     };
   });
 
-  // Edges: projects sharing >= 1 technology
+  // ── Edges: shared tech ────────────────────────────────────────
   const edges = [];
   for (let i = 0; i < PROJECTS.length; i++) {
     for (let j = i+1; j < PROJECTS.length; j++) {
@@ -2654,67 +2658,114 @@ function initProjectGraph() {
     }
   }
 
-  // Node meshes
+  // ── Star node meshes + glow halos ────────────────────────────
   const spheres = nodeData.map(nd => {
-    const geo = new THREE.SphereGeometry(10, 20, 20);
-    const mat = new THREE.MeshPhongMaterial({ color: new THREE.Color(nd.p.color), shininess: 80, transparent: true, opacity: 1 });
+    const geo = new THREE.SphereGeometry(10, 22, 22);
+    const mat = new THREE.MeshPhongMaterial({
+      color: new THREE.Color(nd.p.color),
+      emissive: new THREE.Color(nd.p.color),
+      emissiveIntensity: 0.55,
+      shininess: 140,
+      transparent: true, opacity: 1,
+    });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(nd.x, nd.y, nd.z);
     mesh.userData = { nd, idx: nodeData.indexOf(nd) };
-    scene.add(mesh);
     return mesh;
   });
 
-  // Ring around active node
-  const ringGeo = new THREE.TorusGeometry(14, 1.5, 8, 32);
-  const ringMat = new THREE.MeshBasicMaterial({ color: 0xf5c430 });
+  // Soft glow halo — rendered from inside (BackSide) so it blooms outward
+  const halos = nodeData.map(nd => {
+    const geo = new THREE.SphereGeometry(22, 12, 12);
+    const mat = new THREE.MeshBasicMaterial({
+      color: new THREE.Color(nd.p.color),
+      transparent: true, opacity: 0.07,
+      side: THREE.BackSide, depthWrite: false,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(nd.x, nd.y, nd.z);
+    return mesh;
+  });
+
+  // ── Selection torus ───────────────────────────────────────────
+  const ringGeo = new THREE.TorusGeometry(14, 1.5, 8, 40);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xf5c430, transparent: true, opacity: 0.9 });
   const ring = new THREE.Mesh(ringGeo, ringMat);
   ring.visible = false;
-  scene.add(ring);
 
-  // Edge lines — shared material for global dimming
-  const edgeMat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.4 });
-  const edgeLines = [];
-  edges.forEach(e => {
+  // ── Edge lines (geometry rebuilt each frame as nodes move) ────
+  const edgeMat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.35 });
+  const edgeLines = edges.map(e => {
     const pts = [
       new THREE.Vector3(nodeData[e.i].x, nodeData[e.i].y, nodeData[e.i].z),
       new THREE.Vector3(nodeData[e.j].x, nodeData[e.j].y, nodeData[e.j].z),
     ];
-    const colors = [];
     const c1 = new THREE.Color(PROJECTS[e.i].color);
     const c2 = new THREE.Color(PROJECTS[e.j].color);
-    colors.push(c1.r, c1.g, c1.b, c2.r, c2.g, c2.b);
+    const colors = [c1.r, c1.g, c1.b, c2.r, c2.g, c2.b];
     const geo = new THREE.BufferGeometry().setFromPoints(pts);
     geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    const line = new THREE.Line(geo, edgeMat);
-    scene.add(line);
-    edgeLines.push(line);
+    return new THREE.Line(geo, edgeMat);
   });
 
-  // Label sprites
+  // ── Edge pulse dots — travel from node i → node j, looping ───
+  const edgePulses = edges.map(e => {
+    const col = new THREE.Color(PROJECTS[e.i].color)
+      .lerp(new THREE.Color(PROJECTS[e.j].color), 0.5);
+    const geo = new THREE.SphereGeometry(2, 5, 5);
+    const mat = new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.88 });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.userData = {
+      t: Math.random(),
+      speed: 0.0007 + Math.random() * 0.0006,
+      edge: e,
+    };
+    return mesh;
+  });
+
+  // ── Click burst rings (3 shockwave rings per click) ──────────
+  const burstPool = Array.from({ length: 3 }, (_, i) => {
+    const geo = new THREE.RingGeometry(11, 15, 48);
+    const mat = new THREE.MeshBasicMaterial({
+      color: [0xf5c430, 0x60a5d4, 0xc08fff][i],
+      transparent: true, opacity: 0,
+      side: THREE.DoubleSide, depthWrite: false,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.visible = false;
+    return { mesh, mat, active: false, t: 0, delay: i * 75 };
+  });
+
+  function fireBurst(pos) {
+    burstPool.forEach(b => {
+      b.mesh.position.copy(pos);
+      b.mesh.scale.setScalar(0.08);
+      b.mesh.visible = true;
+      b.active = true;
+      b.t = 0;
+    });
+  }
+
+  // ── Labels ────────────────────────────────────────────────────
   function makeLabel(text, color, fontSize = 24) {
     const c = document.createElement('canvas'); c.width = 256; c.height = 64;
     const ctx = c.getContext('2d');
     ctx.font = `bold ${fontSize}px Caveat, cursive`;
     ctx.fillStyle = color;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(text, 128, 32);
     const tex = new THREE.CanvasTexture(c);
-    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
-    const sprite = new THREE.Sprite(mat);
-    return sprite;
+    return new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
   }
 
   const labels = nodeData.map(nd => {
-    const sprite = makeLabel(nd.p.name, nd.p.color);
-    sprite.scale.set(80, 20, 1);
-    sprite.position.set(nd.x, nd.y + 18, nd.z);
-    scene.add(sprite);
-    return sprite;
+    const s = makeLabel(nd.p.name, nd.p.color);
+    s.scale.set(80, 20, 1);
+    s.position.set(nd.x, nd.y + 18, nd.z);
+    return s;
   });
 
-  // Tech layer colors for satellite visualization
+  // ── Tech layer colours ────────────────────────────────────────
   const LAYER_COLORS = {
     Frontend: '#60a5d4', Backend: '#f0984e', AI_ML: '#c08fff',
     Data: '#4ecdc4', Infrastructure: '#7ab87a',
@@ -2729,122 +2780,145 @@ function initProjectGraph() {
     'SHAP':'AI_ML','Optuna':'AI_ML','Lava Models':'AI_ML',
     'Snowflake':'Data','Redis':'Data','Supabase':'Data','Pandas':'Data',
   };
-  const getTechLayer = t => TECH_LAYER_MAP[t] || 'Infrastructure';
 
-  // Workflow visualization — shows per-project architecture with directed data flow
-  let satObjects = [];
-  let wfMeshes  = [];   // { mesh, wn } — workflow spheres, raycaster-hittable
-  let wfAnimStart = 0; // timestamp when workflow appeared (for scale-in animation)
+  // ── Satellite / workflow ──────────────────────────────────────
+  let satObjects  = [];
+  let wfMeshes    = [];
+  let wfAnimStart = 0;
 
   function clearSatellites() {
     satObjects.forEach(o => group.remove(o));
-    satObjects = [];
-    wfMeshes = [];
+    satObjects = []; wfMeshes = [];
   }
 
+  // Each workflow node orbits the parent project node in 3D.
   function showWorkflow(nd) {
     clearSatellites();
     const wf = PROJECT_WORKFLOW[nd.p.id];
     if (!wf) return;
-
     wfAnimStart = Date.now();
 
-    // Build world positions for each workflow node
-    const wfPos = {}; // id → { pos: Vector3, color: string }
+    const pPos = new THREE.Vector3(nd.x, nd.y, nd.z);
+    const nodeCount = wf.nodes.length;
+    const wfPos = {};
+    const xAxis = new THREE.Vector3(1, 0, 0);
+    const zAxis = new THREE.Vector3(0, 0, 1);
+
     wf.nodes.forEach((wn, wIdx) => {
-      const wx = nd.x + wn.ox;
-      const wy = nd.y + wn.oy;
-      const wz = nd.z;
-      const color = LAYER_COLORS[wn.role] || '#7ab87a';
+      const color  = LAYER_COLORS[wn.role] || '#7ab87a';
+      const orbitR = 36 + wIdx * 11;
+      // Alternate direction so planets cross each other
+      const orbitSpeed = (0.0005 + wIdx * 0.00014) * (wIdx % 2 === 0 ? 1 : -1);
+      const orbitAngle0 = (wIdx / nodeCount) * Math.PI * 2;
+      // Tilted orbital plane — each planet lives in its own inclined orbit
+      const tiltX = (wIdx % 3 - 1) * 0.55 + (Math.random() - 0.5) * 0.2;
+      const tiltZ = (wIdx % 2 === 0 ? 0.3 : -0.3) + (Math.random() - 0.5) * 0.15;
 
-      // Thin anchor line from parent node to this workflow node
-      const lGeo = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(nd.x, nd.y, nd.z),
-        new THREE.Vector3(wx, wy, wz),
-      ]);
-      const lLine = new THREE.Line(lGeo, new THREE.LineBasicMaterial({ color: new THREE.Color(color), transparent: true, opacity: 0.18 }));
-      group.add(lLine);
-      satObjects.push(lLine);
+      // Faint orbit guide ring
+      const orbRGeo = new THREE.RingGeometry(orbitR - 0.4, orbitR + 0.4, 64);
+      const orbRMat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color(color), transparent: true, opacity: 0.09,
+        side: THREE.DoubleSide, depthWrite: false,
+      });
+      const orbRMesh = new THREE.Mesh(orbRGeo, orbRMat);
+      orbRMesh.position.copy(pPos);
+      // Tilt the ring to match the orbital plane
+      orbRMesh.rotation.x = -Math.PI / 2 + tiltX;
+      orbRMesh.rotation.z = tiltZ;
+      group.add(orbRMesh); satObjects.push(orbRMesh);
 
-      // Workflow component sphere — starts at scale 0, animates in
+      // Dynamic anchor line (start = parent, end = planet — updated per frame)
+      const lGeo = new THREE.BufferGeometry().setFromPoints([pPos.clone(), pPos.clone()]);
+      const lLine = new THREE.Line(lGeo, new THREE.LineBasicMaterial({
+        color: new THREE.Color(color), transparent: true, opacity: 0.15,
+      }));
+      group.add(lLine); satObjects.push(lLine);
+
+      // Planet sphere
       const sGeo = new THREE.SphereGeometry(6.5, 14, 14);
-      const sMat = new THREE.MeshPhongMaterial({ color: new THREE.Color(color), shininess: 80, transparent: true, opacity: 0.95, emissive: new THREE.Color(color), emissiveIntensity: 0.12 });
+      const sMat = new THREE.MeshPhongMaterial({
+        color: new THREE.Color(color), shininess: 100,
+        transparent: true, opacity: 0.95,
+        emissive: new THREE.Color(color), emissiveIntensity: 0.25,
+      });
       const sMesh = new THREE.Mesh(sGeo, sMat);
-      sMesh.position.set(wx, wy, wz);
-      sMesh.scale.setScalar(0); // starts hidden, scale-in via animate loop
-      sMesh.userData.wfIdx = wIdx;
-      group.add(sMesh);
-      satObjects.push(sMesh);
-      wfMeshes.push({ mesh: sMesh, wn, nd, stagger: wIdx * 70 });
+      sMesh.scale.setScalar(0); // scale-in on reveal
+      sMesh.userData = {
+        wfIdx: wIdx, orbitR, orbitSpeed, orbitAngle: orbitAngle0,
+        tiltX, tiltZ, parentNd: nd, anchorLine: lLine, label: null,
+      };
+      group.add(sMesh); satObjects.push(sMesh);
+      wfMeshes.push({ mesh: sMesh, wn, nd, stagger: wIdx * 80 });
 
-      // Component label
+      // Label follows planet
       const lbl = makeLabel(wn.name, color, 17);
       lbl.scale.set(66, 16, 1);
-      lbl.position.set(wx, wy + 12, wz);
-      group.add(lbl);
-      satObjects.push(lbl);
+      lbl.position.copy(pPos);
+      group.add(lbl); satObjects.push(lbl);
+      sMesh.userData.label = lbl;
 
-      wfPos[wn.id] = { pos: new THREE.Vector3(wx, wy, wz), color };
+      // Initial static position for arrows (first frame approximation)
+      const rawX = Math.cos(orbitAngle0) * orbitR;
+      const rawZ = Math.sin(orbitAngle0) * orbitR;
+      const initialPos = pPos.clone().add(
+        new THREE.Vector3(rawX, rawX * Math.sin(tiltX) * 0.5, rawZ)
+      );
+      wfPos[wn.id] = { pos: initialPos, color };
     });
 
-    // Directed data-flow arrows between workflow nodes
+    // Directed arrows between workflow nodes (drawn once at initial orbit positions)
     wf.edges.forEach(([fromId, toId]) => {
       const from = wfPos[fromId]; const to = wfPos[toId];
       if (!from || !to) return;
       const dir = to.pos.clone().sub(from.pos);
       const dist = dir.length();
-      if (dist < 2) return;
+      if (dist < 4) return;
       dir.normalize();
-
-      const startOffset = 9;  // clear of source sphere
-      const endOffset   = 12; // clear of target sphere + arrowhead
-      const arrowLen = dist - startOffset - endOffset;
+      const arrowLen = dist - 9 - 12;
       if (arrowLen <= 4) return;
-
-      const origin = from.pos.clone().add(dir.clone().multiplyScalar(startOffset));
+      const origin = from.pos.clone().add(dir.clone().multiplyScalar(9));
       const midColor = new THREE.Color(from.color).lerp(new THREE.Color(to.color), 0.5);
-      const headLen   = Math.min(9, arrowLen * 0.22);
-      const headWidth = headLen * 0.55;
-
-      const arrow = new THREE.ArrowHelper(dir, origin, arrowLen, midColor.getHex(), headLen, headWidth);
-      // Make the line part slightly transparent
-      arrow.line.material.transparent = true;
-      arrow.line.material.opacity = 0.75;
-      group.add(arrow);
-      satObjects.push(arrow);
+      const headLen = Math.min(9, arrowLen * 0.22);
+      const arrow = new THREE.ArrowHelper(dir, origin, arrowLen, midColor.getHex(), headLen, headLen * 0.55);
+      arrow.line.material.transparent = true; arrow.line.material.opacity = 0.55;
+      group.add(arrow); satObjects.push(arrow);
     });
   }
 
-  // Node dimming — fade non-selected nodes and edges
+  // ── Node dimming ──────────────────────────────────────────────
   function dimNodes(activeIdx) {
     spheres.forEach((s, i) => {
-      s.material.opacity = (activeIdx < 0 || i === activeIdx) ? 1.0 : 0.18;
+      s.material.opacity = (activeIdx < 0 || i === activeIdx) ? 1.0 : 0.15;
+    });
+    halos.forEach((h, i) => {
+      h.material.opacity = (activeIdx < 0 || i === activeIdx) ? 0.07 : 0.01;
     });
     labels.forEach((l, i) => {
-      l.material.opacity = (activeIdx < 0 || i === activeIdx) ? 1.0 : 0.12;
+      l.material.opacity = (activeIdx < 0 || i === activeIdx) ? 1.0 : 0.10;
     });
-    edgeMat.opacity = activeIdx < 0 ? 0.4 : 0.08;
+    edgeMat.opacity = activeIdx < 0 ? 0.35 : 0.06;
+    edgePulses.forEach(p => {
+      p.material.opacity = activeIdx < 0 ? 0.88 : 0.0;
+    });
   }
 
   const infoEl = document.getElementById('graph-info');
   const raycaster = new THREE.Raycaster();
   const mouse2D = new THREE.Vector2();
-  let activeIdx = -1;
+  let activeIdx  = -1;
+  let hoveredIdx = -1; // for gravity well
 
-  // Show detail for a clicked workflow component (non-project sphere)
+  // ── Workflow component detail ──────────────────────────────────
   function showWorkflowDetail(wfItem) {
     if (!infoEl) return;
     const { wn, nd } = wfItem;
     const color = LAYER_COLORS[wn.role] || '#7ab87a';
     const p = nd.p;
-
-    // Find which workflow edges touch this node
     const wf = PROJECT_WORKFLOW[p.id];
     const inbound  = wf?.edges.filter(([, t]) => t === wn.id).map(([f]) => f) ?? [];
     const outbound = wf?.edges.filter(([f]) => f === wn.id).map(([, t]) => t) ?? [];
     const edgeNodes = wf?.nodes ?? [];
     const nameOf = id => edgeNodes.find(n => n.id === id)?.name ?? id;
-
     infoEl.innerHTML = `
       <div class="gi-header" style="border-left-color:${color};margin-bottom:0.5rem">
         <span class="gi-name" style="color:${color}">${wn.name}</span>
@@ -2853,10 +2927,7 @@ function initProjectGraph() {
       <p class="gi-tagline">${wn.desc || 'Component of ' + p.name}</p>
       ${inbound.length  ? `<div class="gi-conns-label" style="margin-top:0.75rem">receives from</div><div class="gi-conns">${inbound.map(id=>`<div class="gi-conn-row"><span class="gi-conn-name">${nameOf(id)}</span></div>`).join('')}</div>` : ''}
       ${outbound.length ? `<div class="gi-conns-label" style="margin-top:0.5rem">sends to</div><div class="gi-conns">${outbound.map(id=>`<div class="gi-conn-row"><span class="gi-conn-name">${nameOf(id)}</span></div>`).join('')}</div>` : ''}
-      <div style="margin-top:1rem">
-        <button class="gi-link" id="gi-back-btn">← ${p.name}</button>
-      </div>`;
-
+      <div style="margin-top:1rem"><button class="gi-link" id="gi-back-btn">← ${p.name}</button></div>`;
     document.getElementById('gi-back-btn')?.addEventListener('click', () => showInfo(activeIdx));
   }
 
@@ -2878,7 +2949,6 @@ function initProjectGraph() {
     showWorkflow(nodeData[idx]);
     targetCamZ = 270;
 
-    // Auto-rotate group to face the selected node
     const nd = nodeData[idx];
     const dist = Math.sqrt(nd.x * nd.x + nd.z * nd.z);
     targetRotY = -Math.atan2(nd.x, nd.z);
@@ -2904,20 +2974,20 @@ function initProjectGraph() {
         ${p.devpost ? `<a href="${p.devpost}" target="_blank" class="gi-link">DevPost ↗</a>` : ''}
         ${p.demo ? `<a href="${p.demo}" target="_blank" class="gi-link">Demo ↗</a>` : ''}
       </div>`;
-
     window._graphChatActivate?.(p.id, p.name);
   }
 
-  // Orbit controls
+  // ── Orbit controls ────────────────────────────────────────────
   let isDragging = false, lastX = 0, lastY = 0;
   let rotX = 0, rotY = 0, autoRot = true;
   let targetRotX = 0, targetRotY = 0, focusNode = false;
 
   canvas.addEventListener('mousedown', e => {
     isDragging = true; lastX = e.clientX; lastY = e.clientY;
-    autoRot = false; focusNode = false; // user takes manual control
+    autoRot = false; focusNode = false;
   });
   window.addEventListener('mouseup', () => { isDragging = false; });
+
   canvas.addEventListener('mousemove', e => {
     if (isDragging) {
       rotY += (e.clientX - lastX) * 0.008;
@@ -2929,6 +2999,7 @@ function initProjectGraph() {
     mouse2D.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
     raycaster.setFromCamera(mouse2D, camera);
     const hits = raycaster.intersectObjects(spheres);
+    hoveredIdx = hits.length ? hits[0].object.userData.idx : -1;
     const wfHover = !hits.length && raycaster.intersectObjects(wfMeshes.map(w => w.mesh)).length;
     canvas.style.cursor = (hits.length || wfHover) ? 'pointer' : 'grab';
   });
@@ -2939,16 +3010,15 @@ function initProjectGraph() {
     mouse2D.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
     raycaster.setFromCamera(mouse2D, camera);
 
-    // Check project nodes first
     const hits = raycaster.intersectObjects(spheres);
     if (hits.length) {
       const idx = hits[0].object.userData.idx;
-      showInfo(idx);
       ring.position.copy(hits[0].object.position);
+      fireBurst(hits[0].object.position.clone());
+      showInfo(idx);
       return;
     }
 
-    // Then check workflow component spheres
     const wfHits = raycaster.intersectObjects(wfMeshes.map(w => w.mesh));
     if (wfHits.length) {
       const hit = wfMeshes.find(w => w.mesh === wfHits[0].object);
@@ -2960,10 +3030,10 @@ function initProjectGraph() {
   });
 
   canvas.addEventListener('wheel', e => {
-    targetCamZ = Math.max(200, Math.min(800, targetCamZ + e.deltaY * 0.5));
-  });
+    e.preventDefault();
+    targetCamZ = Math.max(250, Math.min(1800, targetCamZ + e.deltaY * 0.5));
+  }, { passive: false });
 
-  // Touch support
   let lastTouch = null;
   canvas.addEventListener('touchstart', e => { lastTouch = e.touches[0]; autoRot = false; }, { passive: true });
   canvas.addEventListener('touchmove', e => {
@@ -2973,50 +3043,207 @@ function initProjectGraph() {
     lastTouch = e.touches[0];
   }, { passive: true });
 
-  // Group all scene objects for rotation
+  // ── Group (all scene objects rotate together) ─────────────────
   const group = new THREE.Group();
-  spheres.forEach(s => { scene.remove(s); group.add(s); });
-  labels.forEach(l => { scene.remove(l); group.add(l); });
-  edgeLines.forEach(l => { scene.remove(l); group.add(l); });
-  scene.remove(ring); group.add(ring);
+  spheres.forEach(s => group.add(s));
+  halos.forEach(h => group.add(h));
+  labels.forEach(l => group.add(l));
+  edgeLines.forEach(l => group.add(l));
+  edgePulses.forEach(p => group.add(p));
+  burstPool.forEach(b => group.add(b.mesh));
+  group.add(ring);
   scene.add(group);
 
-  // Particle stars
-  const starGeo = new THREE.BufferGeometry();
-  const starPos = new Float32Array(600);
-  for (let i = 0; i < 600; i++) starPos[i] = (Math.random() - 0.5) * 1200;
-  starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
-  scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xf0e8d5, size: 1.5, transparent: true, opacity: 0.3 })));
+  // ── Layered starfield (3 depths, different tints) ─────────────
+  function makeStarLayer(count, radius, color, size, opacity) {
+    const pos = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const u = Math.random(), v = Math.random();
+      const th = 2 * Math.PI * u;
+      const ph = Math.acos(2 * v - 1);
+      pos[i*3]   = radius * Math.sin(ph) * Math.cos(th);
+      pos[i*3+1] = radius * Math.sin(ph) * Math.sin(th);
+      pos[i*3+2] = radius * Math.cos(ph);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    scene.add(new THREE.Points(geo, new THREE.PointsMaterial({
+      color, size, transparent: true, opacity, sizeAttenuation: true,
+    })));
+  }
+  makeStarLayer(2200, 900, 0xddeeff, 1.6, 0.55);
+  makeStarLayer(420,  860, 0x60a5d4, 2.4, 0.50);
+  makeStarLayer(110,  830, 0xf5c430, 3.2, 0.65);
 
   showInfo(-1);
   initGraphChatbot();
 
-  // Animate
+  // ── Physics constants ─────────────────────────────────────────
+  const K_SPRING  = 0.014;  // pull toward rest position
+  const K_REPEL   = 5500;   // node-node repulsion
+  const K_EDGE    = 0.005;  // edge spring attraction
+  const K_GRAVITY = 0.005;  // hover gravity well strength
+  const DAMPING   = 0.80;   // velocity damping per frame
+
+  let clock = 0;
+
+  // ── Animation loop ────────────────────────────────────────────
   function animate() {
     requestAnimationFrame(animate);
-    if (autoRot) rotY += 0.003;
+    clock += 0.016;
 
-    // Lerp group rotation toward selected node (camera auto-focus)
+    if (autoRot) rotY += 0.003;
     if (focusNode) {
       rotX += (targetRotX - rotX) * 0.04;
       rotY += (targetRotY - rotY) * 0.04;
     }
-
     group.rotation.x = rotX;
     group.rotation.y = rotY;
     camera.position.z += (targetCamZ - camera.position.z) * 0.06;
 
-    // Scale-in animation for workflow spheres (staggered pop-in)
+    // ── Force-directed physics ─────────────────────────────────
+    nodeData.forEach((nd, i) => {
+      // Spring toward rest (golden spiral) position
+      let fx = (nd.rx - nd.x) * K_SPRING;
+      let fy = (nd.ry - nd.y) * K_SPRING;
+      let fz = (nd.rz - nd.z) * K_SPRING;
+
+      // Repulsion from every other node
+      nodeData.forEach((other, j) => {
+        if (i === j) return;
+        const dx = nd.x - other.x, dy = nd.y - other.y, dz = nd.z - other.z;
+        const d2 = dx*dx + dy*dy + dz*dz + 0.01;
+        const d  = Math.sqrt(d2);
+        if (d > 240) return;
+        const f = K_REPEL / d2;
+        fx += (dx / d) * f; fy += (dy / d) * f; fz += (dz / d) * f;
+      });
+
+      // Edge attraction — pull connected nodes toward each other
+      edges.forEach(e => {
+        if (e.i !== i && e.j !== i) return;
+        const oi = e.i === i ? e.j : e.i;
+        const o  = nodeData[oi];
+        const dx = o.x - nd.x, dy = o.y - nd.y, dz = o.z - nd.z;
+        fx += dx * K_EDGE * e.strength;
+        fy += dy * K_EDGE * e.strength;
+        fz += dz * K_EDGE * e.strength;
+      });
+
+      // Hover gravity well — hovered node gently attracts neighbours
+      if (hoveredIdx >= 0 && hoveredIdx !== i) {
+        const hov = nodeData[hoveredIdx];
+        const dx = hov.x - nd.x, dy = hov.y - nd.y, dz = hov.z - nd.z;
+        const d  = Math.sqrt(dx*dx + dy*dy + dz*dz + 0.01);
+        if (d < 200) {
+          const gf = K_GRAVITY * (1 - d / 200);
+          fx += dx * gf; fy += dy * gf; fz += dz * gf;
+        }
+      }
+
+      nd.vx = (nd.vx + fx) * DAMPING;
+      nd.vy = (nd.vy + fy) * DAMPING;
+      nd.vz = (nd.vz + fz) * DAMPING;
+      nd.x += nd.vx; nd.y += nd.vy; nd.z += nd.vz;
+
+      // Node breathing — gentle scale + emissive pulse
+      const breath = 1 + Math.sin(clock * 1.8 + nd.pulse) * 0.045;
+      spheres[i].position.set(nd.x, nd.y, nd.z);
+      spheres[i].scale.setScalar(breath);
+      // Boost hovered node
+      const isHov = i === hoveredIdx;
+      halos[i].position.set(nd.x, nd.y, nd.z);
+      halos[i].scale.setScalar((isHov ? 1.6 : 1.0) + Math.sin(clock * 1.2 + nd.pulse) * 0.1);
+      halos[i].material.opacity = isHov ? 0.18 : (activeIdx < 0 ? 0.07 : (activeIdx === i ? 0.07 : 0.01));
+      labels[i].position.set(nd.x, nd.y + 18, nd.z);
+    });
+
+    // Update edge line geometry to follow nodes
+    edgeLines.forEach((line, ei) => {
+      const e = edges[ei], a = nodeData[e.i], b = nodeData[e.j];
+      const pa = line.geometry.attributes.position;
+      pa.setXYZ(0, a.x, a.y, a.z);
+      pa.setXYZ(1, b.x, b.y, b.z);
+      pa.needsUpdate = true;
+    });
+
+    // Edge pulse dots
+    edgePulses.forEach(dot => {
+      const { edge } = dot.userData;
+      dot.userData.t = (dot.userData.t + dot.userData.speed) % 1;
+      const tt = dot.userData.t;
+      const a = nodeData[edge.i], b = nodeData[edge.j];
+      dot.position.set(
+        a.x + (b.x - a.x) * tt,
+        a.y + (b.y - a.y) * tt,
+        a.z + (b.z - a.z) * tt,
+      );
+    });
+
+    // Follow selected node with torus ring
+    if (activeIdx >= 0 && ring.visible) {
+      const nd = nodeData[activeIdx];
+      ring.position.set(nd.x, nd.y, nd.z);
+      ring.rotation.y += 0.02; // spin the ring
+    }
+
+    // ── Orbital planets (workflow nodes) ──────────────────────
     if (wfMeshes.length) {
-      const now = Date.now();
-      const elapsed = now - wfAnimStart;
+      const elapsed = Date.now() - wfAnimStart;
       wfMeshes.forEach(({ mesh, stagger }) => {
-        const t = Math.min(1, Math.max(0, (elapsed - stagger) / 320));
-        // Ease out cubic
-        const s = 1 - Math.pow(1 - t, 3);
+        // Scale-in pop
+        const scaleT = Math.min(1, Math.max(0, (elapsed - stagger) / 340));
+        const s = 1 - Math.pow(1 - scaleT, 3);
         mesh.scale.setScalar(s);
+
+        // Advance orbital angle
+        mesh.userData.orbitAngle += mesh.userData.orbitSpeed;
+        const angle = mesh.userData.orbitAngle;
+        const r     = mesh.userData.orbitR;
+        const nd    = mesh.userData.parentNd;
+        const tx    = mesh.userData.tiltX;
+        const tz    = mesh.userData.tiltZ;
+
+        // Position in tilted orbital plane using axis-angle rotation
+        const rawX = Math.cos(angle) * r;
+        const rawZ = Math.sin(angle) * r;
+        // Apply tilt: mix Y from both axes
+        const px = nd.x + rawX;
+        const py = nd.y + rawX * Math.sin(tx) * 0.6 + rawZ * Math.sin(tz) * 0.4;
+        const pz = nd.z + rawZ;
+
+        mesh.position.set(px, py, pz);
+
+        // Label follows planet
+        if (mesh.userData.label) {
+          mesh.userData.label.position.set(px, py + 12, pz);
+        }
+
+        // Update dynamic anchor line
+        const al = mesh.userData.anchorLine;
+        if (al) {
+          const lp = al.geometry.attributes.position;
+          lp.setXYZ(0, nd.x, nd.y, nd.z);
+          lp.setXYZ(1, px, py, pz);
+          lp.needsUpdate = true;
+        }
       });
     }
+
+    // ── Burst ring animation ──────────────────────────────────
+    burstPool.forEach(b => {
+      if (!b.active) return;
+      b.t += 0.022;
+      const delay = b.delay / 1000 * 60; // convert ms delay to frame-ticks
+      const ft = Math.max(0, b.t - b.delay * 0.001);
+      if (ft <= 0) return;
+      if (ft >= 1) { b.mesh.visible = false; b.mat.opacity = 0; b.active = false; return; }
+      const eased = 1 - Math.pow(1 - ft, 2.2);
+      b.mesh.scale.setScalar(0.08 + eased * 5.0);
+      b.mat.opacity = ft < 0.25 ? (ft / 0.25) * 0.85 : 0.85 * (1 - (ft - 0.25) / 0.75);
+      // Billboard: ring always faces camera
+      b.mesh.lookAt(group.worldToLocal(camera.position.clone()));
+    });
 
     renderer.render(scene, camera);
   }

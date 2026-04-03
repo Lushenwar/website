@@ -2651,6 +2651,18 @@ function initProjectGraph() {
     };
   });
 
+  // ── Adjust rest positions for Health Assistant ─────────────────
+  nodeData.forEach(nd => {
+    if (nd.p.id === '010') {
+      // Pull Health Assistant's rest position much closer to origin
+      nd.rx *= 0.25;
+      nd.ry *= 0.25;
+      nd.rz *= 0.25;
+      // Also snap live position closer so it doesn't have to travel far
+      nd.x = nd.rx; nd.y = nd.ry; nd.z = nd.rz;
+    }
+  });
+
   // ── Edges: shared tech ────────────────────────────────────────
   const edges = [];
   for (let i = 0; i < PROJECTS.length; i++) {

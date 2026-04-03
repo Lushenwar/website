@@ -2790,7 +2790,7 @@ function initProjectGraph() {
 
   function clearSatellites() {
     satObjects.forEach(o => group.remove(o));
-    satObjects = []; wfMeshes = [];
+    satObjects = []; wfMeshes = []; wfArrows = [];
   }
 
   // Each workflow node orbits the parent project node in 3D.
@@ -2884,6 +2884,7 @@ function initProjectGraph() {
       const arrow = new THREE.ArrowHelper(dir, origin, arrowLen, midColor.getHex(), headLen, headLen * 0.55);
       arrow.line.material.transparent = true; arrow.line.material.opacity = 0.55;
       group.add(arrow); satObjects.push(arrow);
+      wfArrows.push({ arrow, fromId, toId });
     });
   }
 
@@ -3234,6 +3235,29 @@ function initProjectGraph() {
           lp.needsUpdate = true;
         }
       });
+      
+      // Update Arrow positions and directions dynamically
+      if (typeof wfArrows !== 'undefined' && wfArrows.length) {
+        wfArrows.forEach(link => {
+          const fromW = wfMeshes.find(w => w.wn.id === link.fromId);
+          const toW = wfMeshes.find(w => w.wn.id === link.toId);
+          if (!fromW || !toW) return;
+          const fP = fromW.mesh.position;
+          const tP = toW.mesh.position;
+          const dir = new THREE.Vector3().subVectors(tP, fP);
+          const dist = dir.length();
+          if (dist < 4) { link.arrow.visible = false; return; }
+          link.arrow.visible = true;
+          dir.normalize();
+          const arrowLen = dist - 9 - 12;
+          if (arrowLen <= 4) { link.arrow.visible = false; return; }
+          const origin = fP.clone().add(dir.clone().multiplyScalar(9));
+          link.arrow.position.copy(origin);
+          link.arrow.setDirection(dir);
+          const headLen = Math.min(9, arrowLen * 0.22);
+          link.arrow.setLength(arrowLen, headLen, headLen * 0.55);
+        });
+      }
     }
 
     // ── Burst ring animation ──────────────────────────────────

@@ -166,8 +166,9 @@
       </div>
       <div class="top-nav-tabs">
         <button class="top-tab active" data-section="sec-portfolio">portfolio</button>
-        <button class="top-tab" data-section="sec-origami">origami</button>
+        <button class="top-tab" data-section="sec-timeline">timeline</button>
         <button class="top-tab" data-section="sec-graph">graph</button>
+        <button class="top-tab" data-section="sec-origami">origami</button>
         <button class="top-tab" data-section="sec-games">games</button>
         <button class="top-tab" data-section="sec-models">models</button>
       </div>
@@ -280,7 +281,7 @@
                 <span class="stat-label">awards won</span>
               </div>
               <div class="stat">
-                <span class="stat-num">10</span>
+                <span class="stat-num">14</span>
                 <span class="stat-label">projects shipped</span>
               </div>
             </div>
@@ -313,10 +314,31 @@
     </div>
 
     <!-- ============================================================
+         TIMELINE SECTION
+         ============================================================ -->
+    <div class="top-section" id="sec-timeline">
+      <section class="timeline-section">
+        <div class="section-header">
+          <svg class="section-squiggle" width="60" height="14" viewBox="0 0 60 14" fill="none">
+            <path d="M 2 7 C 10 2, 18 12, 30 7 C 42 2, 50 12, 58 7" stroke="var(--pencil)" stroke-width="2" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="section-eyebrow">from first line to now</span>
+        </div>
+        <p class="timeline-subtitle">scroll down to explore the journey — oldest at top, newest at bottom.</p>
+        <div class="timeline-spine-wrap">
+          <div class="timeline-spine"></div>
+          <div class="timeline-events" id="timeline-events">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+      </section>
+    </div><!-- /#sec-timeline -->
+
+    <!-- ============================================================
          ORIGAMI SECTION
          ============================================================ -->
     <div class="top-section" id="sec-origami">
-      <section class="origami-section" style="padding: 3rem 5vw 6rem;">
+      <section class="origami-section">
         <div class="section-header">
           <svg class="section-squiggle" width="60" height="14" viewBox="0 0 60 14" fill="none">
             <path d="M 2 7 C 10 2, 18 12, 30 7 C 42 2, 50 12, 58 7" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" fill="none"/>
@@ -324,41 +346,97 @@
           <span class="section-eyebrow">take a break · fold something</span>
         </div>
 
-        <div class="orig-legend">
-          <span class="legend-heading">legend</span>
-          <div class="legend-item">
-            <svg width="56" height="18" viewBox="0 0 56 18" fill="none">
-              <line x1="2" y1="9" x2="54" y2="9" stroke="var(--cobalt)" stroke-width="1.8" stroke-dasharray="7 5"/>
-              <path d="M 25 3 L 28 9 L 31 3" stroke="var(--cobalt)" stroke-width="1.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
-            </svg>
-            <span>valley fold</span>
-          </div>
-          <div class="legend-item">
-            <svg width="56" height="18" viewBox="0 0 56 18" fill="none">
-              <path d="M 2 9 L 9 9 M 12 9 L 14 9 M 17 9 L 24 9 M 27 9 L 29 9 M 32 9 L 39 9 M 42 9 L 44 9 M 47 9 L 54 9" stroke="var(--rouge)" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M 25 15 L 28 9 L 31 15" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
-            </svg>
-            <span>mountain fold</span>
-          </div>
-          <div class="legend-item">
-            <svg width="56" height="18" viewBox="0 0 56 18" fill="none">
-              <line x1="2" y1="9" x2="54" y2="9" stroke="var(--ink-muted)" stroke-width="1"/>
-              <circle cx="12" cy="9" r="2" fill="var(--ink-muted)" opacity="0.5"/>
-              <circle cx="28" cy="9" r="2" fill="var(--ink-muted)" opacity="0.5"/>
-              <circle cx="44" cy="9" r="2" fill="var(--ink-muted)" opacity="0.5"/>
-            </svg>
-            <span>existing crease</span>
-          </div>
-        </div>
-
         <div class="orig-main-layout">
-          <!-- LEFT: Guide panel -->
+
+          <!-- LEFT: Fold types sidebar — always visible, scrolls with page -->
+          <div class="orig-folds-sidebar">
+            <div class="orig-sidebar-title">fold types</div>
+
+            <div class="sbl-row">
+              <div class="sbl-item">
+                <svg width="38" height="13" viewBox="0 0 38 13" fill="none"><line x1="2" y1="6.5" x2="36" y2="6.5" stroke="var(--cobalt)" stroke-width="1.5" stroke-dasharray="5 3"/><path d="M 15 2 L 19 6.5 L 15 11" stroke="var(--cobalt)" stroke-width="1.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>
+                <span>valley</span>
+              </div>
+              <div class="sbl-item">
+                <svg width="38" height="13" viewBox="0 0 38 13" fill="none"><path d="M 2 6.5 L 6 6.5 M 9 6.5 L 11 6.5 M 14 6.5 L 20 6.5 M 23 6.5 L 25 6.5 M 28 6.5 L 36 6.5" stroke="var(--rouge)" stroke-width="1.5" stroke-linecap="round"/><path d="M 15 11 L 19 6.5 L 15 2" stroke="var(--rouge)" stroke-width="1.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>
+                <span>mountain</span>
+              </div>
+              <div class="sbl-item">
+                <svg width="38" height="13" viewBox="0 0 38 13" fill="none"><line x1="2" y1="6.5" x2="36" y2="6.5" stroke="var(--ink-muted)" stroke-width="1"/><circle cx="10" cy="6.5" r="1.5" fill="var(--ink-muted)" opacity="0.5"/><circle cx="19" cy="6.5" r="1.5" fill="var(--ink-muted)" opacity="0.5"/><circle cx="28" cy="6.5" r="1.5" fill="var(--ink-muted)" opacity="0.5"/></svg>
+                <span>crease</span>
+              </div>
+            </div>
+
+            <div class="fold-dict-sidebar">
+              <div class="fds-entry">
+                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><rect x="4" y="4" width="48" height="28" stroke="var(--ink-faint)" stroke-width="1"/><path d="M4 18 L 52 18" stroke="var(--cobalt)" stroke-width="1.5" stroke-dasharray="6 4"/><path d="M 22 12 L 28 18 L 22 24" stroke="var(--cobalt)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="18" width="48" height="14" fill="rgba(96,165,212,0.08)"/></svg>
+                <div><div class="fds-name">Valley Fold ⌄</div><div class="fds-desc">Fold toward you — V shape. Most common.</div></div>
+              </div>
+              <div class="fds-entry">
+                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><rect x="4" y="4" width="48" height="28" stroke="var(--ink-faint)" stroke-width="1"/><path d="M4 18 L 52 18" stroke="var(--rouge)" stroke-width="1.5" stroke-dasharray="2 4"/><path d="M 22 24 L 28 18 L 22 12" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="4" width="48" height="14" fill="rgba(224,85,85,0.08)"/></svg>
+                <div><div class="fds-name">Mountain Fold ⌃</div><div class="fds-desc">Fold away — peak up. Valley geometry, flipped.</div></div>
+              </div>
+              <div class="fds-entry">
+                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><rect x="4" y="4" width="48" height="28" stroke="var(--ink-faint)" stroke-width="1"/><path d="M4 18 L 52 18" stroke="var(--ink-muted)" stroke-width="1.2" stroke-dasharray="3 6"/><circle cx="14" cy="18" r="2" fill="var(--ink-faint)"/><circle cx="28" cy="18" r="2" fill="var(--ink-faint)"/><circle cx="42" cy="18" r="2" fill="var(--ink-faint)"/></svg>
+                <div><div class="fds-name">Crease &amp; Unfold ◇</div><div class="fds-desc">Fold then unfold — leaves a reference line.</div></div>
+              </div>
+              <div class="fds-entry">
+                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><path d="M4 4 L52 4 L52 36 L4 36 Z" fill="rgba(240,232,213,0.05)" stroke="var(--ink-faint)" stroke-width="1"/><path d="M18 4 L18 36" stroke="var(--cobalt)" stroke-width="1.5" stroke-dasharray="6 4"/><path d="M32 4 L32 36" stroke="var(--rouge)" stroke-width="1.2" stroke-dasharray="2 4"/><rect x="18" y="4" width="14" height="32" fill="rgba(122,184,122,0.12)"/></svg>
+                <div><div class="fds-name">Pleat Fold ≡</div><div class="fds-desc">Valley + mountain — zigzag accordion ridge.</div></div>
+              </div>
+              <div class="fds-entry">
+                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><path d="M4 36 L28 4 L52 36" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M28 4 L28 36" stroke="var(--pencil)" stroke-width="1.2" stroke-dasharray="4 3"/><path d="M4 20 L28 20" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="5 3"/><path d="M52 20 L28 20" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="5 3"/></svg>
+                <div><div class="fds-name">Petal Fold</div><div class="fds-desc">Opens flap into two symmetric points.</div></div>
+              </div>
+              <div class="fds-entry">
+                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><path d="M28 4 L4 28 L52 28 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M20 20 C28 12 36 20 28 28" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M28 4 L28 20" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="4 3"/></svg>
+                <div><div class="fds-name">Squash Fold</div><div class="fds-desc">Open a layered flap and press it flat.</div></div>
+              </div>
+              <div class="fds-entry">
+                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><path d="M28 4 L4 36 L52 36 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M16 20 L28 4 L40 20" stroke="var(--pencil)" stroke-width="1.5" fill="rgba(245,196,48,0.08)" stroke-linejoin="round"/><path d="M28 4 L28 24" stroke="var(--rouge)" stroke-width="1.2" stroke-dasharray="3 3"/></svg>
+                <div><div class="fds-name">Rabbit Ear</div><div class="fds-desc">Three creases form a single pointed ear.</div></div>
+              </div>
+              <div class="fds-entry">
+                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><path d="M28 4 L4 20 L28 36 L52 20 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M28 14 L28 28" stroke="var(--cobalt)" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="28" cy="20" r="4" stroke="var(--rouge)" stroke-width="1.5" fill="none"/></svg>
+                <div><div class="fds-name">Inside Reverse</div><div class="fds-desc">Reverses a point inward between layers.</div></div>
+              </div>
+              <div class="fds-entry">
+                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><path d="M28 4 L4 20 L28 36 L52 20 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M28 14 C20 8 14 14 12 20" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M28 14 C36 8 42 14 44 20" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+                <div><div class="fds-name">Outside Reverse</div><div class="fds-desc">Reverses a point outward over the layers.</div></div>
+              </div>
+              <div class="fds-entry">
+                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><path d="M4 28 L28 4 L52 28" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M28 20 L28 28" stroke="var(--cobalt)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 3"/><circle cx="28" cy="14" r="3" stroke="var(--pencil)" stroke-width="1.5" fill="rgba(245,196,48,0.15)"/><path d="M20 28 L28 20 L36 28" stroke="var(--sage)" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div><div class="fds-name">Sink Fold</div><div class="fds-desc">Pushes a corner inside the model.</div></div>
+              </div>
+            </div>
+
+            <div class="fd-bases-block">
+              <div class="fd-bases-title">common bases</div>
+              <div class="fd-base"><span class="fd-base-name">◇ Kite</span><span class="fd-base-desc">2 edges → center diagonal</span></div>
+              <div class="fd-base"><span class="fd-base-name">◇ Square</span><span class="fd-base-desc">X + + creases → collapse</span></div>
+              <div class="fd-base"><span class="fd-base-name">◇ Bird</span><span class="fd-base-desc">Square base + 2 petal folds</span></div>
+              <div class="fd-base"><span class="fd-base-name">◇ Waterbomb</span><span class="fd-base-desc">X mountain + + valley → collapse</span></div>
+              <div class="fd-base"><span class="fd-base-name">◇ Frog</span><span class="fd-base-desc">Waterbomb + squash + petal folds</span></div>
+            </div>
+
+            <div class="fd-kawasaki">
+              <span class="fd-kaw-label">Kawasaki's theorem</span>
+              Alternating angles at any vertex must sum to 180° for flat-foldability. Mountain − Valley = ±2 (Maekawa).
+            </div>
+          </div>
+
+          <!-- CENTER: Step-by-step guides -->
           <div class="orig-guide-panel">
             <div class="orig-guide-tabs">
               <button class="orig-guide-tab active" data-guide="crane">🦢 crane</button>
               <button class="orig-guide-tab" data-guide="lotus">🌸 lotus</button>
               <button class="orig-guide-tab" data-guide="boat">⛵ boat</button>
-              <button class="orig-guide-tab" data-guide="types">📖 folds</button>
+              <button class="orig-guide-tab" data-guide="dragon">🐉 dragon</button>
+              <button class="orig-guide-tab" data-guide="frog">🐸 frog</button>
+              <button class="orig-guide-tab" data-guide="heart">💜 heart</button>
+              <button class="orig-guide-tab" data-guide="star">⭐ star</button>
+              <button class="orig-guide-tab" data-guide="butterfly">🦋 butterfly</button>
+              <button class="orig-guide-tab" data-guide="phoenix">🔥 phoenix</button>
             </div>
 
             <div class="guide-content active" id="guide-crane">
@@ -390,94 +468,101 @@
                 <button class="crane-btn primary" id="boat-next">next →</button>
               </div>
             </div>
-          </div>
 
-            <!-- Fold Types Reference -->
-            <div class="guide-content" id="guide-types">
-              <div class="fold-dict">
-                <div class="fd-entry">
-                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><rect x="4" y="4" width="48" height="28" stroke="var(--ink-faint)" stroke-width="1"/><path d="M4 18 L 52 18" stroke="var(--cobalt)" stroke-width="1.5" stroke-dasharray="6 4"/><path d="M 22 12 L 28 18 L 22 24" stroke="var(--cobalt)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="18" width="48" height="14" fill="rgba(96,165,212,0.08)"/></svg>
-                  <div><div class="fd-name">Valley Fold ⌄</div><div class="fd-desc">Fold toward you — paper bends down into a V. Blue dashed line in diagrams. The most common fold.</div></div>
-                </div>
-                <div class="fd-entry">
-                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><rect x="4" y="4" width="48" height="28" stroke="var(--ink-faint)" stroke-width="1"/><path d="M4 18 L 52 18" stroke="var(--rouge)" stroke-width="1.5" stroke-dasharray="2 4"/><path d="M 22 24 L 28 18 L 22 12" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="4" width="48" height="14" fill="rgba(224,85,85,0.08)"/></svg>
-                  <div><div class="fd-name">Mountain Fold ⌃</div><div class="fd-desc">Fold away from you — paper peaks upward. Red dot-dash line. Same geometry as valley but flipped.</div></div>
-                </div>
-                <div class="fd-entry">
-                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><rect x="4" y="4" width="48" height="28" stroke="var(--ink-faint)" stroke-width="1"/><path d="M4 18 L 52 18" stroke="var(--ink-muted)" stroke-width="1.2" stroke-dasharray="3 6"/><circle cx="14" cy="18" r="2" fill="var(--ink-faint)"/><circle cx="28" cy="18" r="2" fill="var(--ink-faint)"/><circle cx="42" cy="18" r="2" fill="var(--ink-faint)"/></svg>
-                  <div><div class="fd-name">Crease &amp; Unfold ◇</div><div class="fd-desc">Fold then unfold — leaves a reference crease. Essential for setting up petal folds, bird base, and pre-creasing crane.</div></div>
-                </div>
-                <div class="fd-entry">
-                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><path d="M4 4 L52 4 L52 36 L4 36 Z" fill="rgba(240,232,213,0.05)" stroke="var(--ink-faint)" stroke-width="1"/><path d="M18 4 L18 36" stroke="var(--cobalt)" stroke-width="1.5" stroke-dasharray="6 4"/><path d="M32 4 L32 36" stroke="var(--rouge)" stroke-width="1.2" stroke-dasharray="2 4"/><rect x="18" y="4" width="14" height="32" fill="rgba(122,184,122,0.12)"/></svg>
-                  <div><div class="fd-name">Pleat Fold ≡</div><div class="fd-desc">Two parallel folds: valley then mountain. Creates a zigzag ridge — like accordion pleats in a shirt.</div></div>
-                </div>
-                <div class="fd-entry">
-                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><path d="M4 36 L28 4 L52 36" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M28 4 L28 36" stroke="var(--pencil)" stroke-width="1.2" stroke-dasharray="4 3"/><path d="M4 20 L28 20" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="5 3"/><path d="M52 20 L28 20" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="5 3"/></svg>
-                  <div><div class="fd-name">Petal Fold</div><div class="fd-desc">Opens a flap into two symmetric points. Core move in bird base: fold edges to center, unfold, lift top, collapse sides.</div></div>
-                </div>
-                <div class="fd-entry">
-                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><path d="M28 4 L4 28 L52 28 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M20 20 C28 12 36 20 28 28" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M28 4 L28 20" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="4 3"/></svg>
-                  <div><div class="fd-name">Squash Fold</div><div class="fd-desc">Open a layered flap from the top and press it flat. Creates a wider, symmetric flap from a narrow point.</div></div>
-                </div>
-                <div class="fd-entry">
-                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><path d="M28 4 L4 36 L52 36 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M16 20 L28 4 L40 20" stroke="var(--pencil)" stroke-width="1.5" fill="rgba(245,196,48,0.08)" stroke-linejoin="round"/><path d="M28 4 L28 24" stroke="var(--rouge)" stroke-width="1.2" stroke-dasharray="3 3"/></svg>
-                  <div><div class="fd-name">Rabbit Ear Fold</div><div class="fd-desc">Three creases converge: two edge creases + center bisector. Creates a single pointed ear/fin. Two = petal fold.</div></div>
-                </div>
-                <div class="fd-entry">
-                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><path d="M28 4 L4 20 L28 36 L52 20 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M28 14 L28 28" stroke="var(--cobalt)" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="28" cy="20" r="4" stroke="var(--rouge)" stroke-width="1.5" fill="none"/></svg>
-                  <div><div class="fd-name">Inside Reverse Fold</div><div class="fd-desc">Reverses a point inward between layers. Used for crane head and tail. Pre-crease the fold line first.</div></div>
-                </div>
-                <div class="fd-entry">
-                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><path d="M28 4 L4 20 L28 36 L52 20 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M28 14 C20 8 14 14 12 20" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M28 14 C36 8 42 14 44 20" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-                  <div><div class="fd-name">Outside Reverse Fold</div><div class="fd-desc">Reverses a point outward around the layers. Tip bends back over the outside of the model.</div></div>
-                </div>
-                <div class="fd-entry">
-                  <svg width="56" height="36" viewBox="0 0 56 36" fill="none"><path d="M4 28 L28 4 L52 28" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M28 20 L28 28" stroke="var(--cobalt)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 3"/><circle cx="28" cy="14" r="3" stroke="var(--pencil)" stroke-width="1.5" fill="rgba(245,196,48,0.15)"/><path d="M20 28 L28 20 L36 28" stroke="var(--sage)" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  <div><div class="fd-name">Sink Fold</div><div class="fd-desc">Pushes a corner tip inward by collapsing it inside the model. Requires pre-creasing around the target corner.</div></div>
-                </div>
-                <div class="fd-entry fd-entry-wide">
-                  <div class="fd-bases">
-                    <div class="fd-base"><span class="fd-base-name">◇ Kite Base</span><span class="fd-base-desc">2 edges → center diagonal</span></div>
-                    <div class="fd-base"><span class="fd-base-name">◇ Square Base</span><span class="fd-base-desc">X + + creases → collapse</span></div>
-                    <div class="fd-base"><span class="fd-base-name">◇ Bird Base</span><span class="fd-base-desc">Square base + 2 petal folds</span></div>
-                    <div class="fd-base"><span class="fd-base-name">◇ Waterbomb Base</span><span class="fd-base-desc">X mountain + + valley → collapse</span></div>
-                    <div class="fd-base"><span class="fd-base-name">◇ Frog Base</span><span class="fd-base-desc">Waterbomb + 4 squash folds + 4 petal folds</span></div>
-                  </div>
-                </div>
-              </div>
-              <div class="fd-kawasaki">
-                <span class="fd-kaw-label">Kawasaki's theorem</span>
-                At any vertex, alternating angles around it must sum to 180° for flat-foldability. Mountain − Valley = ±2 at every vertex (Maekawa's theorem).
+            <div class="guide-content" id="guide-dragon">
+              <div class="guide-step-visual" id="dragon-step-svg"></div>
+              <div class="guide-step-counter">step <span id="dragon-step-num">1</span> <span class="guide-sep">of</span> <span id="dragon-step-total">8</span></div>
+              <p class="guide-step-desc" id="dragon-step-desc"></p>
+              <div class="guide-controls">
+                <button class="crane-btn" id="dragon-prev" disabled>← back</button>
+                <button class="crane-btn primary" id="dragon-next">next →</button>
               </div>
             </div>
 
+            <div class="guide-content" id="guide-frog">
+              <div class="guide-step-visual" id="frog-step-svg"></div>
+              <div class="guide-step-counter">step <span id="frog-step-num">1</span> <span class="guide-sep">of</span> <span id="frog-step-total">6</span></div>
+              <p class="guide-step-desc" id="frog-step-desc"></p>
+              <div class="guide-controls">
+                <button class="crane-btn" id="frog-prev" disabled>← back</button>
+                <button class="crane-btn primary" id="frog-next">next →</button>
+              </div>
+            </div>
+
+            <div class="guide-content" id="guide-heart">
+              <div class="guide-step-visual" id="heart-step-svg"></div>
+              <div class="guide-step-counter">step <span id="heart-step-num">1</span> <span class="guide-sep">of</span> <span id="heart-step-total">5</span></div>
+              <p class="guide-step-desc" id="heart-step-desc"></p>
+              <div class="guide-controls">
+                <button class="crane-btn" id="heart-prev" disabled>← back</button>
+                <button class="crane-btn primary" id="heart-next">next →</button>
+              </div>
+            </div>
+
+            <div class="guide-content" id="guide-star">
+              <div class="guide-step-visual" id="star-step-svg"></div>
+              <div class="guide-step-counter">step <span id="star-step-num">1</span> <span class="guide-sep">of</span> <span id="star-step-total">6</span></div>
+              <p class="guide-step-desc" id="star-step-desc"></p>
+              <div class="guide-controls">
+                <button class="crane-btn" id="star-prev" disabled>← back</button>
+                <button class="crane-btn primary" id="star-next">next →</button>
+              </div>
+            </div>
+
+            <div class="guide-content" id="guide-butterfly">
+              <div class="guide-difficulty">⚠ hard</div>
+              <div class="guide-step-visual" id="butterfly-step-svg"></div>
+              <div class="guide-step-counter">step <span id="butterfly-step-num">1</span> <span class="guide-sep">of</span> <span id="butterfly-step-total">9</span></div>
+              <p class="guide-step-desc" id="butterfly-step-desc"></p>
+              <div class="guide-controls">
+                <button class="crane-btn" id="butterfly-prev" disabled>← back</button>
+                <button class="crane-btn primary" id="butterfly-next">next →</button>
+              </div>
+            </div>
+
+            <div class="guide-content" id="guide-phoenix">
+              <div class="guide-difficulty">💀 expert</div>
+              <div class="guide-step-visual" id="phoenix-step-svg"></div>
+              <div class="guide-step-counter">step <span id="phoenix-step-num">1</span> <span class="guide-sep">of</span> <span id="phoenix-step-total">10</span></div>
+              <p class="guide-step-desc" id="phoenix-step-desc"></p>
+              <div class="guide-controls">
+                <button class="crane-btn" id="phoenix-prev" disabled>← back</button>
+                <button class="crane-btn primary" id="phoenix-next">next →</button>
+              </div>
+            </div>
+          </div>
+
           <!-- RIGHT: Simulator -->
           <div class="orig-sim-panel">
-            <div class="orig-sim-header">
+            <div class="sim-top-bar">
               <span class="orig-sim-title">fold it yourself</span>
-              <div class="orig-sim-fold-types">
+              <div class="orig-sim-actions">
+                <button class="sim-action-btn" id="fold-undo" title="undo">↩ undo</button>
+                <button class="sim-action-btn" id="fold-reset" title="reset">↺ reset</button>
+              </div>
+            </div>
+            <div class="sim-body">
+              <canvas id="origami-canvas"></canvas>
+              <div class="sim-fold-sidebar">
                 <button class="sim-mode-btn active" id="fold-valley" title="Valley fold: fold toward you">⌄ valley</button>
                 <button class="sim-mode-btn" id="fold-mountain" title="Mountain fold: fold away from you">⌃ mountain</button>
                 <button class="sim-mode-btn" id="fold-crease" title="Crease &amp; unfold: mark without folding">◇ crease</button>
                 <button class="sim-mode-btn" id="fold-pleat" title="Pleat fold: valley + parallel mountain mark">≡ pleat</button>
-                <button class="sim-mode-btn" id="fold-inside-rev" title="Inside reverse: push tip inward between layers">↩ inside rev</button>
-                <button class="sim-mode-btn" id="fold-outside-rev" title="Outside reverse: bend tip outward over layers">↪ outside rev</button>
                 <button class="sim-mode-btn" id="fold-petal" title="Petal fold: opens flap into two symmetric points">⟡ petal</button>
                 <button class="sim-mode-btn" id="fold-squash" title="Squash fold: open and press a layered flap flat">◈ squash</button>
                 <button class="sim-mode-btn" id="fold-rabbit" title="Rabbit ear: three creases converge to a single point">☽ rabbit ear</button>
+                <button class="sim-mode-btn" id="fold-inside-rev" title="Inside reverse: push tip inward between layers">↩ inside rev</button>
+                <button class="sim-mode-btn" id="fold-outside-rev" title="Outside reverse: bend tip outward over layers">↪ outside rev</button>
                 <button class="sim-mode-btn" id="fold-sink" title="Sink fold: push a corner inward inside the model">⇲ sink</button>
               </div>
-              <div class="orig-sim-actions">
-                <button class="sim-action-btn" id="fold-undo" title="undo">↩</button>
-                <button class="sim-action-btn" id="fold-reset" title="reset">↺</button>
-              </div>
             </div>
-            <canvas id="origami-canvas"></canvas>
+            <!-- sim-extra-controls (rotate/tools/angle/presets) injected here by JS -->
             <div class="sim-status-row">
               <span class="sim-hint" id="sim-hint">Click two points to draw a fold line</span>
               <span class="sim-folds-count"><span id="fold-count">0</span> folds</span>
             </div>
           </div>
+
         </div>
       </section>
     </div><!-- /#sec-origami -->

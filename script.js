@@ -145,6 +145,62 @@ const PROJECTS = [
     color: '#7ab87a',
     type: 'hackathon',
   },
+  {
+    id: '011',
+    name: 'MAZERACE',
+    tagline: 'Race through a castle. Beat the leaderboard.',
+    description: 'Java Swing 2D castle maze game with collectible coins, a persistent top-5 leaderboard saved to file, character and difficulty selection, directional animations for each movement, and original background music. A complete game built entirely from scratch in Java.',
+    hackathon: null,
+    award: null,
+    tech: ['Java', 'Java Swing', 'File I/O', 'Java Sound API'],
+    github: 'https://github.com/Lushenwar/MazeRace',
+    devpost: null,
+    demo: null,
+    color: '#f0984e',
+    type: 'personal',
+  },
+  {
+    id: '012',
+    name: 'PEARSTORE',
+    tagline: 'Answer a survey. Find your perfect laptop.',
+    description: 'Java Swing laptop recommendation tool that walks users through a preference survey, runs a weighted matching algorithm across a file-backed inventory, and presents the top 3 laptop matches with full specifications. Built as a group school project in Java.',
+    hackathon: null,
+    award: null,
+    tech: ['Java', 'Java Swing', 'File I/O'],
+    github: 'https://github.com/Lushenwar/PearStore',
+    devpost: null,
+    demo: null,
+    color: '#7ab87a',
+    type: 'personal',
+  },
+  {
+    id: '013',
+    name: 'CLASSESOBJECTSMODULE',
+    tagline: 'Learn OOP through a Witcher-themed adventure.',
+    description: 'Interactive Java OOP educational module targeting beginners in Java, Python, and C++. Features a Witcher-themed narrative framework, embedded quizzes, and matching mini-games that reinforce classes, objects, inheritance, and polymorphism concepts.',
+    hackathon: null,
+    award: null,
+    tech: ['Java', 'Java Swing', 'File I/O'],
+    github: 'https://github.com/Lushenwar/ClassesObjectsModule',
+    devpost: null,
+    demo: null,
+    color: '#c08fff',
+    type: 'personal',
+  },
+  {
+    id: '014',
+    name: 'WEATHERAPP',
+    tagline: 'Check the forecast. Dress for it.',
+    description: 'Browser-based weather app delivering current conditions, multi-day forecasts, and AI-generated clothing and activity recommendations tailored to the weather. Built entirely with vanilla JavaScript, HTML, and CSS — my first deployed web project.',
+    hackathon: null,
+    award: null,
+    tech: ['JavaScript', 'HTML/CSS', 'Weather API', 'Web APIs'],
+    github: 'https://github.com/Lushenwar/WeatherApp',
+    devpost: null,
+    demo: 'https://lushenwar.github.io/WeatherApp/',
+    color: '#60a5d4',
+    type: 'personal',
+  },
 ];
 
 // ================================================================
@@ -711,9 +767,15 @@ function initOrigami() {
   });
 
   initSimulator();
-  initGuide('crane', CRANE_STEPS, 'crane-step-svg', 'crane-step-num', 'crane-step-total', 'crane-step-desc', 'crane-prev', 'crane-next');
-  initGuide('lotus', LOTUS_STEPS, 'lotus-step-svg', 'lotus-step-num', 'lotus-step-total', 'lotus-step-desc', 'lotus-prev', 'lotus-next');
-  initGuide('boat',  BOAT_STEPS,  'boat-step-svg',  'boat-step-num',  'boat-step-total',  'boat-step-desc',  'boat-prev',  'boat-next');
+  initGuide('crane',  CRANE_STEPS,  'crane-step-svg',  'crane-step-num',  'crane-step-total',  'crane-step-desc',  'crane-prev',  'crane-next');
+  initGuide('lotus',  LOTUS_STEPS,  'lotus-step-svg',  'lotus-step-num',  'lotus-step-total',  'lotus-step-desc',  'lotus-prev',  'lotus-next');
+  initGuide('boat',   BOAT_STEPS,   'boat-step-svg',   'boat-step-num',   'boat-step-total',   'boat-step-desc',   'boat-prev',   'boat-next');
+  initGuide('dragon',    DRAGON_STEPS,    'dragon-step-svg',    'dragon-step-num',    'dragon-step-total',    'dragon-step-desc',    'dragon-prev',    'dragon-next');
+  initGuide('frog',      FROG_STEPS,      'frog-step-svg',      'frog-step-num',      'frog-step-total',      'frog-step-desc',      'frog-prev',      'frog-next');
+  initGuide('heart',     HEART_STEPS,     'heart-step-svg',     'heart-step-num',     'heart-step-total',     'heart-step-desc',     'heart-prev',     'heart-next');
+  initGuide('star',      STAR_STEPS,      'star-step-svg',      'star-step-num',      'star-step-total',      'star-step-desc',      'star-prev',      'star-next');
+  initGuide('butterfly', BUTTERFLY_STEPS, 'butterfly-step-svg', 'butterfly-step-num', 'butterfly-step-total', 'butterfly-step-desc', 'butterfly-prev', 'butterfly-next');
+  initGuide('phoenix',   PHOENIX_STEPS,   'phoenix-step-svg',   'phoenix-step-num',   'phoenix-step-total',   'phoenix-step-desc',   'phoenix-prev',   'phoenix-next');
 }
 
 // ---- Generic guide navigator ----
@@ -1191,7 +1253,9 @@ function initSimulator() {
           <span style="color:#7ab87a">●</span>crossing
         </span>
       </div>`;
-    canvas.insertAdjacentElement('beforebegin', wrap);
+    const simBody = canvas.closest('.sim-body');
+    if (simBody) simBody.insertAdjacentElement('afterend', wrap);
+    else canvas.insertAdjacentElement('beforebegin', wrap);
   }
 
   // ── Canvas events ─────────────────────────────────────────────────
@@ -1333,12 +1397,75 @@ const BOAT_STEPS = [
   {desc:"Gently pull the two top points apart and press the bottom flat. ⛵ Your boat is ready to sail!",svg:`<path d="M 40 155 L 40 100 L 110 60 L 180 100 L 180 155 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(96,165,212,0.08)"/><path d="M 40 155 L 180 155" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/><path d="M 110 60 L 110 155" stroke="var(--ink-muted)" stroke-width="1" opacity="0.3"/><path d="M 30 165 C 50 160 70 168 90 163 C 110 158 130 166 150 161 C 170 156 185 162 200 158" stroke="var(--cobalt)" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.4"/>`},
 ];
 
+const DRAGON_STEPS = [
+  {desc:"Start with a square sheet, colored side facing down. Use a larger sheet (20cm+) — this model has many layers.",svg:`<rect x="35" y="35" width="150" height="150" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.05)"/><text x="110" y="118" text-anchor="middle" font-family="Caveat,cursive" font-size="13" fill="var(--ink-muted)">colored side down</text><text x="110" y="138" text-anchor="middle" font-family="Caveat,cursive" font-size="11" fill="var(--ink-muted)" opacity="0.7">bigger = easier</text>`},
+  {desc:"Crease both diagonals (mountain folds) and both midlines (valley folds). These are your navigation lines — crease sharply, then unfold all.",svg:`<rect x="35" y="35" width="150" height="150" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.04)"/><line x1="35" y1="35" x2="185" y2="185" stroke="var(--rouge)" stroke-width="1.3" stroke-dasharray="2 4" opacity="0.7"/><line x1="185" y1="35" x2="35" y2="185" stroke="var(--rouge)" stroke-width="1.3" stroke-dasharray="2 4" opacity="0.7"/><line x1="110" y1="35" x2="110" y2="185" stroke="var(--cobalt)" stroke-width="1.4" stroke-dasharray="5 4" opacity="0.7"/><line x1="35" y1="110" x2="185" y2="110" stroke="var(--cobalt)" stroke-width="1.4" stroke-dasharray="5 4" opacity="0.7"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">crease all 4 lines, unfold</text>`},
+  {desc:"Collapse all creases together — push the midpoints of each side inward so the paper folds into a small square diamond. This is the preliminary (square) base.",svg:`<polygon points="110,30 185,110 110,185 35,110" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.05)"/><line x1="110" y1="30" x2="110" y2="185" stroke="var(--ink-muted)" stroke-width="1" opacity="0.3"/><line x1="35" y1="110" x2="185" y2="110" stroke="var(--ink-muted)" stroke-width="1" opacity="0.3"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">preliminary / square base</text>`},
+  {desc:"Petal fold: fold left and right edges of the front flap to the center line. Crease, then unfold. Lift the top point of the front flap and collapse the sides inward. Repeat on the back. You now have the bird base.",svg:`<polygon points="110,35 165,110 110,180 55,110" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.05)"/><polygon points="110,180 85,110 110,55 135,110" stroke="var(--sage)" stroke-width="1.5" fill="rgba(122,184,122,0.07)"/><line x1="55" y1="110" x2="85" y2="110" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="4 3"/><line x1="165" y1="110" x2="135" y2="110" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="4 3"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">petal fold front + back → bird base</text>`},
+  {desc:"Valley fold the two lower side flaps upward along the center line to narrow them into wing points. Crease firmly. The body gets thinner as the wings extend.",svg:`<path d="M 110 45 L 75 125 L 110 165 L 145 125 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.05)"/><line x1="75" y1="125" x2="92" y2="88" stroke="var(--cobalt)" stroke-width="1.4" stroke-dasharray="5 4"/><line x1="145" y1="125" x2="128" y2="88" stroke="var(--cobalt)" stroke-width="1.4" stroke-dasharray="5 4"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">valley fold to narrow the wings</text>`},
+  {desc:"Spread the four long points outward — two become wings, one becomes the neck/head, one becomes the tail. Gently pull the wing layers apart on each side.",svg:`<path d="M 110 50 L 78 132 L 110 175 L 142 132 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.05)"/><path d="M 78 132 C 58 108 36 88 18 70" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M 142 132 C 162 108 184 88 202 70" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" fill="none"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">pull wing layers apart</text>`},
+  {desc:"Inside reverse fold one narrow point upward to form the neck and head. Pre-crease first: pinch and fold the point back, crease the base angle, then open and reverse it between the layers.",svg:`<path d="M 110 55 L 78 140 L 110 178 L 142 140 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.05)"/><path d="M 78 140 C 58 114 36 90 20 72" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M 142 140 C 162 114 184 90 200 72" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M 110 55 C 102 38 95 27 90 18" stroke="var(--rouge)" stroke-width="1.5" stroke-dasharray="2 4" fill="none"/><circle cx="90" cy="16" r="3" stroke="var(--rouge)" stroke-width="1.5" fill="none"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">inside reverse fold → head + neck</text>`},
+  {desc:"Curve the neck gently. Inside reverse fold the tip of the head to make a snout. Spread the wings slightly. Give the tail an outside reverse fold to arch it. 🐉 Your dragon is complete!",svg:`<ellipse cx="110" cy="138" rx="20" ry="12" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.07)"/><path d="M 92 128 C 68 108 42 88 22 68" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M 128 128 C 152 108 178 88 198 68" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M 100 127 C 95 106 89 85 82 64" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/><ellipse cx="78" cy="58" rx="10" ry="7" stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,232,213,0.06)" transform="rotate(-25 78 58)"/><path d="M 70 57 L 63 52" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round"/><circle cx="76" cy="54" r="1.8" fill="var(--pencil)" opacity="0.85"/><path d="M 61 50 C 55 43 57 34 53 30 C 59 35 63 40 61 50 Z" stroke="var(--orange)" stroke-width="1.2" fill="rgba(245,196,48,0.14)"/><path d="M 120 127 C 127 106 135 86 142 66" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M 142 66 C 150 52 154 43 148 34" stroke="var(--ink)" stroke-width="1.7" stroke-linecap="round" fill="none"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="13" fill="var(--orange)">🐉 dragon complete!</text>`},
+];
+
+const FROG_STEPS = [
+  {desc:"Start with a square sheet, colored side facing up. Use a nice vibrant green if you have it.",svg:`<rect x="35" y="35" width="150" height="150" stroke="var(--ink)" stroke-width="2" fill="rgba(122,184,122,0.1)"/><text x="110" y="118" text-anchor="middle" font-family="Caveat,cursive" font-size="13" fill="var(--ink-muted)">colored side up</text>`},
+  {desc:"Fold all four corners to the center point. Crease each one sharply — this is the classic blintz base. The paper should now be a smaller square.",svg:`<polygon points="110,35 185,110 110,185 35,110" stroke="var(--ink)" stroke-width="2" fill="rgba(122,184,122,0.09)"/><line x1="110" y1="35" x2="110" y2="110" stroke="var(--pencil)" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/><line x1="185" y1="110" x2="110" y2="110" stroke="var(--pencil)" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/><line x1="110" y1="185" x2="110" y2="110" stroke="var(--pencil)" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/><line x1="35" y1="110" x2="110" y2="110" stroke="var(--pencil)" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">all 4 corners → center</text>`},
+  {desc:"Flip it over. Fold all four corners to the center again — a double blintz. You'll have an even smaller square.",svg:`<polygon points="110,57 160,110 110,163 60,110" stroke="var(--ink)" stroke-width="2" fill="rgba(122,184,122,0.09)"/><line x1="110" y1="57" x2="110" y2="110" stroke="var(--pencil)" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/><line x1="160" y1="110" x2="110" y2="110" stroke="var(--pencil)" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/><line x1="110" y1="163" x2="110" y2="110" stroke="var(--pencil)" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/><line x1="60" y1="110" x2="110" y2="110" stroke="var(--pencil)" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/><text x="110" y="192" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">flip → fold corners again</text>`},
+  {desc:"Flip back to the front. You'll see four square flaps. Pull the tucked-under corners out on each side — four diagonal leg points emerge from the corners!",svg:`<rect x="72" y="72" width="76" height="76" stroke="var(--ink)" stroke-width="2" fill="rgba(122,184,122,0.07)"/><path d="M 72 72 L 46 46" stroke="var(--sage)" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M 148 72 L 174 46" stroke="var(--sage)" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M 72 148 L 46 174" stroke="var(--sage)" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M 148 148 L 174 174" stroke="var(--sage)" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="46" cy="46" r="3" stroke="var(--sage)" stroke-width="1.5" fill="none"/><circle cx="174" cy="46" r="3" stroke="var(--sage)" stroke-width="1.5" fill="none"/><circle cx="46" cy="174" r="3" stroke="var(--sage)" stroke-width="1.5" fill="none"/><circle cx="174" cy="174" r="3" stroke="var(--sage)" stroke-width="1.5" fill="none"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">pull out tucked corners → legs!</text>`},
+  {desc:"Fold the front two leg points outward and slightly forward for front legs. Fold the back two leg points outward and backward. Add two small circles for bulging frog eyes.",svg:`<rect x="80" y="80" width="60" height="60" stroke="var(--ink)" stroke-width="2" fill="rgba(122,184,122,0.09)"/><path d="M 80 88 C 62 74 48 66 34 63" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M 140 88 C 158 74 172 66 186 63" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M 88 140 C 74 158 66 172 63 186" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M 132 140 C 146 158 154 172 157 186" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/><circle cx="93" cy="87" r="5" stroke="var(--ink)" stroke-width="1.5" fill="rgba(122,184,122,0.18)"/><circle cx="127" cy="87" r="5" stroke="var(--ink)" stroke-width="1.5" fill="rgba(122,184,122,0.18)"/><circle cx="93" cy="87" r="2" fill="var(--ink)" opacity="0.55"/><circle cx="127" cy="87" r="2" fill="var(--ink)" opacity="0.55"/><path d="M 99 106 Q 110 114 121 106" stroke="var(--ink)" stroke-width="1.4" fill="none" stroke-linecap="round"/>`},
+  {desc:"Press gently on the back center to flatten. Set on a table and tap the back — it will leap! Make a bunch and race them. 🐸",svg:`<rect x="80" y="80" width="60" height="60" stroke="var(--ink)" stroke-width="2" fill="rgba(122,184,122,0.09)"/><path d="M 80 88 C 62 74 48 66 34 63" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M 140 88 C 158 74 172 66 186 63" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M 88 140 C 74 158 66 172 63 186" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M 132 140 C 146 158 154 172 157 186" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/><circle cx="93" cy="87" r="5" stroke="var(--ink)" stroke-width="1.5" fill="rgba(122,184,122,0.18)"/><circle cx="127" cy="87" r="5" stroke="var(--ink)" stroke-width="1.5" fill="rgba(122,184,122,0.18)"/><circle cx="93" cy="87" r="2" fill="var(--ink)" opacity="0.55"/><circle cx="127" cy="87" r="2" fill="var(--ink)" opacity="0.55"/><path d="M 99 106 Q 110 114 121 106" stroke="var(--ink)" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M 110 142 L 110 158" stroke="var(--pencil)" stroke-width="1.4" stroke-dasharray="3 3"/><path d="M 105 155 L 110 162 L 115 155" stroke="var(--pencil)" stroke-width="1.4" fill="none" stroke-linecap="round"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="13" fill="var(--sage)">🐸 tap back to jump!</text>`},
+];
+
+const HEART_STEPS = [
+  {desc:"Start with a square sheet of any color — red, pink, purple, whatever your heart desires. Colored side facing down.",svg:`<rect x="35" y="35" width="150" height="150" stroke="var(--rouge)" stroke-width="2" fill="rgba(224,85,85,0.07)"/><text x="110" y="112" text-anchor="middle" font-family="Caveat,cursive" font-size="13" fill="var(--ink-muted)">colored side down</text><text x="110" y="130" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--rouge)" opacity="0.6">♡</text>`},
+  {desc:"Fold in half diagonally corner-to-corner. Crease sharply and unfold. Now fold the other diagonal — crease and unfold. You have an X crease.",svg:`<rect x="35" y="35" width="150" height="150" stroke="var(--ink)" stroke-width="1.5" fill="rgba(224,85,85,0.05)" stroke-dasharray="4 6" opacity="0.5"/><line x1="35" y1="35" x2="185" y2="185" stroke="var(--pencil)" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.65"/><line x1="185" y1="35" x2="35" y2="185" stroke="var(--pencil)" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.65"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">crease X, unfold</text>`},
+  {desc:"Fold the top edge down to meet the center point of the X crease. Crease well. Then fold the bottom point up to meet the top folded edge.",svg:`<rect x="35" y="110" width="150" height="75" stroke="var(--ink)" stroke-width="2" fill="rgba(224,85,85,0.07)"/><polygon points="35,110 185,110 110,35" stroke="var(--rouge)" stroke-width="1.5" fill="rgba(224,85,85,0.06)"/><line x1="35" y1="110" x2="185" y2="110" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">fold top edge to center</text>`},
+  {desc:"Fold the left corner up to the top-left, and the right corner up to the top-right — these become the two round bumps of the heart.",svg:`<polygon points="35,110 185,110 185,185 35,185" stroke="var(--ink)" stroke-width="1.5" fill="rgba(224,85,85,0.06)"/><polygon points="35,110 185,110 110,35" stroke="var(--ink)" stroke-width="1.5" fill="rgba(224,85,85,0.06)"/><polygon points="35,110 110,35 72,75" stroke="var(--rouge)" stroke-width="1.4" fill="rgba(224,85,85,0.1)"/><polygon points="185,110 110,35 148,75" stroke="var(--rouge)" stroke-width="1.4" fill="rgba(224,85,85,0.1)"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">fold two corners up → bumps</text>`},
+  {desc:"Flip over. Fold each of the four remaining corners in slightly to round the heart shape. The top two corners make the curved bumps smoother; the bottom corner makes the point sharper. 💜",svg:`<path d="M 72 100 C 72 79 93 72 110 88 C 127 72 148 79 148 100 L 148 140 L 110 180 L 72 140 Z" stroke="var(--rouge)" stroke-width="2" fill="rgba(224,85,85,0.13)"/><path d="M 88 85 C 85 80 90 75 95 79" stroke="rgba(255,255,255,0.25)" stroke-width="2" stroke-linecap="round" fill="none"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="13" fill="var(--rouge)">💜 heart complete!</text>`},
+];
+
+const STAR_STEPS = [
+  {desc:"Cut or tear a long thin strip of paper — about 1.5cm wide and 30cm long. Any paper works: magazine strips, gift wrapping, origami paper cut to strips.",svg:`<rect x="20" y="96" width="180" height="22" stroke="var(--pencil)" stroke-width="1.8" fill="rgba(245,196,48,0.09)"/><text x="110" y="140" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">long thin strip</text><text x="110" y="156" text-anchor="middle" font-family="Caveat,cursive" font-size="11" fill="var(--ink-muted)" opacity="0.7">~1.5cm × 30cm</text>`},
+  {desc:"Tie a loose overhand knot near one end. Carefully flatten it — pinch and press the knot into a flat pentagon. A small tail sticks out one side; keep it.",svg:`<polygon points="110,52 148,80 134,124 86,124 72,80" stroke="var(--pencil)" stroke-width="2" fill="rgba(245,196,48,0.09)"/><path d="M 148 80 L 180 66" stroke="var(--pencil)" stroke-width="1.5" stroke-dasharray="4 3"/><circle cx="180" cy="66" r="2" fill="var(--pencil)" opacity="0.4"/><text x="110" y="152" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">tie knot → flatten into pentagon</text>`},
+  {desc:"Tuck the short tail underneath the nearest edge of the pentagon so it's hidden. Press it in cleanly — the short end should disappear flush with the edge.",svg:`<polygon points="110,52 148,80 134,124 86,124 72,80" stroke="var(--pencil)" stroke-width="2" fill="rgba(245,196,48,0.09)"/><path d="M 148 80 L 140 85" stroke="var(--pencil)" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.5"/><text x="110" y="152" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">tuck short tail under edge</text>`},
+  {desc:"Now take the long tail and fold it along each edge of the pentagon in turn — wrap it flat along each side. Keep going until the tail runs out; tuck the final end under the last available edge.",svg:`<polygon points="110,52 148,80 134,124 86,124 72,80" stroke="var(--pencil)" stroke-width="2" fill="rgba(245,196,48,0.11)"/><path d="M 148 80 C 158 102 148 122 134 124" stroke="var(--orange)" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M 143 120 L 134 124 L 138 132" stroke="var(--orange)" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M 134 124 C 112 132 90 128 86 124" stroke="var(--orange)" stroke-width="1.5" fill="none" stroke-linecap="round"/><text x="110" y="152" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">wrap long tail along each edge</text>`},
+  {desc:"Hold the pentagon between thumb and forefinger. Use your other thumbnail to press gently inward on each of the 5 flat edges. They'll dimple inward and the star puffs up into a 3D shape!",svg:`<polygon points="110,52 148,80 134,124 86,124 72,80" stroke="var(--pencil)" stroke-width="2" fill="rgba(245,196,48,0.1)"/><path d="M 100 58 L 110 52 L 120 58" stroke="var(--orange)" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M 143 75 L 148 80 L 142 87" stroke="var(--orange)" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M 78 87 L 72 80 L 78 75" stroke="var(--orange)" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M 89 126 L 86 124 L 95 119" stroke="var(--orange)" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M 129 126 L 134 124 L 125 119" stroke="var(--orange)" stroke-width="1.3" fill="none" stroke-linecap="round"/><text x="110" y="152" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">pinch each side with thumbnail</text>`},
+  {desc:"Each side pops inward to form a 5-pointed puffy star. Make a bunch and fill a jar! Legend says folding 1000 grants any wish. 🌟",svg:`<polygon points="110,38 124,80 168,80 134,104 148,146 110,122 72,146 86,104 52,80 96,80" stroke="var(--pencil)" stroke-width="2" fill="rgba(245,196,48,0.2)"/><polygon points="110,38 124,80 110,82 96,80" fill="rgba(245,196,48,0.08)"/><polygon points="168,80 148,146 136,112 134,104" fill="rgba(245,196,48,0.06)" opacity="0.7"/><polygon points="52,80 72,146 84,112 86,104" fill="rgba(245,196,48,0.06)" opacity="0.7"/><text x="110" y="165" text-anchor="middle" font-family="Caveat,cursive" font-size="13" fill="var(--pencil)">⭐ lucky star!</text><text x="110" y="181" text-anchor="middle" font-family="Caveat,cursive" font-size="11" fill="var(--ink-muted)">make 1000 for any wish</text>`},
+];
+
+const BUTTERFLY_STEPS = [
+  {desc:"Start with a square sheet, colored side facing down. A 20cm+ sheet is highly recommended — the butterfly has many layers and tight folds that need room.",svg:`<rect x="35" y="35" width="150" height="150" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.05)"/><text x="110" y="112" text-anchor="middle" font-family="Caveat,cursive" font-size="13" fill="var(--ink-muted)">colored side down</text><text x="110" y="132" text-anchor="middle" font-family="Caveat,cursive" font-size="11" fill="var(--lavender)" opacity="0.7">20cm+ recommended</text>`},
+  {desc:"Crease both diagonals as mountain folds and both midlines as valley folds. Press each crease firmly — these are your collapse lines. Unfold everything flat.",svg:`<rect x="35" y="35" width="150" height="150" stroke="var(--ink)" stroke-width="2" fill="rgba(240,232,213,0.04)"/><line x1="35" y1="35" x2="185" y2="185" stroke="var(--rouge)" stroke-width="1.4" stroke-dasharray="2 4" opacity="0.75"/><line x1="185" y1="35" x2="35" y2="185" stroke="var(--rouge)" stroke-width="1.4" stroke-dasharray="2 4" opacity="0.75"/><line x1="110" y1="35" x2="110" y2="185" stroke="var(--cobalt)" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.7"/><line x1="35" y1="110" x2="185" y2="110" stroke="var(--cobalt)" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.7"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">mountain diag + valley mid, unfold all</text>`},
+  {desc:"Collapse all creases simultaneously — push the four sides inward as the two diagonal mountains bring the corners up. Flatten into the preliminary (square) base.",svg:`<polygon points="110,30 185,110 110,185 35,110" stroke="var(--ink)" stroke-width="2" fill="rgba(192,143,255,0.06)"/><line x1="110" y1="30" x2="110" y2="185" stroke="var(--ink-muted)" stroke-width="1" opacity="0.3"/><line x1="35" y1="110" x2="185" y2="110" stroke="var(--ink-muted)" stroke-width="1" opacity="0.3"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">preliminary base</text>`},
+  {desc:"Petal fold the front: fold left and right edges to center, crease, unfold. Lift the top point and collapse the sides upward and inward. Repeat on the back. You now have the bird base.",svg:`<polygon points="110,35 165,110 110,180 55,110" stroke="var(--ink)" stroke-width="2" fill="rgba(192,143,255,0.06)"/><polygon points="110,180 85,110 110,55 135,110" stroke="var(--lavender)" stroke-width="1.5" fill="rgba(192,143,255,0.1)"/><line x1="55" y1="110" x2="85" y2="110" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.7"/><line x1="165" y1="110" x2="135" y2="110" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.7"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">petal fold front + back → bird base</text>`},
+  {desc:"Rotate the bird base so the open (split) end faces up. Valley fold the right flap over to the left — like turning a page. Repeat on the back. The long wing points now extend sideways.",svg:`<path d="M 110 52 L 78 135 L 110 172 L 142 135 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(192,143,255,0.06)"/><path d="M 78 135 C 52 114 28 94 10 76" stroke="var(--lavender)" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M 142 135 C 168 114 192 94 210 76" stroke="var(--lavender)" stroke-width="2.2" stroke-linecap="round" fill="none"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">rotate — wing points extend sideways</text>`},
+  {desc:"Squash fold each of the two long wing layers open and flat: gently open the flap from underneath, realigning the crease so the wing spreads into a flat diamond. Repeat on all four wing sections.",svg:`<ellipse cx="62" cy="124" rx="38" ry="25" stroke="var(--lavender)" stroke-width="1.8" fill="rgba(192,143,255,0.09)" transform="rotate(-35 62 124)"/><ellipse cx="158" cy="124" rx="38" ry="25" stroke="var(--lavender)" stroke-width="1.8" fill="rgba(192,143,255,0.09)" transform="rotate(35 158 124)"/><polygon points="110,55 90,132 110,155 130,132" stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,232,213,0.04)"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">squash fold all 4 wing layers flat</text>`},
+  {desc:"Now fold the upper triangular points of the lower wings upward — valley fold each to create the upper hindwing section. The model will look like four stacked wing lobes.",svg:`<ellipse cx="62" cy="124" rx="38" ry="25" stroke="var(--lavender)" stroke-width="1.8" fill="rgba(192,143,255,0.09)" transform="rotate(-35 62 124)"/><ellipse cx="158" cy="124" rx="38" ry="25" stroke="var(--lavender)" stroke-width="1.8" fill="rgba(192,143,255,0.09)" transform="rotate(35 158 124)"/><ellipse cx="72" cy="82" rx="30" ry="20" stroke="var(--lavender)" stroke-width="1.6" fill="rgba(192,143,255,0.07)" transform="rotate(18 72 82)"/><ellipse cx="148" cy="82" rx="30" ry="20" stroke="var(--lavender)" stroke-width="1.6" fill="rgba(192,143,255,0.07)" transform="rotate(-18 148 82)"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">fold upper wing lobes upward</text>`},
+  {desc:"Inside reverse fold the two thin top tips inward to form the antennae: pre-crease each tip back toward the body, open the layers, then tuck the tip inside between them. Curve slightly outward.",svg:`<ellipse cx="62" cy="124" rx="38" ry="25" stroke="var(--lavender)" stroke-width="1.8" fill="rgba(192,143,255,0.09)" transform="rotate(-35 62 124)"/><ellipse cx="158" cy="124" rx="38" ry="25" stroke="var(--lavender)" stroke-width="1.8" fill="rgba(192,143,255,0.09)" transform="rotate(35 158 124)"/><ellipse cx="72" cy="82" rx="30" ry="20" stroke="var(--lavender)" stroke-width="1.6" fill="rgba(192,143,255,0.07)" transform="rotate(18 72 82)"/><ellipse cx="148" cy="82" rx="30" ry="20" stroke="var(--lavender)" stroke-width="1.6" fill="rgba(192,143,255,0.07)" transform="rotate(-18 148 82)"/><path d="M 110 72 C 100 56 88 42 80 30" stroke="var(--pencil)" stroke-width="1.5" stroke-dasharray="3 4" fill="none"/><path d="M 110 72 C 120 56 132 42 140 30" stroke="var(--pencil)" stroke-width="1.5" stroke-dasharray="3 4" fill="none"/><circle cx="80" cy="28" r="2.5" fill="var(--pencil)" opacity="0.85"/><circle cx="140" cy="28" r="2.5" fill="var(--pencil)" opacity="0.85"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">inside reverse fold → antennae tips</text>`},
+  {desc:"Gently spread all four wing layers. Pinch the body center to thin it. Add a dot on each lower wing for wing spots. Curve the antennae up slightly. 🦋 Your butterfly is complete!",svg:`<ellipse cx="58" cy="118" rx="44" ry="30" stroke="var(--lavender)" stroke-width="2" fill="rgba(192,143,255,0.13)" transform="rotate(-28 58 118)"/><ellipse cx="162" cy="118" rx="44" ry="30" stroke="var(--lavender)" stroke-width="2" fill="rgba(192,143,255,0.13)" transform="rotate(28 162 118)"/><ellipse cx="70" cy="78" rx="32" ry="22" stroke="var(--lavender)" stroke-width="1.8" fill="rgba(192,143,255,0.10)" transform="rotate(16 70 78)"/><ellipse cx="150" cy="78" rx="32" ry="22" stroke="var(--lavender)" stroke-width="1.8" fill="rgba(192,143,255,0.10)" transform="rotate(-16 150 78)"/><ellipse cx="110" cy="118" rx="10" ry="20" stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,232,213,0.06)"/><path d="M 110 98 C 100 82 88 68 78 56" stroke="var(--pencil)" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M 110 98 C 120 82 132 68 142 56" stroke="var(--pencil)" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="78" cy="54" r="2.5" fill="var(--pencil)" opacity="0.88"/><circle cx="142" cy="54" r="2.5" fill="var(--pencil)" opacity="0.88"/><circle cx="55" cy="116" r="5" stroke="var(--lavender)" stroke-width="1.2" fill="rgba(192,143,255,0.22)"/><circle cx="165" cy="116" r="5" stroke="var(--lavender)" stroke-width="1.2" fill="rgba(192,143,255,0.22)"/><circle cx="55" cy="116" r="2" fill="var(--ink)" opacity="0.4"/><circle cx="165" cy="116" r="2" fill="var(--ink)" opacity="0.4"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="13" fill="var(--lavender)">🦋 butterfly complete!</text>`},
+];
+
+const PHOENIX_STEPS = [
+  {desc:"Start with a large square sheet (25cm+ strongly recommended), colored side facing down. The phoenix has the most intricate folding of all — give yourself plenty of paper to work with.",svg:`<rect x="35" y="35" width="150" height="150" stroke="var(--orange)" stroke-width="2" fill="rgba(240,152,78,0.07)"/><text x="110" y="112" text-anchor="middle" font-family="Caveat,cursive" font-size="13" fill="var(--ink-muted)">colored side down</text><text x="110" y="132" text-anchor="middle" font-family="Caveat,cursive" font-size="11" fill="var(--orange)" opacity="0.75">25cm+ strongly recommended</text>`},
+  {desc:"Pre-crease the grid: both diagonals as mountain folds, both midlines as valley folds. Every crease must be sharp and precise — this is the foundation for all 8 remaining steps. Unfold flat after.",svg:`<rect x="35" y="35" width="150" height="150" stroke="var(--ink)" stroke-width="2" fill="rgba(240,152,78,0.04)"/><line x1="35" y1="35" x2="185" y2="185" stroke="var(--rouge)" stroke-width="1.4" stroke-dasharray="2 4" opacity="0.75"/><line x1="185" y1="35" x2="35" y2="185" stroke="var(--rouge)" stroke-width="1.4" stroke-dasharray="2 4" opacity="0.75"/><line x1="110" y1="35" x2="110" y2="185" stroke="var(--cobalt)" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.72"/><line x1="35" y1="110" x2="185" y2="110" stroke="var(--cobalt)" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.72"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">mountain diag + valley mid, unfold</text>`},
+  {desc:"Collapse to the preliminary base: pinch opposite corners together while pushing the midpoints in. All four mountain creases meet at the top; the paper folds into a square diamond.",svg:`<polygon points="110,30 185,110 110,185 35,110" stroke="var(--ink)" stroke-width="2" fill="rgba(240,152,78,0.07)"/><line x1="110" y1="30" x2="110" y2="185" stroke="var(--ink-muted)" stroke-width="1" opacity="0.3"/><line x1="35" y1="110" x2="185" y2="110" stroke="var(--ink-muted)" stroke-width="1" opacity="0.3"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">preliminary base</text>`},
+  {desc:"Petal fold both sides: fold edges to center, crease, unfold. Lift the top point and collapse inward — layers spread into the kite shape. Flip and repeat. This is the bird base with 4 long points.",svg:`<polygon points="110,35 165,110 110,180 55,110" stroke="var(--ink)" stroke-width="2" fill="rgba(240,152,78,0.07)"/><polygon points="110,180 85,110 110,55 135,110" stroke="var(--orange)" stroke-width="1.5" fill="rgba(240,152,78,0.10)"/><line x1="55" y1="110" x2="85" y2="110" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.7"/><line x1="165" y1="110" x2="135" y2="110" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.7"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">petal fold × 2 → bird base</text>`},
+  {desc:"Valley fold the two side lower flaps upward along the body centerline, narrowing and elongating the body. Crease very firmly at the root — these will become the primary wing shafts.",svg:`<path d="M 110 45 L 78 132 L 110 170 L 142 132 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(240,152,78,0.07)"/><line x1="78" y1="132" x2="94" y2="90" stroke="var(--cobalt)" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.75"/><line x1="142" y1="132" x2="126" y2="90" stroke="var(--cobalt)" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.75"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">valley fold → elongate body shaft</text>`},
+  {desc:"Inside reverse fold the neck upward: pre-crease the point backward toward the tail, open the body layers, then tuck the point inside between them so it angles upward at ~45°. The neck emerges proud.",svg:`<path d="M 110 52 L 80 138 L 110 174 L 140 138 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(240,152,78,0.07)"/><path d="M 80 138 C 58 112 35 88 18 68" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M 140 138 C 162 112 185 88 202 68" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M 110 52 C 101 34 93 20 86 10" stroke="var(--rouge)" stroke-width="1.5" stroke-dasharray="2 4" fill="none"/><circle cx="86" cy="8" r="3" stroke="var(--rouge)" stroke-width="1.5" fill="none"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">inside reverse fold → neck up</text>`},
+  {desc:"Inside reverse fold the tip of the neck to form the head and beak: pre-crease the very end of the neck point, open and tuck. Add a small outside reverse at the beak tip for the curved hooked bill.",svg:`<path d="M 110 52 L 80 138 L 110 174 L 140 138 Z" stroke="var(--ink)" stroke-width="2" fill="rgba(240,152,78,0.07)"/><path d="M 80 138 C 58 112 35 88 18 68" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M 140 138 C 162 112 185 88 202 68" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M 104 48 C 96 30 88 18 78 8" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/><ellipse cx="73" cy="4" rx="10" ry="7" stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,152,78,0.09)" transform="rotate(-25 73 4)"/><path d="M 64 6 L 56 2" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"/><circle cx="72" cy="1" r="2" fill="var(--orange)" opacity="0.9"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">reverse fold tip → hooked beak</text>`},
+  {desc:"Create the tail fan: valley fold the tail point in tight accordion pleats — fold a narrow strip down, then back up, then down again. Five or seven pleats gives a rich tail. Each pleat must be parallel.",svg:`<path d="M 110 52 L 80 138 L 110 174 L 140 138 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,152,78,0.04)" opacity="0.7"/><path d="M 80 138 C 58 112 35 88 18 68" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M 140 138 C 162 112 185 88 202 68" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M 98 162 C 86 176 74 188 60 198" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M 103 166 C 96 182 92 194 90 206" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M 110 168 C 110 184 110 196 110 208" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M 117 166 C 124 182 128 194 130 206" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M 122 162 C 134 176 146 188 160 198" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" fill="none"/><text x="110" y="216" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">accordion pleat → fan tail feathers</text>`},
+  {desc:"Outside reverse fold the two wing shafts outward and upward: open each shaft layer, fold around the outside, close. Both wings now spread wide — the phoenix stances open in flight.",svg:`<ellipse cx="110" cy="130" rx="22" ry="14" stroke="var(--ink)" stroke-width="2" fill="rgba(240,152,78,0.09)"/><path d="M 90 120 C 64 98 40 78 20 60" stroke="var(--ink)" stroke-width="2.8" stroke-linecap="round" fill="none"/><path d="M 130 120 C 156 98 180 78 200 60" stroke="var(--ink)" stroke-width="2.8" stroke-linecap="round" fill="none"/><path d="M 100 118 C 90 96 80 76 68 54" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M 120 118 C 130 96 140 76 152 54" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M 152 54 C 160 38 162 24 158 14" stroke="var(--orange)" stroke-width="1.7" stroke-linecap="round" fill="none"/><text x="110" y="204" text-anchor="middle" font-family="Caveat,cursive" font-size="12" fill="var(--ink-muted)">outside reverse fold → wings spread</text>`},
+  {desc:"Shape and breathe life into the phoenix: curve the neck gracefully, fan the tail feathers wide, gently curve each wing tip upward. Add a tiny flame at the crest. 🔥 The phoenix rises!",svg:`<ellipse cx="110" cy="124" rx="20" ry="13" stroke="var(--ink)" stroke-width="2" fill="rgba(240,152,78,0.09)"/><path d="M 92 114 C 66 94 42 74 22 56" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round" fill="none"/><path d="M 128 114 C 154 94 178 74 198 56" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round" fill="none"/><path d="M 102 112 C 92 90 80 70 66 48" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/><ellipse cx="61" cy="44" rx="10" ry="7" stroke="var(--ink)" stroke-width="1.8" fill="rgba(240,152,78,0.09)" transform="rotate(-25 61 44)"/><path d="M 53 42 L 45 38" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"/><circle cx="60" cy="40" r="2" fill="var(--orange)" opacity="0.95"/><path d="M 118 112 C 128 90 140 70 154 48" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M 154 48 C 162 32 164 18 158 10" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M 96 140 C 84 158 72 172 58 184" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M 102 144 C 95 164 92 178 90 190" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M 110 146 C 110 166 110 180 110 192" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M 118 144 C 125 164 128 178 130 190" stroke="var(--orange)" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M 124 140 C 136 158 148 172 162 184" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M 56 38 C 49 26 51 12 46 6 C 53 12 58 24 56 38 Z" stroke="var(--orange)" stroke-width="1.3" fill="rgba(245,196,48,0.2)"/><text x="110" y="208" text-anchor="middle" font-family="Caveat,cursive" font-size="13" fill="var(--orange)">🔥 phoenix rises!</text>`},
+];
+
 // ================================================================
 // TOP NAV
 // ================================================================
 
 function initTopNav() {
   let graphInited = false;
+  let timelineInited = false;
   document.querySelectorAll('.top-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.top-tab').forEach(t => t.classList.remove('active'));
@@ -1347,10 +1474,13 @@ function initTopNav() {
       const sec = document.getElementById(tab.dataset.section);
       if (sec) sec.classList.add('active');
       window.scrollTo(0, 0);
-      // Lazy-init graph when tab first becomes visible (canvas needs visible width)
       if (tab.dataset.section === 'sec-graph' && !graphInited) {
         graphInited = true;
         requestAnimationFrame(() => initProjectGraph());
+      }
+      if (tab.dataset.section === 'sec-timeline' && !timelineInited) {
+        timelineInited = true;
+        requestAnimationFrame(() => initTimeline());
       }
     });
   });
@@ -2521,6 +2651,26 @@ const PROJECT_KB = {
     architecture: 'Three tabs: Chat (GPT-3.5 with offline fallback), Reminders (priority queue with Notifications API alerts), Calendar (event grid with audio cues). Fully client-side — no backend. Built as a first hackathon project at Hack404.',
     challenge: 'The offline fallback system was the most thoughtful part — when the API is unavailable, a curated set of pattern-matched responses handles common mental health check-ins without any API call. Ensuring these fallback responses felt empathetic rather than clinical took careful writing.',
   },
+  '011': {
+    stack_detail: 'Pure Java with Java Swing for the GUI. The maze is rendered on a custom JPanel using 2D graphics. Java Sound API handles background music and sound effects. Leaderboard data persists between sessions using plain text file I/O with BufferedReader/Writer.',
+    architecture: 'Single-window Swing app: MainMenu → CharacterSelect → DifficultySelect → MazeGame → LeaderboardScreen. The maze is generated from a 2D integer grid. Collision detection, coin collection, and movement animation are handled in a game loop using javax.swing.Timer.',
+    challenge: 'Implementing smooth directional animations in Swing required pre-loading sprite sheets and coordinating repaint() calls with the Timer tick. Getting the leaderboard file writes to be atomic (no partial writes on crash) required careful use of try-with-resources around every file operation.',
+  },
+  '012': {
+    stack_detail: 'Java Swing desktop application. Survey answers are collected through a JWizard-style multi-panel flow. The matching algorithm reads laptop inventory from a CSV file on startup and scores each entry against the user\'s weighted preferences.',
+    architecture: 'Three phases: Survey (multi-step JPanel form collecting budget, usage, specs preference), Matching (weighted scoring across CSV inventory rows, normalized 0–100), Results (top-3 display with full spec breakdown). File I/O loads the inventory on launch; no database required.',
+    challenge: 'Normalizing scores across very different spec ranges (RAM in GB, price in dollars, screen size in inches) required a min-max normalization step per column. Getting the survey flow to feel smooth in Swing without freezing the UI meant running the matching algorithm on a background SwingWorker thread.',
+  },
+  '013': {
+    stack_detail: 'Java application with Swing UI. Course content is stored in structured text files. The quiz engine parses question banks from file and handles multiple-choice and matching question types. The Witcher narrative wrapper is a custom JPanel with themed artwork rendered via Java 2D Graphics.',
+    architecture: 'Module loader reads content files (concepts + quiz banks) organized by OOP topic. Each topic has a Learn phase (scrollable content panel), Quiz phase (randomized MCQ), and Match phase (drag-connect matching game). Progress is tracked in memory and saved to a local progress file at exit.',
+    challenge: 'Making the matching game feel interactive in Swing required custom mouse drag listeners and dynamic line-drawing between matched pairs using paintComponent override. Keeping the Witcher theme consistent across 10+ modules without duplicating UI code led to a reusable theming utility class.',
+  },
+  '014': {
+    stack_detail: 'Vanilla JavaScript, HTML5, and CSS3 — no frameworks or libraries. Fetches live weather data from a public weather API. Forecast logic and recommendation engine are pure client-side JavaScript. Deployed on GitHub Pages.',
+    architecture: 'Single-page app: geolocation or city search → Weather API fetch → current conditions display → 5-day forecast rendering → recommendation engine (clothing/activity suggestions based on temperature, precipitation, and wind). All state managed in plain JS variables.',
+    challenge: 'The recommendation engine needed to handle edge cases — "light rain + 5°C" requires very different advice than "light rain + 25°C". Building a rule matrix that felt natural rather than robotic took many iterations. Making it look polished with pure CSS (no component library) was also a deliberate design challenge.',
+  },
 };
 
 // Per-project workflow graphs: nodes = components, edges = directed data flow
@@ -2624,6 +2774,42 @@ const PROJECT_WORKFLOW = {
     ],
     edges:[[0,1],[1,0],[0,2],[2,0],[0,3]],
   },
+  '011': { // MAZERACE
+    nodes: [
+      { id:0, name:'Java Swing', role:'Frontend',      ox:-50, oy: 35, desc:'Game window rendering maze, player, coins, and animations' },
+      { id:1, name:'Game Loop',  role:'Backend',        ox: 20, oy: 52, desc:'javax.swing.Timer driving movement, collision and coin logic' },
+      { id:2, name:'Sound API',  role:'Infrastructure', ox: 52, oy:-10, desc:'Java Sound API playing background music and effects' },
+      { id:3, name:'File I/O',   role:'Data',           ox:-10, oy:-52, desc:'Persistent leaderboard stored in plain-text .txt file' },
+    ],
+    edges:[[0,1],[1,0],[1,2],[1,3],[3,1]],
+  },
+  '012': { // PEARSTORE
+    nodes: [
+      { id:0, name:'Java Swing', role:'Frontend',      ox:-52, oy: 20, desc:'Multi-panel survey wizard and results display' },
+      { id:1, name:'Survey Flow',role:'Backend',        ox:  0, oy: 52, desc:'Step-by-step wizard collecting budget, usage, and spec preferences' },
+      { id:2, name:'Matcher',    role:'AI_ML',          ox: 52, oy: 10, desc:'Weighted scoring algorithm ranking laptops against preferences' },
+      { id:3, name:'File I/O',   role:'Data',           ox: 20, oy:-52, desc:'CSV inventory file loaded at startup with laptop specs and prices' },
+    ],
+    edges:[[0,1],[1,2],[2,3],[3,2],[2,0]],
+  },
+  '013': { // CLASSESOBJECTSMODULE
+    nodes: [
+      { id:0, name:'Java Swing', role:'Frontend',      ox:-52, oy: 20, desc:'Witcher-themed UI panels for content, quiz, and matching phases' },
+      { id:1, name:'Module Loader',role:'Backend',     ox:  0, oy: 52, desc:'Reads and parses topic files into learn/quiz/match content objects' },
+      { id:2, name:'Quiz Engine', role:'AI_ML',         ox: 52, oy: 10, desc:'Randomizes MCQ banks and grades matching game answers' },
+      { id:3, name:'File I/O',   role:'Data',           ox: 20, oy:-52, desc:'Content files storing OOP concepts, question banks, and progress' },
+    ],
+    edges:[[0,1],[1,2],[1,3],[3,1],[2,0]],
+  },
+  '014': { // WEATHERAPP
+    nodes: [
+      { id:0, name:'HTML/CSS',   role:'Frontend',      ox:-52, oy: 20, desc:'Single-page responsive layout showing forecast cards and recommendations' },
+      { id:1, name:'JavaScript', role:'Backend',        ox:  0, oy: 52, desc:'Core logic: geolocation, API calls, recommendation engine' },
+      { id:2, name:'Weather API',role:'Infrastructure', ox: 52, oy: 10, desc:'Public REST API providing current conditions and 5-day forecast' },
+      { id:3, name:'Reco Engine',role:'AI_ML',          ox: 20, oy:-52, desc:'Rule-matrix generating clothing and activity suggestions from weather data' },
+    ],
+    edges:[[0,1],[1,2],[2,1],[1,3],[3,1],[1,0]],
+  },
 };
 
 function initProjectGraph() {
@@ -2667,13 +2853,25 @@ function initProjectGraph() {
   // ── Adjust rest positions for Health Assistant ─────────────────
   nodeData.forEach(nd => {
     if (nd.p.id === '010') {
-      // Pull Health Assistant's rest position much closer to origin
-      nd.rx *= 0.25;
-      nd.ry *= 0.25;
-      nd.rz *= 0.25;
-      // Also snap live position closer so it doesn't have to travel far
+      nd.rx *= 0.25; nd.ry *= 0.25; nd.rz *= 0.25;
       nd.x = nd.rx; nd.y = nd.ry; nd.z = nd.rz;
     }
+  });
+
+  // ── High-school "solar system" cluster (ids 011-014) ──────────
+  // Position these 4 personal projects in a tight orbit around
+  // a cluster center far from the main sphere, like a mini solar system.
+  const HS_CENTER = { x: -380, y: 260, z: -120 };
+  const HS_R = 75;
+  const HS_IDS = ['011', '012', '013', '014'];
+  nodeData.forEach(nd => {
+    const idx = HS_IDS.indexOf(nd.p.id);
+    if (idx === -1) return;
+    const angle = (idx / HS_IDS.length) * Math.PI * 2;
+    nd.rx = HS_CENTER.x + Math.cos(angle) * HS_R;
+    nd.ry = HS_CENTER.y + Math.sin(angle) * HS_R;
+    nd.rz = HS_CENTER.z + (idx - 1.5) * 18;
+    nd.x = nd.rx; nd.y = nd.ry; nd.z = nd.rz;
   });
 
   // ── Edges: shared tech ────────────────────────────────────────
@@ -3438,6 +3636,84 @@ function initGamesHub() {
       loadGame(g);
     });
   });
+}
+
+// ================================================================
+// TIMELINE
+// ================================================================
+
+const TIMELINE_EVENTS = [
+  { year: '2021', month: 'Sep', type: 'milestone', label: 'First line of code', desc: 'Opened a Java IDE for the first time and printed "Hello World" — the start of everything.', icon: '🌱', color: '#7ab87a' },
+  { year: '2022', month: 'Jan', type: 'personal',  label: 'ClassesObjectsModule', desc: 'Built an interactive OOP learning module with a Witcher-themed story, quizzes, and matching games in Java.', icon: '⚔️', color: '#c08fff', id: '013' },
+  { year: '2022', month: 'Mar', type: 'personal',  label: 'MazeRace', desc: 'Designed and shipped a full Java Swing castle maze game with coins, directional animations, and a file-backed leaderboard.', icon: '🏰', color: '#f0984e', id: '011' },
+  { year: '2022', month: 'Jun', type: 'personal',  label: 'PearStore', desc: 'Built a laptop recommendation tool that surveys users and matches them to the best fit using a weighted algorithm.', icon: '💻', color: '#7ab87a', id: '012' },
+  { year: '2023', month: 'Feb', type: 'personal',  label: 'WeatherApp', desc: 'First deployed web project — a browser weather app with 5-day forecasts and clothing/activity recommendations.', icon: '🌤️', color: '#60a5d4', id: '014' },
+  { year: '2023', month: 'Jul', type: 'hackathon', label: 'Health Assistant @ Hack404', desc: 'First hackathon ever. Shipped an AI-powered mental health companion with reminders and a calendar — won 3rd place in the beginner stream.', icon: '🥉', color: '#7ab87a', award: '🥉 3rd Place', id: '010' },
+  { year: '2024', month: 'Jan', type: 'personal',  label: 'BWF Predictor', desc: 'End-to-end ML pipeline predicting badminton match outcomes at 75%+ accuracy using Glicko-2 + LightGBM/XGBoost ensembles.', icon: '🏸', color: '#f5c430', id: '009' },
+  { year: '2024', month: 'Feb', type: 'hackathon', label: 'OpenScore @ DeltaHacks 12', desc: 'Reimagined credit scoring for 3M+ credit-invisible Canadians using Plaid + Gemini instead of traditional bureau data.', icon: '💳', color: '#4ecdc4', id: '006' },
+  { year: '2024', month: 'Apr', type: 'hackathon', label: 'Interprefy @ JAMHacks', desc: 'Real-time audio translation desktop app — captures system audio, transcribes with DeepGram, translates with DeepL, overlays subtitles.', icon: '🌐', color: '#e05555', id: '003' },
+  { year: '2024', month: 'Sep', type: 'hackathon', label: 'FixMyFeed @ YHacks', desc: 'Behavior-aware social media filter with multi-agent LLM triage and a neural map dashboard — finalist across 4 tracks.', icon: '🏆', color: '#f0984e', award: '🏆 Finalist · 4 tracks', id: '007' },
+  { year: '2024', month: 'Nov', type: 'hackathon', label: 'Spotlight @ HackCanada', desc: 'AI platform detecting natural product placement surfaces in video and seamlessly inserting brand assets using Gemini + FFmpeg.', icon: '🎬', color: '#e05555', id: '008' },
+  { year: '2025', month: 'Sep', type: 'milestone', label: 'Started university', desc: 'Began Math at the University of Waterloo — new chapter, same obsession with building things.', icon: '🎓', color: '#60a5d4' },
+  { year: '2025', month: 'Jan', type: 'personal',  label: 'MasteringGenZ', desc: 'Full-stack slang autocomplete engine powered by a custom GAT + GRU deep learning pipeline and Gemini context re-ranking.', icon: '📱', color: '#c08fff', id: '004' },
+  { year: '2025', month: 'Mar', type: 'hackathon', label: 'Eco-Pulse @ GenAI Genesis', desc: 'AI-powered urban heat mitigation planner mapping Montreal heat zones and generating tree-planting blueprints — won 1st place.', icon: '🏆', color: '#7ab87a', award: '🏆 1st Place', id: '002' },
+  { year: '2025', month: 'Mar', type: 'hackathon', label: 'IFYShop @ CxC 2026', desc: 'Multi-agent shopping AI that identifies products from screenshots, scrapes reviews, compares prices, and generates Eco Scores.', icon: '★', color: '#f5c430', award: '★ Best Snowflake', id: '005' },
+  { year: '2025', month: 'Apr', type: 'hackathon', label: 'LOCATR @ DeerHacks V', desc: 'Five-agent LangGraph system discovering and scoring venues for any activity — Snowflake-backed memory, won Best Use of Auth0.', icon: '★', color: '#60a5d4', award: '★ Best Auth0', id: '001' },
+];
+
+function initTimeline() {
+  const container = document.getElementById('timeline-events');
+  if (!container) return;
+
+  container.innerHTML = '';
+  TIMELINE_EVENTS.forEach((ev, i) => {
+    const item = document.createElement('div');
+    item.className = 'tl-item tl-item--' + ev.type;
+    item.style.setProperty('--tl-color', ev.color);
+    item.style.animationDelay = (i * 0.04) + 's';
+
+    const awardBadge = ev.award
+      ? `<span class="tl-award">${ev.award}</span>`
+      : '';
+
+    const demoLinks = ev.id ? (() => {
+      const p = PROJECTS.find(proj => proj.id === ev.id);
+      if (!p) return '';
+      const links = [];
+      if (p.github) links.push(`<a href="${p.github}" target="_blank" rel="noopener" class="tl-link">GitHub ↗</a>`);
+      if (p.devpost) links.push(`<a href="${p.devpost}" target="_blank" rel="noopener" class="tl-link">Devpost ↗</a>`);
+      if (p.demo) links.push(`<a href="${p.demo}" target="_blank" rel="noopener" class="tl-link">Demo ↗</a>`);
+      return links.length ? `<div class="tl-links">${links.join('')}</div>` : '';
+    })() : '';
+
+    item.innerHTML = `
+      <div class="tl-spine-dot"></div>
+      <div class="tl-card">
+        <div class="tl-meta">
+          <span class="tl-date">${ev.month} ${ev.year}</span>
+          <span class="tl-type-badge tl-badge--${ev.type}">${ev.type}</span>
+          ${awardBadge}
+        </div>
+        <div class="tl-icon">${ev.icon}</div>
+        <h3 class="tl-label">${ev.label}</h3>
+        <p class="tl-desc">${ev.desc}</p>
+        ${demoLinks}
+      </div>
+    `;
+    container.appendChild(item);
+  });
+
+  // Scroll-triggered reveal via IntersectionObserver
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('tl-visible');
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  container.querySelectorAll('.tl-item').forEach(el => obs.observe(el));
 }
 
 // ================================================================

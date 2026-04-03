@@ -2791,7 +2791,7 @@ function initProjectGraph() {
 
   function clearSatellites() {
     satObjects.forEach(o => group.remove(o));
-    satObjects = []; wfMeshes = []; wfArrows = [];
+    satObjects = []; wfMeshes = []; try { wfArrows = []; } catch(e) {}
   }
 
   // Each workflow node orbits the parent project node in 3D.

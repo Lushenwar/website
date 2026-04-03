@@ -2627,7 +2627,7 @@ function initProjectGraph() {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(55, W/H, 0.1, 2000);
   camera.position.set(0, 0, 500);
-  let targetCamZ = 1350;
+  let targetCamZ = 1000;
 
   scene.add(new THREE.AmbientLight(0x111133, 0.7));
   const dLight = new THREE.DirectionalLight(0xffffff, 0.9);
@@ -2941,7 +2941,7 @@ function initProjectGraph() {
 
     if (idx < 0) {
       clearSatellites();
-      targetCamZ = 1350;
+      targetCamZ = 1000;
       focusNode = false;
       infoEl.innerHTML = '<p class="gi-hint">Click a node to explore a project</p>';
       window._graphChatDeactivate?.();
@@ -3036,7 +3036,7 @@ function initProjectGraph() {
 
   canvas.addEventListener('wheel', e => {
     e.preventDefault();
-    targetCamZ = Math.max(300, Math.min(2600, targetCamZ + e.deltaY * 1.5));
+    targetCamZ = Math.max(300, Math.min(2600, targetCamZ + e.deltaY * 3.5));
   }, { passive: false });
 
   let lastTouch = null;

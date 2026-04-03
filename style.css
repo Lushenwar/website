@@ -3001,3 +3001,24 @@ main { position: relative; z-index: 5; }
   right: 5vw;
   pointer-events: none;
 }
+
+/* Force custom cursor across all game elements */
+.mini-gate *, .c4-wrap *, .ttt-wrap *, .math-wrap *, #gate * {
+  cursor: none !important;
+}
+#cursor {
+  z-index: 999999 !important;
+}
+
+/* GLOBAL CUSTOM CURSOR FORCED ON TOP */
+#cursor {
+  z-index: 999999 !important;
+  pointer-events: none !important;
+}
+/* Ensure system cursor is hidden even over buttons on the gate screen */
+.mini-gate *, #gate *, .c4-wrap *, .ttt-wrap *, .rps-grid *, .math-wrap * {
+  cursor: none !important;
+}
+@media (max-width: 580px) {
+  #cursor { display: block !important; opacity: 1 !important; }
+}

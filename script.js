@@ -544,11 +544,24 @@ function initCursor() {
   const ring = document.getElementById('cursor');
   if (!ring) return;
   let cx = 0, cy = 0, rx = 0, ry = 0;
-  document.addEventListener('mousemove', e => { cx = e.clientX; cy = e.clientY; });
+  let moved = false;
+  document.addEventListener('mousemove', e => {
+    cx = e.clientX;
+    cy = e.clientY;
+    if (!moved) { rx = cx; ry = cy; moved = true; }
+    ring.style.opacity = '1';
+    ring.style.display = 'block';
+  }, { passive: true });
+
   (function loop() {
     requestAnimationFrame(loop);
-    rx += (cx - rx) * 0.12; ry += (cy - ry) * 0.12;
-    ring.style.left = `${rx}px`; ring.style.top = `${ry}px`;
+    rx += (cx - rx) * 0.18;
+    ry += (cy - ry) * 0.18;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    // Stay at absolute top of the stack (above overlays)
+    ring.style.zIndex = '999999';
+    ring.style.pointerEvents = 'none';
   })();
 }
 

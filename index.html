@@ -93,9 +93,6 @@
     <!-- Grain overlay -->
     <div class="grain-overlay" aria-hidden="true"></div>
 
-    <!-- Custom cursor -->
-    <div id="cursor" aria-hidden="true"></div>
-
     <nav class="top-nav" id="top-nav">
       <div class="top-nav-brand" style="display:flex; align-items:center; gap: 0.8rem; cursor:pointer;" onclick="window.scrollTo({top:0,behavior:'smooth'})">
     <div id="faller" aria-hidden="true">
@@ -675,6 +672,9 @@
     </div><!-- /#sec-models -->
 
   </div><!-- /#portfolio -->
+
+  <!-- Custom cursor — must be a direct body child so #portfolio's opacity:0 doesn't hide it -->
+  <div id="cursor" aria-hidden="true"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="script.js"></script>

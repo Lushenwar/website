@@ -2786,6 +2786,7 @@ function initProjectGraph() {
   // ── Satellite / workflow ──────────────────────────────────────
   let satObjects  = [];
   let wfMeshes    = [];
+  let wfArrows    = [];
   let wfAnimStart = 0;
 
   function clearSatellites() {

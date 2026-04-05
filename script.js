@@ -446,6 +446,10 @@ function initScene() {
 
   // ---- Click shockwaves ----
   const shockwaves = [];
+  let hasDragged = false, _bgMouseDown = false;
+  canvas.addEventListener('mousedown', () => { hasDragged = false; _bgMouseDown = true; });
+  window.addEventListener('mouseup', () => { _bgMouseDown = false; });
+  canvas.addEventListener('mousemove', () => { if (_bgMouseDown) hasDragged = true; });
 
   canvas.addEventListener('click', e => {
     if (hasDragged) { hasDragged = false; return; }
@@ -828,6 +832,7 @@ function initSimulator() {
   let pending   = null;     // first click point (world space)
   let mouse     = null;     // live mouse pos (world space)
   let snapPt    = null;     // current snap target
+  let hasDragged = false;
 
   const INIT_PAPER = () => [
     {x:CX-HALF, y:CY-HALF}, {x:CX+HALF, y:CY-HALF},
@@ -2861,8 +2866,8 @@ function initProjectGraph() {
   // ── High-school "solar system" cluster (ids 011-014) ──────────
   // Position these 4 personal projects in a tight orbit around
   // a cluster center far from the main sphere, like a mini solar system.
-  const HS_CENTER = { x: -380, y: 260, z: -120 };
-  const HS_R = 75;
+  const HS_CENTER = { x: -210, y: 145, z: -65 };
+  const HS_R = 58;
   const HS_IDS = ['011', '012', '013', '014'];
   nodeData.forEach(nd => {
     const idx = HS_IDS.indexOf(nd.p.id);
@@ -3166,6 +3171,9 @@ function initProjectGraph() {
 
     if (idx < 0) {
       clearSatellites();
+      clearTimeout(camFocusTimer);
+      camZooming = false;
+      prevFocusIdx = -1;
       targetCamZ = 500;
       focusNode = false;
       infoEl.innerHTML = '<p class="gi-hint">Click a node to explore a project</p>';
@@ -3174,13 +3182,31 @@ function initProjectGraph() {
     }
 
     showWorkflow(nodeData[idx]);
-    targetCamZ = 380;
 
     const nd = nodeData[idx];
-    const dist = Math.sqrt(nd.x * nd.x + nd.z * nd.z);
-    targetRotY = -Math.atan2(nd.x, nd.z);
-    targetRotX = Math.atan2(-nd.y, dist > 1 ? dist : 1);
-    focusNode = true;
+    // Use REST positions for rotation so focus is always accurate regardless of physics jitter.
+    const ndR    = Math.sqrt(nd.rx * nd.rx + nd.ry * nd.ry + nd.rz * nd.rz);
+    const finalZ = Math.max(430, ndR + 55);
+    const distR  = Math.sqrt(nd.rx * nd.rx + nd.rz * nd.rz);
+    targetRotY   = -Math.atan2(nd.rx, nd.rz);
+    targetRotX   = Math.atan2(-nd.ry, distR > 1 ? distR : 1);
+    focusNode    = true;
+
+    // When switching between two different nodes, zoom out first for a clean
+    // cross-system transition, then zoom into the new node
+    clearTimeout(camFocusTimer);
+    if (prevFocusIdx >= 0 && prevFocusIdx !== idx) {
+      camZooming = true;
+      targetCamZ = 1350;          // pull back far enough to see both clusters clearly
+      camFocusTimer = setTimeout(() => {
+        targetCamZ = finalZ;
+        camZooming = false;
+      }, 440);
+    } else {
+      targetCamZ = finalZ;
+      camZooming = false;
+    }
+    prevFocusIdx = idx;
 
     const p = PROJECTS[idx];
     const connNames = edges.filter(e => e.i===idx||e.j===idx).map(e => {
@@ -3208,11 +3234,13 @@ function initProjectGraph() {
   let isDragging = false, lastX = 0, lastY = 0, hasDragged = false;
   let rotX = 0, rotY = 0, autoRot = true;
   let targetRotX = 0, targetRotY = 0, focusNode = false;
+  let camFocusTimer = null, camZooming = false, prevFocusIdx = -1;
 
   canvas.addEventListener('mousedown', e => {
     hasDragged = false;
     isDragging = true; lastX = e.clientX; lastY = e.clientY;
     autoRot = false; focusNode = false;
+    clearTimeout(camFocusTimer); camZooming = false; prevFocusIdx = -1;
   });
   window.addEventListener('mouseup', () => { isDragging = false; });
 
@@ -3261,7 +3289,7 @@ function initProjectGraph() {
 
   canvas.addEventListener('wheel', e => {
     e.preventDefault();
-    targetCamZ = Math.max(120, Math.min(2600, targetCamZ + e.deltaY * 3.5));
+    targetCamZ = Math.max(120, Math.min(2600, targetCamZ + e.deltaY * 0.35));
   }, { passive: false });
 
   let lastTouch = null;
@@ -3325,12 +3353,16 @@ function initProjectGraph() {
 
     if (autoRot) rotY += 0.003;
     if (focusNode) {
-      rotX += (targetRotX - rotX) * 0.04;
-      rotY += (targetRotY - rotY) * 0.04;
+      // Rotate faster during zoom-out so aim is ready when we zoom back in
+      const rLerp = camZooming ? 0.09 : 0.058;
+      rotX += (targetRotX - rotX) * rLerp;
+      rotY += (targetRotY - rotY) * rLerp;
     }
     group.rotation.x = rotX;
     group.rotation.y = rotY;
-    camera.position.z += (targetCamZ - camera.position.z) * 0.06;
+    // Snappy zoom-out, smooth zoom-in
+    const zLerp = camZooming ? 0.26 : 0.18;
+    camera.position.z += (targetCamZ - camera.position.z) * zLerp;
 
     // ── Force-directed physics ─────────────────────────────────
     nodeData.forEach((nd, i) => {
@@ -3644,76 +3676,277 @@ function initGamesHub() {
 
 const TIMELINE_EVENTS = [
   { year: '2021', month: 'Sep', type: 'milestone', label: 'First line of code', desc: 'Opened a Java IDE for the first time and printed "Hello World" — the start of everything.', icon: '🌱', color: '#7ab87a' },
-  { year: '2022', month: 'Jan', type: 'personal',  label: 'ClassesObjectsModule', desc: 'Built an interactive OOP learning module with a Witcher-themed story, quizzes, and matching games in Java.', icon: '⚔️', color: '#c08fff', id: '013' },
-  { year: '2022', month: 'Mar', type: 'personal',  label: 'MazeRace', desc: 'Designed and shipped a full Java Swing castle maze game with coins, directional animations, and a file-backed leaderboard.', icon: '🏰', color: '#f0984e', id: '011' },
-  { year: '2022', month: 'Jun', type: 'personal',  label: 'PearStore', desc: 'Built a laptop recommendation tool that surveys users and matches them to the best fit using a weighted algorithm.', icon: '💻', color: '#7ab87a', id: '012' },
-  { year: '2023', month: 'Feb', type: 'personal',  label: 'WeatherApp', desc: 'First deployed web project — a browser weather app with 5-day forecasts and clothing/activity recommendations.', icon: '🌤️', color: '#60a5d4', id: '014' },
-  { year: '2023', month: 'Jul', type: 'hackathon', label: 'Health Assistant @ Hack404', desc: 'First hackathon ever. Shipped an AI-powered mental health companion with reminders and a calendar — won 3rd place in the beginner stream.', icon: '🥉', color: '#7ab87a', award: '🥉 3rd Place', id: '010' },
-  { year: '2024', month: 'Jan', type: 'personal',  label: 'BWF Predictor', desc: 'End-to-end ML pipeline predicting badminton match outcomes at 75%+ accuracy using Glicko-2 + LightGBM/XGBoost ensembles.', icon: '🏸', color: '#f5c430', id: '009' },
-  { year: '2024', month: 'Feb', type: 'hackathon', label: 'OpenScore @ DeltaHacks 12', desc: 'Reimagined credit scoring for 3M+ credit-invisible Canadians using Plaid + Gemini instead of traditional bureau data.', icon: '💳', color: '#4ecdc4', id: '006' },
-  { year: '2024', month: 'Apr', type: 'hackathon', label: 'Interprefy @ JAMHacks', desc: 'Real-time audio translation desktop app — captures system audio, transcribes with DeepGram, translates with DeepL, overlays subtitles.', icon: '🌐', color: '#e05555', id: '003' },
-  { year: '2024', month: 'Sep', type: 'hackathon', label: 'FixMyFeed @ YHacks', desc: 'Behavior-aware social media filter with multi-agent LLM triage and a neural map dashboard — finalist across 4 tracks.', icon: '🏆', color: '#f0984e', award: '🏆 Finalist · 4 tracks', id: '007' },
-  { year: '2024', month: 'Nov', type: 'hackathon', label: 'Spotlight @ HackCanada', desc: 'AI platform detecting natural product placement surfaces in video and seamlessly inserting brand assets using Gemini + FFmpeg.', icon: '🎬', color: '#e05555', id: '008' },
+  { year: '2024', month: 'Jan', type: 'personal',  label: 'ClassesObjectsModule', desc: 'Built an interactive OOP learning module with a Witcher-themed story, quizzes, and matching games in Java.', icon: '⚔️', color: '#c08fff', id: '013' },
+  { year: '2024', month: 'Mar', type: 'personal',  label: 'MazeRace', desc: 'Designed and shipped a full Java Swing castle maze game with coins, directional animations, and a file-backed leaderboard.', icon: '🏰', color: '#f0984e', id: '011' },
+  { year: '2024', month: 'Jun', type: 'personal',  label: 'PearStore', desc: 'Built a laptop recommendation tool that surveys users and matches them to the best fit using a weighted algorithm.', icon: '💻', color: '#7ab87a', id: '012' },
+  { year: '2024', month: 'Sep', type: 'personal',  label: 'WeatherApp', desc: 'First deployed web project — a browser weather app with 5-day forecasts and clothing/activity recommendations.', icon: '🌤️', color: '#60a5d4', id: '014' },
+  { year: '2024', month: 'Sep', type: 'personal',  label: 'WechatShop', desc: 'Full-stack WeChat mini-program for social commerce — product listings, cart management, and order tracking with a mobile-first UI.', icon: '🛒', color: '#4ecdc4' },
+  { year: '2025', month: 'May', type: 'hackathon', label: 'Interprefy @ JAMHacks', desc: 'Real-time audio translation desktop app — captures system audio, transcribes with DeepGram, translates with DeepL, overlays subtitles.', icon: '🌐', color: '#e05555', id: '003' },
+  { year: '2025', month: 'Jul', type: 'hackathon', label: 'Health Assistant @ Hack404', desc: 'First hackathon ever. Shipped an AI-powered mental health companion with reminders and a calendar — won 3rd place in the beginner stream.', icon: '🥉', color: '#7ab87a', award: '🥉 3rd Place', id: '010' },
   { year: '2025', month: 'Sep', type: 'milestone', label: 'Started university', desc: 'Began Math at the University of Waterloo — new chapter, same obsession with building things.', icon: '🎓', color: '#60a5d4' },
-  { year: '2025', month: 'Jan', type: 'personal',  label: 'MasteringGenZ', desc: 'Full-stack slang autocomplete engine powered by a custom GAT + GRU deep learning pipeline and Gemini context re-ranking.', icon: '📱', color: '#c08fff', id: '004' },
-  { year: '2025', month: 'Mar', type: 'hackathon', label: 'Eco-Pulse @ GenAI Genesis', desc: 'AI-powered urban heat mitigation planner mapping Montreal heat zones and generating tree-planting blueprints — won 1st place.', icon: '🏆', color: '#7ab87a', award: '🏆 1st Place', id: '002' },
-  { year: '2025', month: 'Mar', type: 'hackathon', label: 'IFYShop @ CxC 2026', desc: 'Multi-agent shopping AI that identifies products from screenshots, scrapes reviews, compares prices, and generates Eco Scores.', icon: '★', color: '#f5c430', award: '★ Best Snowflake', id: '005' },
-  { year: '2025', month: 'Apr', type: 'hackathon', label: 'LOCATR @ DeerHacks V', desc: 'Five-agent LangGraph system discovering and scoring venues for any activity — Snowflake-backed memory, won Best Use of Auth0.', icon: '★', color: '#60a5d4', award: '★ Best Auth0', id: '001' },
+  { year: '2026', month: 'Jan', type: 'hackathon', label: 'OpenScore @ DeltaHacks 12', desc: 'Reimagined credit scoring for 3M+ credit-invisible Canadians using Plaid + Gemini instead of traditional bureau data.', icon: '💳', color: '#4ecdc4', id: '006' },
+  { year: '2026', month: 'Jan', type: 'personal',  label: 'MasteringGenZ', desc: 'Full-stack slang autocomplete engine powered by a custom GAT + GRU deep learning pipeline and Gemini context re-ranking.', icon: '📱', color: '#c08fff', id: '004' },
+  { year: '2026', month: 'Feb', type: 'personal',  label: 'BWF Predictor', desc: 'End-to-end ML pipeline predicting badminton match outcomes at 75%+ accuracy using Glicko-2 + LightGBM/XGBoost ensembles.', icon: '🏸', color: '#f5c430', id: '009' },
+  { year: '2026', month: 'Feb', type: 'hackathon', label: 'IFYShop @ CxC 2026', desc: 'Multi-agent shopping AI that identifies products from screenshots, scrapes reviews, compares prices, and generates Eco Scores.', icon: '★', color: '#f5c430', award: '★ Best Snowflake', id: '005' },
+  { year: '2026', month: 'Mar', type: 'hackathon', label: 'LOCATR @ DeerHacks V', desc: 'Five-agent LangGraph system discovering and scoring venues for any activity — Snowflake-backed memory, won Best Use of Auth0.', icon: '★', color: '#60a5d4', award: '★ Best Auth0', id: '001' },
+  { year: '2026', month: 'Mar', type: 'hackathon', label: 'Spotlight @ HackCanada', desc: 'AI platform detecting natural product placement surfaces in video and seamlessly inserting brand assets using Gemini + FFmpeg.', icon: '🎬', color: '#e05555', id: '008' },
+  { year: '2026', month: 'Mar', type: 'hackathon', label: 'Eco-Pulse @ GenAI Genesis', desc: 'AI-powered urban heat mitigation planner mapping Montreal heat zones and generating tree-planting blueprints — won 1st place.', icon: '🌿', color: '#7ab87a', award: '🏆 1st Place', id: '002' },
+  { year: '2026', month: 'Mar', type: 'hackathon', label: 'FixMyFeed @ YHacks', desc: 'Behavior-aware social media filter with multi-agent LLM triage and a neural map dashboard — finalist across 4 tracks.', icon: '🏆', color: '#f0984e', award: '🏆 Finalist · 4 tracks', id: '007' },
 ];
 
 function initTimeline() {
   const container = document.getElementById('timeline-events');
   if (!container) return;
-
   container.innerHTML = '';
-  TIMELINE_EVENTS.forEach((ev, i) => {
+
+  // Non-milestone items alternate left/right; milestones don't consume a side
+  let sideIdx = 0;
+
+  TIMELINE_EVENTS.forEach(ev => {
+    const isMilestone = ev.type === 'milestone';
+    const side = isMilestone ? null : (sideIdx % 2 === 0 ? 'left' : 'right');
+    if (!isMilestone) sideIdx++;
+
     const item = document.createElement('div');
-    item.className = 'tl-item tl-item--' + ev.type;
+    item.className = `tl-item tl-item--${ev.type}${side ? ` tl-item--${side}` : ''}`;
     item.style.setProperty('--tl-color', ev.color);
-    item.style.animationDelay = (i * 0.04) + 's';
 
-    const awardBadge = ev.award
-      ? `<span class="tl-award">${ev.award}</span>`
-      : '';
-
-    const demoLinks = ev.id ? (() => {
+    const linkHtml = ev.id ? (() => {
       const p = PROJECTS.find(proj => proj.id === ev.id);
       if (!p) return '';
       const links = [];
-      if (p.github) links.push(`<a href="${p.github}" target="_blank" rel="noopener" class="tl-link">GitHub ↗</a>`);
+      if (p.github)  links.push(`<a href="${p.github}"  target="_blank" rel="noopener" class="tl-link">GitHub ↗</a>`);
       if (p.devpost) links.push(`<a href="${p.devpost}" target="_blank" rel="noopener" class="tl-link">Devpost ↗</a>`);
-      if (p.demo) links.push(`<a href="${p.demo}" target="_blank" rel="noopener" class="tl-link">Demo ↗</a>`);
+      if (p.demo)    links.push(`<a href="${p.demo}"    target="_blank" rel="noopener" class="tl-link">Demo ↗</a>`);
       return links.length ? `<div class="tl-links">${links.join('')}</div>` : '';
     })() : '';
+
+    const hasExpand = !!(ev.desc || linkHtml);
 
     item.innerHTML = `
       <div class="tl-spine-dot"></div>
       <div class="tl-card">
-        <div class="tl-meta">
-          <span class="tl-date">${ev.month} ${ev.year}</span>
-          <span class="tl-type-badge tl-badge--${ev.type}">${ev.type}</span>
-          ${awardBadge}
-        </div>
-        <div class="tl-icon">${ev.icon}</div>
+        <span class="tl-date-label">${ev.month} ${ev.year}</span>
         <h3 class="tl-label">${ev.label}</h3>
-        <p class="tl-desc">${ev.desc}</p>
-        ${demoLinks}
-      </div>
-    `;
+        ${ev.award ? `<span class="tl-award">${ev.award}</span>` : ''}
+        ${hasExpand ? `
+          <span class="tl-expand-hint">read more ↓</span>
+          <div class="tl-expand-body">
+            <div class="tl-expand-inner">
+              ${ev.desc ? `<p class="tl-desc">${ev.desc}</p>` : ''}
+              ${linkHtml}
+            </div>
+          </div>` : ''}
+      </div>`;
+
+    if (hasExpand) {
+      item.querySelector('.tl-card').addEventListener('click', function () {
+        this.classList.toggle('tl-expanded');
+      });
+    }
+
     container.appendChild(item);
   });
 
-  // Scroll-triggered reveal via IntersectionObserver
-  const obs = new IntersectionObserver((entries) => {
+  // Reveal observer: items slide in as they enter the viewport bottom
+  const obsReveal = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('tl-visible');
-        obs.unobserve(entry.target);
+        entry.target.classList.remove('tl-past');
       }
     });
-  }, { threshold: 0.12 });
+  }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
 
-  container.querySelectorAll('.tl-item').forEach(el => obs.observe(el));
+  // Past observer: items dim when they scroll above the viewport
+  const obsPast = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
+        // Item has scrolled above the top of the viewport
+        entry.target.classList.add('tl-past');
+      } else if (entry.isIntersecting) {
+        entry.target.classList.remove('tl-past');
+      }
+    });
+  }, { threshold: 0 });
+
+  container.querySelectorAll('.tl-item').forEach(el => {
+    obsReveal.observe(el);
+    obsPast.observe(el);
+  });
+
+  setTimeout(() => initTimelineCanvas(), 200);
+}
+
+function initTimelineCanvas() {
+  const wrap = document.querySelector('.tl-zigzag-wrap');
+  if (!wrap) return;
+
+  let canvas = document.getElementById('timeline-canvas');
+  if (!canvas) {
+    canvas = document.createElement('canvas');
+    canvas.id = 'timeline-canvas';
+    wrap.insertBefore(canvas, wrap.firstChild);
+  }
+  const ctx = canvas.getContext('2d');
+  let raf = null;
+  let particleT = 0;
+
+  function hexRgba(hex, a) {
+    const h = hex.replace('#', '');
+    const l = h.length;
+    const r = parseInt(l === 3 ? h[0]+h[0] : h.slice(0,2), 16);
+    const g = parseInt(l === 3 ? h[1]+h[1] : h.slice(2,4), 16);
+    const b = parseInt(l === 3 ? h[2]+h[2] : h.slice(4,6), 16);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+
+  function bPt(p0, cp0, cp1, p1, t) {
+    const u = 1 - t;
+    return {
+      x: u*u*u*p0.x + 3*u*u*t*cp0.x + 3*u*t*t*cp1.x + t*t*t*p1.x,
+      y: u*u*u*p0.y + 3*u*u*t*cp0.y + 3*u*t*t*cp1.y + t*t*t*p1.y,
+    };
+  }
+
+  function getDots() {
+    const wRect = wrap.getBoundingClientRect();
+    return Array.from(wrap.querySelectorAll('.tl-spine-dot')).map(dot => {
+      const r     = dot.getBoundingClientRect();
+      const item  = dot.closest('.tl-item');
+      const color = item?.style.getPropertyValue('--tl-color')?.trim() || '#f5c430';
+      return {
+        x: r.left - wRect.left + r.width  / 2,
+        y: r.top  - wRect.top  + r.height / 2,
+        color,
+      };
+    });
+  }
+
+  // Vertical spine: straight bezier segments connecting each dot down to the next
+  function buildSegments(pts) {
+    return pts.slice(0, -1).map((p0, i) => {
+      const p1 = pts[i + 1];
+      const dy = p1.y - p0.y;
+      return {
+        p0, p1,
+        cp0: { x: p0.x, y: p0.y + dy * 0.35 },
+        cp1: { x: p1.x, y: p1.y - dy * 0.35 },
+      };
+    });
+  }
+
+  function drawSeg(seg, endT) {
+    const steps = Math.max(2, Math.round(endT * 30));
+    ctx.save();
+    ctx.lineWidth   = 2.5;
+    ctx.lineJoin    = 'round';
+    ctx.lineCap     = 'round';
+    ctx.shadowBlur  = 11;
+    ctx.shadowColor = seg.p0.color;
+    const grad = ctx.createLinearGradient(seg.p0.x, seg.p0.y, seg.p1.x, seg.p1.y);
+    grad.addColorStop(0, hexRgba(seg.p0.color, 0.72));
+    grad.addColorStop(1, hexRgba(seg.p1.color, 0.72));
+    ctx.strokeStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(seg.p0.x, seg.p0.y);
+    for (let k = 1; k <= steps; k++) {
+      const pt = bPt(seg.p0, seg.cp0, seg.cp1, seg.p1, (k / steps) * endT);
+      ctx.lineTo(pt.x, pt.y);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function draw() {
+    const W = wrap.offsetWidth;
+    const H = wrap.offsetHeight;
+    // Don't draw if section is hidden (display:none gives 0 dimensions)
+    if (!W || !H) { raf = requestAnimationFrame(draw); return; }
+
+    canvas.width  = W;
+    canvas.height = H;
+    ctx.clearRect(0, 0, W, H);
+
+    const pts  = getDots();
+    if (pts.length < 2) { raf = requestAnimationFrame(draw); return; }
+
+    const segs = buildSegments(pts);
+    const totalSegs = segs.length;
+
+    // Scroll progress: 0 when timeline top hits viewport, 1 when bottom hits viewport
+    const wRect    = wrap.getBoundingClientRect();
+    const vH       = window.innerHeight;
+    const entered  = Math.max(0, vH - wRect.top);
+    const progress = Math.min(1, (entered / Math.max(1, wRect.height)) * 1.35);
+
+    const drawnSegs = progress * totalSegs;
+    const fullSegs  = Math.floor(drawnSegs);
+    const partial   = drawnSegs - fullSegs;
+
+    // ── Full dashed ghost of entire path ────────────────────────
+    ctx.save();
+    ctx.strokeStyle = 'rgba(240,232,213,0.04)';
+    ctx.lineWidth   = 2;
+    ctx.setLineDash([3, 9]);
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    segs.forEach(s => ctx.bezierCurveTo(s.cp0.x, s.cp0.y, s.cp1.x, s.cp1.y, s.p1.x, s.p1.y));
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    // ── Revealed glowing path ────────────────────────────────────
+    for (let i = 0; i < fullSegs; i++) drawSeg(segs[i], 1);
+    if (fullSegs < totalSegs && partial > 0.01) drawSeg(segs[fullSegs], partial);
+
+    // ── Dot glows for revealed dots ──────────────────────────────
+    pts.forEach((pt, i) => {
+      if (i > drawnSegs + 0.5) return;
+      const g = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, 22);
+      g.addColorStop(0,   hexRgba(pt.color, 0.26));
+      g.addColorStop(0.5, hexRgba(pt.color, 0.09));
+      g.addColorStop(1,   hexRgba(pt.color, 0));
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, 22, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // ── Traveling white particle ─────────────────────────────────
+    particleT = (particleT + 0.0032) % 1;
+    const pPos = particleT * totalSegs;
+    if (pPos <= drawnSegs && totalSegs > 0) {
+      const pSeg   = Math.min(Math.floor(pPos), totalSegs - 1);
+      const pLocal = Math.min(pPos - pSeg, 1);
+      const seg    = segs[pSeg];
+      const pt     = bPt(seg.p0, seg.cp0, seg.cp1, seg.p1, pLocal);
+      const g2 = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, 9);
+      g2.addColorStop(0,    'rgba(255,255,255,0.92)');
+      g2.addColorStop(0.35, hexRgba(seg.p0.color, 0.6));
+      g2.addColorStop(1,    hexRgba(seg.p0.color, 0));
+      ctx.fillStyle = g2;
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, 9, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    raf = requestAnimationFrame(draw);
+  }
+
+  draw();
+
+  // Pause canvas loop when tab is not active, resume when it is
+  document.querySelectorAll('.top-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      if (tab.dataset.section === 'sec-timeline') {
+        if (!raf) draw();
+      } else {
+        cancelAnimationFrame(raf);
+        raf = null;
+      }
+    });
+  });
 }
 
 // ================================================================

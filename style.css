@@ -580,7 +580,7 @@ main { position: relative; z-index: 5; }
    ================================================================ */
 
 .hero {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1055,7 +1055,7 @@ main { position: relative; z-index: 5; }
 .about-text {
   font-family: var(--font-body);
   font-size: 1.05rem;
-  line-height: 1.9;
+  line-height: var(--leading-loose);
   color: var(--ink-muted);
   max-width: 400px;
   margin-bottom: 3rem;
@@ -1703,13 +1703,13 @@ main { position: relative; z-index: 5; }
 
 .top-section {
   display: none;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .top-section.active { display: block; }
 
-#sec-portfolio { padding-top: 52px; }
-#sec-games, #sec-origami, #sec-graph { padding-top: 52px; }
+#sec-portfolio { padding-top: 80px; }
+#sec-games, #sec-origami, #sec-graph, #sec-timeline { padding-top: 80px; }
 #sec-models { padding-top: 0; overflow: hidden; }
 
 /* ================================================================
@@ -3757,4 +3757,90 @@ main { position: relative; z-index: 5; }
   #gate { transition: none !important; }
   #resume-modal { transition: none !important; }
   #resume-modal .resume-modal-inner { transition: none !important; }
+}
+
+/* ================================================================
+   SKIP-TO-CONTENT — keyboard navigation
+   ================================================================ */
+
+.skip-link {
+  position: fixed;
+  top: -100%;
+  left: 1rem;
+  z-index: 100000;
+  background: var(--pencil);
+  color: var(--bg);
+  font-family: var(--font-sketch);
+  font-size: 1rem;
+  padding: 0.5rem 1.2rem;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+
+.skip-link:focus {
+  top: 0.5rem;
+  outline: 2px solid var(--bg);
+  outline-offset: 2px;
+}
+
+/* ================================================================
+   ANIMATION FIXES
+   ================================================================ */
+
+/* game-card: transition: all animates layout properties (bad for perf) */
+.game-card {
+  transition: border-color 0.2s, background 0.2s;
+}
+
+/* ================================================================
+   TOUCH TARGETS — coarse pointer (touch devices) min 44px
+   ================================================================ */
+
+@media (pointer: coarse) {
+  /* Project filter tabs */
+  .proj-tab {
+    min-height: 44px;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+  }
+
+  /* Origami guide tabs */
+  .orig-guide-tab {
+    min-height: 44px;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+  }
+
+  /* Origami prev/next buttons */
+  .crane-btn {
+    min-height: 44px;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+  }
+
+  /* Origami simulator fold mode buttons */
+  .sim-mode-btn {
+    min-height: 44px;
+  }
+
+  /* Simulator action buttons (undo, reset) */
+  .sim-action-btn {
+    min-height: 44px;
+  }
+
+  /* Graph chat send button */
+  .gc-send {
+    min-height: 44px;
+    padding: 0.55rem 1.2rem;
+  }
+
+  /* Game cards in hub selector */
+  .game-card {
+    min-height: 60px;
+  }
+
+  /* Model viewer tabs */
+  .model-tab {
+    padding: 0.9rem 1.2rem;
+  }
 }

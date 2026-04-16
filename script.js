@@ -1471,8 +1471,73 @@ const PHOENIX_STEPS = [
 function initTopNav() {
   let graphInited = false;
   let timelineInited = false;
+
+  // Resume modal logic
+  const resumeModal = document.getElementById('resume-modal');
+  const resumeIframe = document.getElementById('resume-iframe');
+  const resumeClose = document.getElementById('resume-close');
+  let resumeLoaded = false;
+
+  let resumeTrigger = null;
+
+  function getFocusable(el) {
+    return [...el.querySelectorAll(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )];
+  }
+
+  function openResumeModal() {
+    if (!resumeLoaded) {
+      resumeIframe.src = 'resume.pdf';
+      resumeLoaded = true;
+    }
+    resumeTrigger = document.activeElement;
+    resumeModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    // Trap focus: set background inert
+    document.getElementById('portfolio').inert = true;
+    // Focus first focusable element in modal
+    requestAnimationFrame(() => resumeClose.focus());
+  }
+
+  function closeResumeModal() {
+    resumeModal.classList.remove('open');
+    document.body.style.overflow = '';
+    document.getElementById('portfolio').inert = false;
+    // Restore focus to trigger element
+    if (resumeTrigger) resumeTrigger.focus();
+  }
+
+  // Focus trap — keep Tab inside modal
+  resumeModal.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const focusable = getFocusable(resumeModal);
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+    } else {
+      if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+
+  resumeClose.addEventListener('click', closeResumeModal);
+
+  resumeModal.querySelector('.resume-modal-backdrop').addEventListener('click', closeResumeModal);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && resumeModal.classList.contains('open')) {
+      closeResumeModal();
+    }
+  });
+
   document.querySelectorAll('.top-tab').forEach(tab => {
     tab.addEventListener('click', () => {
+      // Resume tab opens modal, doesn't switch sections
+      if (tab.dataset.action === 'resume') {
+        openResumeModal();
+        return;
+      }
       document.querySelectorAll('.top-tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.top-section').forEach(s => s.classList.remove('active'));
       tab.classList.add('active');

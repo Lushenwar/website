@@ -171,6 +171,7 @@
         <button class="top-tab" data-section="sec-origami">origami</button>
         <button class="top-tab" data-section="sec-games">games</button>
         <button class="top-tab" data-section="sec-models">models</button>
+        <button class="top-tab top-tab-resume" data-action="resume">resume ↗</button>
       </div>
     </nav>
 
@@ -757,6 +758,36 @@
     </div><!-- /#sec-models -->
 
   </div><!-- /#portfolio -->
+
+  <!-- Resume PDF Modal -->
+  <div id="resume-modal" role="dialog" aria-modal="true" aria-label="Resume PDF viewer">
+    <div class="resume-modal-backdrop"></div>
+    <div class="resume-modal-inner">
+      <div class="resume-modal-header">
+        <span class="resume-modal-title">ryan qi — resume</span>
+        <div class="resume-modal-actions">
+          <a href="resume.pdf" download class="resume-modal-btn resume-download-btn" title="Download PDF">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            download
+          </a>
+          <button class="resume-modal-btn resume-close-btn" id="resume-close" aria-label="Close resume">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+            close
+          </button>
+        </div>
+      </div>
+      <div class="resume-modal-body">
+        <iframe id="resume-iframe" src="" title="Ryan Qi Resume PDF" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
 
   <!-- Custom cursor — must be a direct body child so #portfolio's opacity:0 doesn't hide it -->
   <div id="cursor" aria-hidden="true"></div>

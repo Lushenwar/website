@@ -1007,12 +1007,14 @@ body {
   overflow: hidden !important;
   transition: max-height 0.38s ease !important;
 }
-.tl-item.tl-open .tl-expand-body,
-.tl-item--left.tl-open .tl-expand-body,
-.tl-item--right.tl-open .tl-expand-body,
-.tl-item--milestone.tl-open .tl-expand-body {
+.tl-card.tl-expanded .tl-expand-body {
   max-height: 400px !important;
 }
+
+.tl-card.tl-expanded .tl-expand-hint {
+  opacity: 0.5 !important;
+}
+.tl-card.tl-expanded .tl-expand-hint::after { content: ' ↑'; }
 
 .tl-expand-inner {
   padding: 16px 0 0 !important;
@@ -1186,4 +1188,268 @@ body {
   .hero-actions { flex-direction: column; align-items: center; }
 
   .wins-label { display: none; }
+}
+
+/* =============================================================
+   THEME TOGGLE BUTTON
+   ============================================================= */
+.theme-toggle {
+  background: none;
+  border: 1.5px solid var(--silver-mist);
+  border-radius: var(--r-pill);
+  color: var(--ink);
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 8px;
+  flex-shrink: 0;
+  transition: border-color var(--fast) ease, background var(--fast) ease, color var(--fast) ease;
+}
+.theme-toggle:hover {
+  border-color: var(--graphite);
+  background: rgba(0,0,0,0.05);
+}
+.theme-toggle .icon-sun  { display: block; }
+.theme-toggle .icon-moon { display: none; }
+
+[data-theme="dark"] .theme-toggle .icon-sun  { display: none; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+
+[data-theme="dark"] .theme-toggle {
+  color: var(--ink);
+  border-color: var(--silver-mist);
+}
+[data-theme="dark"] .theme-toggle:hover {
+  border-color: var(--graphite);
+  background: rgba(255,255,255,0.06);
+}
+
+/* =============================================================
+   DARK THEME — Apple dark mode
+   Applied via [data-theme="dark"] on <html>
+   ============================================================= */
+[data-theme="dark"] {
+  --fog:          #000000;   /* page canvas → pure black */
+  --snow:         #1d1d1f;   /* card surface → graphite */
+  --snow-deep:    #161617;   /* deeper surface for alternating bands */
+  --snow-raised:  #333336;   /* elevated surface */
+  --ink:          #f5f5f7;   /* primary text → pearl */
+  --graphite:     #86868b;   /* secondary text → fog */
+  --silver-mist:  #424245;   /* dividers → steel */
+  --sole-cta:     #2997ff;   /* CTA → signal blue */
+  --sole-cta-h:   #47a8ff;
+}
+
+/* ── Base ── */
+[data-theme="dark"] body {
+  background: #000000;
+  color: #f5f5f7;
+  font-weight: 300;          /* Apple dark: lighter weight avoids halation */
+}
+
+/* ── Nav ── */
+[data-theme="dark"] .top-nav {
+  background: rgba(0,0,0,0.85);
+  border-bottom-color: #333336;
+}
+[data-theme="dark"] .nav-tab.active {
+  background: #f5f5f7;
+  color: #1d1d1f;
+}
+[data-theme="dark"] .nav-cta {
+  background: #2997ff !important;
+  color: #ffffff !important;
+}
+[data-theme="dark"] .nav-cta:hover { background: #47a8ff !important; }
+
+/* ── Hero ── */
+[data-theme="dark"] .hero-stage-glow {
+  background: radial-gradient(ellipse at center,
+    rgba(41,151,255,0.14) 0%,
+    rgba(41,151,255,0.05) 45%,
+    transparent 70%
+  );
+}
+
+/* ── Wins bar ── */
+[data-theme="dark"] .wins-bar {
+  background: #161617;
+  border-color: #333336;
+}
+[data-theme="dark"] .wins-track::before {
+  background: linear-gradient(to right, #161617, transparent);
+}
+[data-theme="dark"] .wins-track::after {
+  background: linear-gradient(to left, #161617, transparent);
+}
+
+/* ── Project cards ── */
+[data-theme="dark"] .project-card {
+  background: #1d1d1f;
+  border: 1px solid #333336;
+}
+[data-theme="dark"] .project-card:hover {
+  background: #242426;
+  border-color: #424245;
+}
+[data-theme="dark"] .project-card::before {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--accent-rgb, 41,151,255), 0.08) 0%,
+    transparent 60%
+  );
+}
+
+/* card number: more prominent in dark */
+[data-theme="dark"] .card-number {
+  color: var(--sole-cta);
+  opacity: 0.8;
+}
+
+[data-theme="dark"] .filter-tabs {
+  background: #1d1d1f;
+  border: 1px solid #333336;
+}
+[data-theme="dark"] .filter-tab { color: #86868b; }
+[data-theme="dark"] .filter-tab.active {
+  background: #f5f5f7;
+  color: #1d1d1f;
+}
+[data-theme="dark"] .filter-tab:hover:not(.active) {
+  background: #333336;
+  color: #f5f5f7;
+}
+
+[data-theme="dark"] .badge-hackathon,
+[data-theme="dark"] .hackathon-tag {
+  background: #333336;
+  border-color: #424245;
+  color: #86868b;
+}
+[data-theme="dark"] .badge-award,
+[data-theme="dark"] .award-tag {
+  background: rgba(41,151,255,0.12);
+  color: #2997ff;
+}
+
+[data-theme="dark"] .tech-pill {
+  background: #333336;
+  border-color: #424245;
+  color: #86868b;
+}
+
+[data-theme="dark"] .card-link {
+  color: #2997ff;
+  border-color: rgba(41,151,255,0.3);
+}
+[data-theme="dark"] .card-link:hover {
+  border-color: #2997ff;
+  background: rgba(41,151,255,0.06);
+}
+[data-theme="dark"] .card-link.disabled {
+  color: #424245;
+  border-color: #333336;
+}
+
+[data-theme="dark"] .card-divider line { stroke: #333336; }
+
+/* ── About section ── */
+[data-theme="dark"] .about-section {
+  background: #161617;
+  border-top-color: #333336;
+}
+[data-theme="dark"] .about-title em { color: #86868b; }
+[data-theme="dark"] .about-stage {
+  background: #333336;
+}
+[data-theme="dark"] .asp-divider { background: #424245; }
+[data-theme="dark"] .skill-row { border-top-color: #424245; }
+
+/* ── Footer ── */
+[data-theme="dark"] .site-footer {
+  border-top-color: #333336;
+}
+
+/* ── Timeline ── */
+[data-theme="dark"] .tl-header {
+  background: #161617;
+  border-bottom-color: #333336;
+}
+[data-theme="dark"] .tl-body { background: #000000; }
+
+[data-theme="dark"] .tl-card {
+  background: #1d1d1f !important;
+  border: 1px solid #333336 !important;
+}
+[data-theme="dark"] .tl-card:hover {
+  background: #242426 !important;
+}
+[data-theme="dark"] .tl-award {
+  background: rgba(41,151,255,0.12) !important;
+  color: #2997ff !important;
+}
+[data-theme="dark"] .tl-expand-hint { color: #2997ff !important; }
+[data-theme="dark"] .tl-expand-inner { border-top-color: #333336 !important; }
+[data-theme="dark"] .tl-link {
+  color: #2997ff !important;
+  border-color: rgba(41,151,255,0.3) !important;
+}
+[data-theme="dark"] .tl-link:hover {
+  border-color: #2997ff !important;
+}
+
+/* ── Buttons in dark ── */
+[data-theme="dark"] .btn-primary {
+  background: #2997ff;
+}
+[data-theme="dark"] .btn-primary:hover { background: #47a8ff; }
+
+[data-theme="dark"] .btn-ghost {
+  color: #2997ff;
+  border-color: #424245;
+}
+[data-theme="dark"] .btn-ghost:hover {
+  border-color: #2997ff;
+  background: rgba(41,151,255,0.06);
+}
+
+[data-theme="dark"] .btn-secondary {
+  color: #f5f5f7;
+  border-color: #424245;
+}
+[data-theme="dark"] .btn-secondary:hover { border-color: #86868b; }
+
+/* ── Modal ── */
+[data-theme="dark"] .modal-inner {
+  background: #1d1d1f;
+}
+[data-theme="dark"] .modal-header {
+  border-bottom-color: #333336;
+}
+[data-theme="dark"] .modal-title { color: #f5f5f7; }
+[data-theme="dark"] .modal-backdrop { background: rgba(0,0,0,0.72); }
+
+/* ── Win links in dark ── */
+[data-theme="dark"] .win a { color: #2997ff; }
+
+/* ── Accent tint: boost opacity slightly in dark mode ── */
+[data-theme="dark"] .project-card:hover::before { opacity: 0.9; }
+
+/* transition on theme switch — smooth crossfade */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color;
+  transition-duration: 0.22s;
+  transition-timing-function: ease;
+}
+/* but don't let the global transition fight with existing transitions */
+.project-card,
+.tl-item, .tl-item--left, .tl-item--right, .tl-item--milestone {
+  transition:
+    opacity var(--dur) ease,
+    transform var(--dur) ease,
+    background-color 0.22s ease,
+    border-color 0.22s ease !important;
 }

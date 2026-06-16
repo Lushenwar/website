@@ -13,776 +13,212 @@
     }
   }
   </script>
-  <title>Ryan Qi</title>
+  <title>Ryan Qi — Software Developer</title>
+  <meta name="description" content="Portfolio of Ryan Qi, Math student at the University of Waterloo. Software developer and ML engineer.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Skip-to-content — screen readers and keyboard nav -->
-  <a href="#main-content" class="skip-link">skip to content</a>
+  <a href="#main-content" class="skip-link">Skip to content</a>
 
-  <!-- Hidden SVG filters -->
-  <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
-    <defs>
-      <filter id="roughen" x="-5%" y="-5%" width="110%" height="110%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.055 0.065" numOctaves="2" seed="3" result="noise"/>
-        <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/>
-      </filter>
-      <filter id="roughen-heavy" x="-8%" y="-8%" width="116%" height="116%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.04 0.055" numOctaves="3" seed="7" result="noise"/>
-        <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G"/>
-      </filter>
-      <filter id="pencil-glow" x="-20%" y="-20%" width="140%" height="140%">
-        <feGaussianBlur stdDeviation="3" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-    </defs>
-  </svg>
-
-  <!-- ============================================================
-       GATE SCREEN
-       ============================================================ -->
-  <div id="gate">
-    <!-- Background doodles -->
-    <div class="gate-doodles" aria-hidden="true">
-      <svg class="doodle doodle-tl" width="180" height="180" viewBox="0 0 180 180" fill="none">
-        <path d="M 20 160 C 40 100, 80 60, 160 20" stroke="var(--ink-faint)" stroke-width="1.5" stroke-dasharray="5 8"/>
-        <circle cx="20" cy="160" r="4" stroke="var(--ink-faint)" stroke-width="1.5" fill="none"/>
-        <path d="M 50 20 L 55 30 M 50 20 L 60 22" stroke="var(--ink-faint)" stroke-width="1.5" stroke-linecap="round"/>
-        <path d="M 90 140 L 95 150 M 90 140 L 100 142" stroke="var(--ink-faint)" stroke-width="1.5" stroke-linecap="round"/>
-        <path d="M 140 60 C 142 55, 148 55, 150 60 C 152 65, 148 70, 143 68 C 138 66, 138 62, 140 60 Z" stroke="var(--ink-faint)" stroke-width="1.5" fill="none"/>
-      </svg>
-      <svg class="doodle doodle-tr" width="180" height="180" viewBox="0 0 180 180" fill="none">
-        <path d="M 30 30 C 60 80, 100 120, 160 150" stroke="var(--ink-faint)" stroke-width="1.5" stroke-dasharray="3 10"/>
-        <path d="M 100 30 L 106 40 L 100 50 L 94 40 Z" stroke="var(--pencil)" stroke-width="1.5" fill="none" opacity="0.4"/>
-        <path d="M 150 80 m -8 0 l 8 -14 l 8 14 Z" stroke="var(--ink-faint)" stroke-width="1.5" fill="none"/>
-      </svg>
-      <svg class="doodle doodle-bl" width="180" height="180" viewBox="0 0 180 180" fill="none">
-        <path d="M 30 40 C 70 80, 110 120, 150 160" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="8 6"/>
-        <path d="M 60 120 C 62 115, 68 115, 70 120 C 72 125, 68 130, 63 128 C 58 126, 58 122, 60 120 Z" stroke="var(--cobalt)" stroke-width="1.5" fill="none" opacity="0.4"/>
-      </svg>
-      <svg class="doodle doodle-br" width="180" height="180" viewBox="0 0 180 180" fill="none">
-        <path d="M 20 30 L 160 160" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="4 12"/>
-        <path d="M 120 40 L 124 52 L 112 52 Z" stroke="var(--rouge)" stroke-width="1.5" fill="none" opacity="0.4"/>
-      </svg>
-    </div>
-
-    <div class="gate-inner">
-      <div class="gate-title">
-        <span class="gate-name">Ryan Qi</span>
-        <div class="gate-sub">prove you're interesting.</div>
-      </div>
-
-      <div class="gate-card" id="game-container">
-        <!-- Rendered by JS -->
-      </div>
-
-      <div class="gate-hint">refresh for a different challenge ↻</div>
-    </div>
-  </div>
-
-  <!-- ============================================================
-       PORTFOLIO
-       ============================================================ -->
   <div id="portfolio">
 
-    <!-- Three.js canvas -->
-    <canvas id="bg"></canvas>
+    <canvas id="bg" aria-hidden="true"></canvas>
 
-    <!-- Hand-drawn astronaut -->
-    <!-- Grain overlay -->
-    <div class="grain-overlay" aria-hidden="true"></div>
-
-    <nav class="top-nav" id="top-nav">
-      <div class="top-nav-brand" style="display:flex; align-items:center; gap: 0.8rem; cursor:pointer;" onclick="window.scrollTo({top:0,behavior:'smooth'})">
-    <div id="faller" aria-hidden="true">
-      <svg id="astronaut-svg" width="200" height="210" viewBox="0 0 200 210" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- Hard hat -->
-              <path d="M 62 82 L 64 62 C 65 44 80 36 100 35 C 120 34 136 44 137 62 L 139 82 Z"
-                    stroke="var(--pencil)" stroke-width="2.2" stroke-linecap="round" fill="rgba(245,196,48,0.08)"/>
-              <path d="M 54 84 L 148 84" stroke="var(--pencil)" stroke-width="3" stroke-linecap="round"/>
-              <!-- hat brim shadow -->
-              <path d="M 56 87 L 146 87" stroke="var(--pencil)" stroke-width="1" stroke-linecap="round" opacity="0.25"/>
-
-              <!-- Helmet bubble -->
-              <path d="M 65 84 C 64 105 68 128 100 130 C 132 132 137 108 137 84"
-                    stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" fill="rgba(240,232,213,0.025)"/>
-              <!-- Visor -->
-              <path d="M 76 90 C 75 104 78 120 100 121 C 122 122 126 105 125 90 C 125 86 122 84 100 84 C 78 84 76 86 76 90 Z"
-                    fill="rgba(96,165,212,0.07)" stroke="var(--cobalt)" stroke-width="1.8" stroke-linecap="round"/>
-              <!-- Visor glare -->
-              <path d="M 81 92 C 82 99 82 108 81 114" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" opacity="0.28" fill="none"/>
-
-              <!-- Body / suit torso -->
-              <rect x="74" y="129" width="52" height="28" rx="5"
-                    stroke="var(--ink)" stroke-width="1.8" fill="none"/>
-              <!-- chest control panel squiggles -->
-              <line x1="82" y1="138" x2="94" y2="138" stroke="var(--ink)" stroke-width="1.1" stroke-linecap="round" opacity="0.4"/>
-              <line x1="82" y1="143" x2="118" y2="143" stroke="var(--ink)" stroke-width="1.1" stroke-linecap="round" opacity="0.4"/>
-              <circle cx="112" cy="135" r="3.5" stroke="var(--rouge)" stroke-width="1.2" fill="none" opacity="0.6"/>
-
-              <!-- Left arm — holds blueprint -->
-              <path d="M 74 140 L 44 130" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
-              <!-- Blueprint scroll in left hand -->
-              <rect x="18" y="118" width="32" height="22" rx="3" stroke="var(--lavender)" stroke-width="1.6" fill="rgba(192,143,255,0.06)"/>
-              <line x1="24" y1="125" x2="44" y2="125" stroke="var(--lavender)" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
-              <line x1="24" y1="130" x2="38" y2="130" stroke="var(--lavender)" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
-              <line x1="24" y1="135" x2="40" y2="135" stroke="var(--lavender)" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
-              <!-- WIP label on blueprint -->
-              <text x="22" y="123" font-family="sans-serif" font-size="5" fill="rgba(192,143,255,0.9)" letter-spacing="1">W·I·P</text>
-
-              <!-- Right arm — holds wrench -->
-              <path d="M 126 140 L 156 128" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
-              <!-- Wrench head -->
-              <path d="M 155 115 C 157 109 165 109 167 115 C 169 121 164 128 159 125 C 154 122 153 118 155 115 Z"
-                    stroke="var(--orange)" stroke-width="2" fill="none"/>
-              <!-- Wrench handle -->
-              <path d="M 160 122 L 172 138" stroke="var(--orange)" stroke-width="3" stroke-linecap="round"/>
-
-              <!-- Legs -->
-              <path d="M 82 157 L 78 180" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
-              <path d="M 118 157 L 122 180" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
-              <!-- Boots -->
-              <path d="M 70 180 L 86 180" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-              <path d="M 116 180 L 132 180" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-
-              <!-- Sparkle stars around -->
-              <path d="M 155 60 L 156 55 L 157 60 L 162 61 L 157 62 L 156 67 L 155 62 L 150 61 Z"
-                    stroke="var(--pencil)" stroke-width="1.1" fill="none" opacity="0.7"/>
-              <circle cx="44" cy="68" r="2.5" stroke="var(--cobalt)" stroke-width="1.2" opacity="0.55"/>
-              <path d="M 38 105 L 39 101 L 40 105 L 44 106 L 40 107 L 39 111 L 38 107 L 34 106 Z"
-                    stroke="var(--lavender)" stroke-width="1" fill="none" opacity="0.5"/>
-              <circle cx="168" cy="85" r="3" stroke="var(--orange)" stroke-width="1.2" opacity="0.45"/>
-              <path d="M 170 50 L 171 47 L 172 50 L 175 51 L 172 52 L 171 55 L 170 52 L 167 51 Z"
-                    stroke="var(--rouge)" stroke-width="1" fill="none" opacity="0.4"/>
-              <!-- small dashes / construction marks -->
-              <path d="M 22 152 L 26 152 M 24 150 L 24 154" stroke="var(--ink-faint)" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
-              <path d="M 170 162 L 174 162 M 172 160 L 172 164" stroke="var(--ink-faint)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
-            </svg>
-      <div class="faller-trail"></div>
-    </div>
-
-        <span>ryan qi</span>
+    <!-- NAV -->
+    <nav class="top-nav" id="top-nav" role="navigation" aria-label="Main navigation">
+      <div class="nav-brand" onclick="window.scrollTo({top:0,behavior:'smooth'})" role="link" tabindex="0" aria-label="Ryan Qi — home">
+        <span class="brand-mark" aria-hidden="true">RQ</span>
+        <span class="brand-name">Ryan Qi</span>
       </div>
       <div class="top-nav-tabs">
-        <button class="top-tab active" data-section="sec-portfolio">portfolio</button>
-        <button class="top-tab" data-section="sec-timeline">timeline</button>
-        <button class="top-tab" data-section="sec-graph">graph</button>
-        <button class="top-tab" data-section="sec-origami">origami</button>
-        <button class="top-tab" data-section="sec-games">games</button>
-        <button class="top-tab" data-section="sec-models">models</button>
-        <button class="top-tab top-tab-resume" data-action="resume">resume ↗</button>
+        <button class="top-tab active" data-section="sec-portfolio">Work</button>
+        <button class="top-tab" data-section="sec-timeline">Timeline</button>
+        <button class="top-tab top-tab-resume" data-action="resume">Résumé ↗</button>
       </div>
     </nav>
 
+    <!-- ============================================================
+         PORTFOLIO
+         ============================================================ -->
     <div class="top-section active" id="sec-portfolio">
-    <main id="main-content">
+      <main id="main-content">
 
-      <!-- HERO -->
-      <section class="hero" id="hero">
-        <div class="hero-eyebrow">portfolio · 2026</div>
+        <!-- HERO -->
+        <section class="hero" aria-label="Introduction">
 
-        <div class="hero-body">
-          <h1 class="hero-name">
-            <span class="name-line name-solid">RYAN</span>
-            <span class="name-line name-outline">QI</span>
-          </h1>
-          <div class="hero-right">
-            <div class="hero-roles">
-              builder
+          <div class="hero-meta">
+            <span class="hero-meta-item">Software Developer</span>
+            <span class="hero-meta-dot" aria-hidden="true">·</span>
+            <span class="hero-meta-item">ML Engineer</span>
+            <span class="hero-meta-dot" aria-hidden="true">·</span>
+            <span class="hero-meta-item">Math · Waterloo</span>
+          </div>
+
+          <div class="hero-center">
+            <h1 class="hero-wordmark" aria-label="Ryan Qi">
+              <span class="wm-ryan">RYAN</span>
+              <span class="wm-qi">QI</span>
+            </h1>
+          </div>
+
+          <div class="hero-bottom">
+            <div class="hero-stats" aria-label="Career highlights">
+              <div class="hstat">
+                <span class="hstat-n">8+</span>
+                <span class="hstat-l">Hackathons</span>
+              </div>
+              <div class="hstat-sep" aria-hidden="true"></div>
+              <div class="hstat">
+                <span class="hstat-n">5</span>
+                <span class="hstat-l">Awards</span>
+              </div>
+              <div class="hstat-sep" aria-hidden="true"></div>
+              <div class="hstat">
+                <span class="hstat-n">14</span>
+                <span class="hstat-l">Projects</span>
+              </div>
             </div>
-            <p class="hero-bio">Math @ University of Waterloo</p>
-            <nav class="hero-nav">
-              <a href="https://github.com/Lushenwar" target="_blank" rel="noopener" class="nav-link">GitHub ↗</a>
-              <a href="https://www.linkedin.com/in/ryan-qi/" target="_blank" rel="noopener" class="nav-link">LinkedIn ↗</a>
-              <a href="mailto:r28qi@uwaterloo.ca" class="nav-link">Email ↗</a>
+            <nav class="hero-links" aria-label="Contact">
+              <a href="https://github.com/Lushenwar" target="_blank" rel="noopener" class="hero-link">GitHub</a>
+              <a href="https://www.linkedin.com/in/ryan-qi/" target="_blank" rel="noopener" class="hero-link">LinkedIn</a>
+              <a href="mailto:r28qi@uwaterloo.ca" class="hero-link">Email</a>
             </nav>
           </div>
-        </div>
 
-        <!-- Hand-drawn arrow pointing down -->
-        <div class="scroll-indicator">
-          <svg width="120" height="40" viewBox="0 0 120 40" fill="none">
-            <path d="M 10 20 C 30 18, 70 22, 100 20" stroke="var(--ink-muted)" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M 94 12 C 98 16, 102 20, 94 28" stroke="var(--ink-muted)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-          </svg>
-          <span class="scroll-label">scroll to explore</span>
-        </div>
-      </section>
+        </section>
 
-      <!-- WINS TICKER -->
-      <div class="wins-ticker-wrap" aria-label="hackathon highlights">
-        <div class="wins-ticker-label">highlights</div>
-        <div class="wins-ticker-track">
-          <div class="wins-ticker-inner">
-            <span class="win-chip win-gold"><span class="win-icon">🏆</span>1st Place — GenAI Genesis <a href="https://devpost.com/software/eco-pulse-fpbo15" target="_blank" rel="noopener" class="win-link">Eco-Pulse ↗</a></span>
-            <span class="win-sep">·</span>
-            <span class="win-chip win-silver"><span class="win-icon">🥉</span>3rd Place — Hack404 <a href="https://devpost.com/software/beginner-track-portfolio" target="_blank" rel="noopener" class="win-link">Health Assistant ↗</a></span>
-            <span class="win-sep">·</span>
-            <span class="win-chip win-award"><span class="win-icon">★</span>Best Use of Auth0 — DeerHacks V <a href="https://devpost.com/software/pathfinder-6h8y1v" target="_blank" rel="noopener" class="win-link">LOCATR ↗</a></span>
-            <span class="win-sep">·</span>
-            <span class="win-chip win-award"><span class="win-icon">★</span>Best Use of Snowflake — CxC 2026 <a href="https://devpost.com/software/ifyshop" target="_blank" rel="noopener" class="win-link">ifyShop ↗</a></span>
-            <span class="win-sep">·</span>
-            <span class="win-chip win-finalist"><span class="win-icon">◈</span>Finalist · 4 tracks — YHacks <a href="https://devpost.com/software/fixmyfeed" target="_blank" rel="noopener" class="win-link">FixMyFeed ↗</a></span>
-            <span class="win-sep">·</span>
-            <!-- duplicate for seamless loop -->
-            <span class="win-chip win-gold"><span class="win-icon">🏆</span>1st Place — GenAI Genesis <a href="https://devpost.com/software/eco-pulse-fpbo15" target="_blank" rel="noopener" class="win-link">Eco-Pulse ↗</a></span>
-            <span class="win-sep">·</span>
-            <span class="win-chip win-silver"><span class="win-icon">🥉</span>3rd Place — Hack404 <a href="https://devpost.com/software/beginner-track-portfolio" target="_blank" rel="noopener" class="win-link">Health Assistant ↗</a></span>
-            <span class="win-sep">·</span>
-            <span class="win-chip win-award"><span class="win-icon">★</span>Best Use of Auth0 — DeerHacks V <a href="https://devpost.com/software/pathfinder-6h8y1v" target="_blank" rel="noopener" class="win-link">LOCATR ↗</a></span>
-            <span class="win-sep">·</span>
-            <span class="win-chip win-award"><span class="win-icon">★</span>Best Use of Snowflake — CxC 2026 <a href="https://devpost.com/software/ifyshop" target="_blank" rel="noopener" class="win-link">ifyShop ↗</a></span>
-            <span class="win-sep">·</span>
-            <span class="win-chip win-finalist"><span class="win-icon">◈</span>Finalist · 4 tracks — YHacks <a href="https://devpost.com/software/fixmyfeed" target="_blank" rel="noopener" class="win-link">FixMyFeed ↗</a></span>
-            <span class="win-sep">·</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- PROJECTS -->
-      <section class="projects-section" id="projects">
-        <!-- Hand-drawn section header -->
-        <div class="section-header">
-          <svg class="section-squiggle" width="60" height="14" viewBox="0 0 60 14" fill="none">
-            <path d="M 2 7 C 10 2, 18 12, 30 7 C 42 2, 50 12, 58 7" stroke="var(--pencil)" stroke-width="2" stroke-linecap="round" fill="none"/>
-          </svg>
-          <span class="section-eyebrow">selected builds</span>
-        </div>
-        <div class="proj-filter-tabs">
-          <button class="proj-tab active" data-filter="hackathon">hackathon projects</button>
-          <button class="proj-tab" data-filter="personal">personal projects</button>
-        </div>
-        <div class="projects-list" id="projects-list">
-          <!-- Injected by JS -->
-        </div>
-      </section>
-
-      <!-- ABOUT -->
-      <section class="about-section" id="about">
-        <div class="section-header">
-          <svg class="section-squiggle" width="60" height="14" viewBox="0 0 60 14" fill="none">
-            <path d="M 2 7 C 10 2, 18 12, 30 7 C 42 2, 50 12, 58 7" stroke="var(--cobalt)" stroke-width="2" stroke-linecap="round" fill="none"/>
-          </svg>
-          <span class="section-eyebrow">about me</span>
-        </div>
-        <div class="about-inner">
-          <h2 class="about-heading">Building at the<br><em>intersection</em> of<br>ML &amp; experience.</h2>
-          <div class="about-right">
-            <p class="about-text">
-              math student at the University of Waterloo obsessed with hackathons, machine learning, and shipping things that shouldn't exist yet. I've competed at GenAI Genesis, Yhacks and more. Connect if you're interested
-            </p>
-            <div class="about-stats">
-              <div class="stat">
-                <span class="stat-num">8+</span>
-                <span class="stat-label">hackathons</span>
-              </div>
-              <div class="stat">
-                <span class="stat-num">3</span>
-                <span class="stat-label">awards won</span>
-              </div>
-              <div class="stat">
-                <span class="stat-num">14</span>
-                <span class="stat-label">projects shipped</span>
-              </div>
+        <!-- WINS TICKER -->
+        <div class="wins-ticker-wrap" aria-label="Hackathon highlights">
+          <span class="wins-ticker-label" aria-hidden="true">Awards</span>
+          <div class="wins-ticker-track" aria-live="off">
+            <div class="wins-ticker-inner" role="list">
+              <span class="win-chip win-gold" role="listitem"><span class="win-icon" aria-hidden="true">🏆</span>1st Place · GenAI Genesis — <a href="https://devpost.com/software/eco-pulse-fpbo15" target="_blank" rel="noopener" class="win-link">Eco-Pulse</a></span>
+              <span class="win-sep" aria-hidden="true">·</span>
+              <span class="win-chip win-silver" role="listitem"><span class="win-icon" aria-hidden="true">🥉</span>3rd Place · Hack404 — <a href="https://devpost.com/software/beginner-track-portfolio" target="_blank" rel="noopener" class="win-link">Health Assistant</a></span>
+              <span class="win-sep" aria-hidden="true">·</span>
+              <span class="win-chip win-award" role="listitem"><span class="win-icon" aria-hidden="true">★</span>Best Use of Auth0 · DeerHacks V — <a href="https://devpost.com/software/pathfinder-6h8y1v" target="_blank" rel="noopener" class="win-link">LOCATR</a></span>
+              <span class="win-sep" aria-hidden="true">·</span>
+              <span class="win-chip win-award" role="listitem"><span class="win-icon" aria-hidden="true">★</span>Best Use of Snowflake · CxC 2026 — <a href="https://devpost.com/software/ifyshop" target="_blank" rel="noopener" class="win-link">ifyShop</a></span>
+              <span class="win-sep" aria-hidden="true">·</span>
+              <span class="win-chip win-finalist" role="listitem"><span class="win-icon" aria-hidden="true">◈</span>Finalist · 4 tracks · YHacks — <a href="https://devpost.com/software/fixmyfeed" target="_blank" rel="noopener" class="win-link">FixMyFeed</a></span>
+              <span class="win-sep" aria-hidden="true">·</span>
+              <!-- duplicate for seamless loop -->
+              <span class="win-chip win-gold" aria-hidden="true"><span class="win-icon">🏆</span>1st Place · GenAI Genesis — <a href="https://devpost.com/software/eco-pulse-fpbo15" target="_blank" rel="noopener" class="win-link">Eco-Pulse</a></span>
+              <span class="win-sep" aria-hidden="true">·</span>
+              <span class="win-chip win-silver" aria-hidden="true"><span class="win-icon">🥉</span>3rd Place · Hack404 — <a href="https://devpost.com/software/beginner-track-portfolio" target="_blank" rel="noopener" class="win-link">Health Assistant</a></span>
+              <span class="win-sep" aria-hidden="true">·</span>
+              <span class="win-chip win-award" aria-hidden="true"><span class="win-icon">★</span>Best Use of Auth0 · DeerHacks V — <a href="https://devpost.com/software/pathfinder-6h8y1v" target="_blank" rel="noopener" class="win-link">LOCATR</a></span>
+              <span class="win-sep" aria-hidden="true">·</span>
+              <span class="win-chip win-award" aria-hidden="true"><span class="win-icon">★</span>Best Use of Snowflake · CxC 2026 — <a href="https://devpost.com/software/ifyshop" target="_blank" rel="noopener" class="win-link">ifyShop</a></span>
+              <span class="win-sep" aria-hidden="true">·</span>
+              <span class="win-chip win-finalist" aria-hidden="true"><span class="win-icon">◈</span>Finalist · 4 tracks · YHacks — <a href="https://devpost.com/software/fixmyfeed" target="_blank" rel="noopener" class="win-link">FixMyFeed</a></span>
+              <span class="win-sep" aria-hidden="true">·</span>
             </div>
           </div>
         </div>
-      </section>
 
-      <footer class="footer">
-        <div class="footer-inner">
-          <div class="footer-name">ryan qi</div>
-          <nav class="footer-links">
-            <a href="https://github.com/Lushenwar" target="_blank" rel="noopener">github</a>
-            <a href="https://www.linkedin.com/in/ryan-qi/" target="_blank" rel="noopener">linkedin</a>
-            <a href="mailto:r28qi@uwaterloo.ca">email</a>
-          </nav>
-          <div class="footer-copy">drawn with love · 2026</div>
-        </div>
-      </footer>
-    </main>
+        <!-- PROJECTS -->
+        <section class="projects-section" id="projects">
+          <div class="projects-header">
+            <div class="projects-header-left">
+              <span class="section-label">Selected Work</span>
+              <h2 class="section-title">Projects</h2>
+            </div>
+            <div class="proj-filter-tabs" role="tablist" aria-label="Filter projects">
+              <button class="proj-tab active" data-filter="hackathon" role="tab" aria-selected="true">Hackathon</button>
+              <button class="proj-tab" data-filter="personal" role="tab" aria-selected="false">Personal</button>
+            </div>
+          </div>
+          <div class="projects-list" id="projects-list" aria-live="polite"></div>
+        </section>
+
+        <!-- ABOUT -->
+        <section class="about-section" id="about">
+          <div class="about-inner">
+            <div class="about-left">
+              <span class="section-label">Background</span>
+              <h2 class="about-display">Building at the<br><em>intersection</em><br>of ML &amp;<br>experience.</h2>
+            </div>
+            <div class="about-right">
+              <p class="about-text">
+                Math student at the University of Waterloo, obsessed with hackathons, machine learning, and shipping things that shouldn't exist yet. I've competed at GenAI Genesis, YHacks, DeerHacks, CxC, and more — picking up awards along the way.
+              </p>
+              <div class="about-skills">
+                <div class="skill-row">
+                  <span class="skill-label">Languages</span>
+                  <span class="skill-items">Python · TypeScript · Java · JavaScript</span>
+                </div>
+                <div class="skill-row">
+                  <span class="skill-label">Frameworks</span>
+                  <span class="skill-items">React · FastAPI · Next.js · PyTorch</span>
+                </div>
+                <div class="skill-row">
+                  <span class="skill-label">Tools</span>
+                  <span class="skill-items">LangGraph · Snowflake · Supabase · Gemini</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <div class="footer-inner">
+            <span class="footer-name">Ryan Qi</span>
+            <nav class="footer-links" aria-label="Footer navigation">
+              <a href="https://github.com/Lushenwar" target="_blank" rel="noopener">GitHub ↗</a>
+              <a href="https://www.linkedin.com/in/ryan-qi/" target="_blank" rel="noopener">LinkedIn ↗</a>
+              <a href="mailto:r28qi@uwaterloo.ca">Email ↗</a>
+            </nav>
+            <span class="footer-copy">© 2026</span>
+          </div>
+        </footer>
+
+      </main>
     </div><!-- /#sec-portfolio -->
 
-    <!-- Mini-gate modal (per-project challenge) -->
-    <div id="mini-gate" class="mini-gate" style="display:none" role="dialog" aria-modal="true" aria-labelledby="mini-gate-title">
-      <div class="mini-gate-card">
-        <button class="mini-gate-close" aria-label="close">×</button>
-        <div class="mini-gate-eyebrow">incoming threat</div>
-        <h3 class="mini-gate-title" id="mini-gate-title">The Astronaut blocks your path</h3>
-        <div id="mini-game-container"></div>
-      </div>
-    </div>
-
     <!-- ============================================================
-         TIMELINE SECTION
+         TIMELINE
          ============================================================ -->
     <div class="top-section" id="sec-timeline">
       <section class="timeline-section">
-        <div class="section-header">
-          <svg class="section-squiggle" width="60" height="14" viewBox="0 0 60 14" fill="none">
-            <path d="M 2 7 C 10 2, 18 12, 30 7 C 42 2, 50 12, 58 7" stroke="var(--pencil)" stroke-width="2" stroke-linecap="round" fill="none"/>
-          </svg>
-          <span class="section-eyebrow">from first line to now</span>
+        <div class="timeline-header">
+          <span class="section-label">Journey</span>
+          <h2 class="section-title">Timeline</h2>
+          <p class="timeline-sub">From first line of code to now.</p>
         </div>
-        <p class="timeline-subtitle">the path from first line of code to now — scroll to reveal each chapter.</p>
         <div class="tl-zigzag-wrap">
-          <div class="timeline-events" id="timeline-events">
-            <!-- Injected by JS -->
-          </div>
-        </div>
-        <p class="tl-coming-soon">more coming soon...</p>
-      </section>
-    </div><!-- /#sec-timeline -->
-
-    <!-- ============================================================
-         ORIGAMI SECTION
-         ============================================================ -->
-    <div class="top-section" id="sec-origami">
-      <section class="origami-section">
-        <div class="section-header">
-          <svg class="section-squiggle" width="60" height="14" viewBox="0 0 60 14" fill="none">
-            <path d="M 2 7 C 10 2, 18 12, 30 7 C 42 2, 50 12, 58 7" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" fill="none"/>
-          </svg>
-          <span class="section-eyebrow">take a break · fold something</span>
-        </div>
-
-        <div class="orig-main-layout">
-
-          <!-- LEFT: Fold types sidebar — always visible, scrolls with page -->
-          <div class="orig-folds-sidebar">
-            <div class="orig-sidebar-title">fold types</div>
-
-            <div class="sbl-row">
-              <div class="sbl-item">
-                <svg width="38" height="13" viewBox="0 0 38 13" fill="none"><line x1="2" y1="6.5" x2="36" y2="6.5" stroke="var(--cobalt)" stroke-width="1.5" stroke-dasharray="5 3"/><path d="M 15 2 L 19 6.5 L 15 11" stroke="var(--cobalt)" stroke-width="1.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>
-                <span>valley</span>
-              </div>
-              <div class="sbl-item">
-                <svg width="38" height="13" viewBox="0 0 38 13" fill="none"><path d="M 2 6.5 L 6 6.5 M 9 6.5 L 11 6.5 M 14 6.5 L 20 6.5 M 23 6.5 L 25 6.5 M 28 6.5 L 36 6.5" stroke="var(--rouge)" stroke-width="1.5" stroke-linecap="round"/><path d="M 15 11 L 19 6.5 L 15 2" stroke="var(--rouge)" stroke-width="1.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>
-                <span>mountain</span>
-              </div>
-              <div class="sbl-item">
-                <svg width="38" height="13" viewBox="0 0 38 13" fill="none"><line x1="2" y1="6.5" x2="36" y2="6.5" stroke="var(--ink-muted)" stroke-width="1"/><circle cx="10" cy="6.5" r="1.5" fill="var(--ink-muted)" opacity="0.5"/><circle cx="19" cy="6.5" r="1.5" fill="var(--ink-muted)" opacity="0.5"/><circle cx="28" cy="6.5" r="1.5" fill="var(--ink-muted)" opacity="0.5"/></svg>
-                <span>crease</span>
-              </div>
-            </div>
-
-            <div class="fold-dict-sidebar">
-              <div class="fds-entry">
-                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><rect x="4" y="4" width="48" height="28" stroke="var(--ink-faint)" stroke-width="1"/><path d="M4 18 L 52 18" stroke="var(--cobalt)" stroke-width="1.5" stroke-dasharray="6 4"/><path d="M 22 12 L 28 18 L 22 24" stroke="var(--cobalt)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="18" width="48" height="14" fill="rgba(96,165,212,0.08)"/></svg>
-                <div><div class="fds-name">Valley Fold ⌄</div><div class="fds-desc">Fold toward you — V shape. Most common.</div></div>
-              </div>
-              <div class="fds-entry">
-                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><rect x="4" y="4" width="48" height="28" stroke="var(--ink-faint)" stroke-width="1"/><path d="M4 18 L 52 18" stroke="var(--rouge)" stroke-width="1.5" stroke-dasharray="2 4"/><path d="M 22 24 L 28 18 L 22 12" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="4" width="48" height="14" fill="rgba(224,85,85,0.08)"/></svg>
-                <div><div class="fds-name">Mountain Fold ⌃</div><div class="fds-desc">Fold away — peak up. Valley geometry, flipped.</div></div>
-              </div>
-              <div class="fds-entry">
-                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><rect x="4" y="4" width="48" height="28" stroke="var(--ink-faint)" stroke-width="1"/><path d="M4 18 L 52 18" stroke="var(--ink-muted)" stroke-width="1.2" stroke-dasharray="3 6"/><circle cx="14" cy="18" r="2" fill="var(--ink-faint)"/><circle cx="28" cy="18" r="2" fill="var(--ink-faint)"/><circle cx="42" cy="18" r="2" fill="var(--ink-faint)"/></svg>
-                <div><div class="fds-name">Crease &amp; Unfold ◇</div><div class="fds-desc">Fold then unfold — leaves a reference line.</div></div>
-              </div>
-              <div class="fds-entry">
-                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><path d="M4 4 L52 4 L52 36 L4 36 Z" fill="rgba(240,232,213,0.05)" stroke="var(--ink-faint)" stroke-width="1"/><path d="M18 4 L18 36" stroke="var(--cobalt)" stroke-width="1.5" stroke-dasharray="6 4"/><path d="M32 4 L32 36" stroke="var(--rouge)" stroke-width="1.2" stroke-dasharray="2 4"/><rect x="18" y="4" width="14" height="32" fill="rgba(122,184,122,0.12)"/></svg>
-                <div><div class="fds-name">Pleat Fold ≡</div><div class="fds-desc">Valley + mountain — zigzag accordion ridge.</div></div>
-              </div>
-              <div class="fds-entry">
-                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><path d="M4 36 L28 4 L52 36" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M28 4 L28 36" stroke="var(--pencil)" stroke-width="1.2" stroke-dasharray="4 3"/><path d="M4 20 L28 20" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="5 3"/><path d="M52 20 L28 20" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="5 3"/></svg>
-                <div><div class="fds-name">Petal Fold</div><div class="fds-desc">Opens flap into two symmetric points.</div></div>
-              </div>
-              <div class="fds-entry">
-                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><path d="M28 4 L4 28 L52 28 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M20 20 C28 12 36 20 28 28" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M28 4 L28 20" stroke="var(--cobalt)" stroke-width="1.2" stroke-dasharray="4 3"/></svg>
-                <div><div class="fds-name">Squash Fold</div><div class="fds-desc">Open a layered flap and press it flat.</div></div>
-              </div>
-              <div class="fds-entry">
-                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><path d="M28 4 L4 36 L52 36 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M16 20 L28 4 L40 20" stroke="var(--pencil)" stroke-width="1.5" fill="rgba(245,196,48,0.08)" stroke-linejoin="round"/><path d="M28 4 L28 24" stroke="var(--rouge)" stroke-width="1.2" stroke-dasharray="3 3"/></svg>
-                <div><div class="fds-name">Rabbit Ear</div><div class="fds-desc">Three creases form a single pointed ear.</div></div>
-              </div>
-              <div class="fds-entry">
-                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><path d="M28 4 L4 20 L28 36 L52 20 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M28 14 L28 28" stroke="var(--cobalt)" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="28" cy="20" r="4" stroke="var(--rouge)" stroke-width="1.5" fill="none"/></svg>
-                <div><div class="fds-name">Inside Reverse</div><div class="fds-desc">Reverses a point inward between layers.</div></div>
-              </div>
-              <div class="fds-entry">
-                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><path d="M28 4 L4 20 L28 36 L52 20 Z" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M28 14 C20 8 14 14 12 20" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M28 14 C36 8 42 14 44 20" stroke="var(--rouge)" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-                <div><div class="fds-name">Outside Reverse</div><div class="fds-desc">Reverses a point outward over the layers.</div></div>
-              </div>
-              <div class="fds-entry">
-                <svg width="44" height="28" viewBox="0 0 56 36" fill="none"><path d="M4 28 L28 4 L52 28" stroke="var(--ink)" stroke-width="1.5" fill="rgba(240,232,213,0.05)"/><path d="M28 20 L28 28" stroke="var(--cobalt)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 3"/><circle cx="28" cy="14" r="3" stroke="var(--pencil)" stroke-width="1.5" fill="rgba(245,196,48,0.15)"/><path d="M20 28 L28 20 L36 28" stroke="var(--sage)" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <div><div class="fds-name">Sink Fold</div><div class="fds-desc">Pushes a corner inside the model.</div></div>
-              </div>
-            </div>
-
-            <div class="fd-bases-block">
-              <div class="fd-bases-title">common bases</div>
-              <div class="fd-base"><span class="fd-base-name">◇ Kite</span><span class="fd-base-desc">2 edges → center diagonal</span></div>
-              <div class="fd-base"><span class="fd-base-name">◇ Square</span><span class="fd-base-desc">X + + creases → collapse</span></div>
-              <div class="fd-base"><span class="fd-base-name">◇ Bird</span><span class="fd-base-desc">Square base + 2 petal folds</span></div>
-              <div class="fd-base"><span class="fd-base-name">◇ Waterbomb</span><span class="fd-base-desc">X mountain + + valley → collapse</span></div>
-              <div class="fd-base"><span class="fd-base-name">◇ Frog</span><span class="fd-base-desc">Waterbomb + squash + petal folds</span></div>
-            </div>
-
-            <div class="fd-kawasaki">
-              <span class="fd-kaw-label">Kawasaki's theorem</span>
-              Alternating angles at any vertex must sum to 180° for flat-foldability. Mountain − Valley = ±2 (Maekawa).
-            </div>
-          </div>
-
-          <!-- CENTER: Step-by-step guides -->
-          <div class="orig-guide-panel">
-            <div class="orig-guide-tabs">
-              <button class="orig-guide-tab active" data-guide="crane">🦢 crane</button>
-              <button class="orig-guide-tab" data-guide="lotus">🌸 lotus</button>
-              <button class="orig-guide-tab" data-guide="boat">⛵ boat</button>
-              <button class="orig-guide-tab" data-guide="dragon">🐉 dragon</button>
-              <button class="orig-guide-tab" data-guide="frog">🐸 frog</button>
-              <button class="orig-guide-tab" data-guide="heart">💜 heart</button>
-              <button class="orig-guide-tab" data-guide="star">⭐ star</button>
-              <button class="orig-guide-tab" data-guide="butterfly">🦋 butterfly</button>
-              <button class="orig-guide-tab" data-guide="phoenix">🔥 phoenix</button>
-            </div>
-
-            <div class="guide-content active" id="guide-crane">
-              <div class="guide-step-visual" id="crane-step-svg"></div>
-              <div class="guide-step-counter">step <span id="crane-step-num">1</span> <span class="guide-sep">of</span> <span id="crane-step-total">8</span></div>
-              <p class="guide-step-desc" id="crane-step-desc"></p>
-              <div class="guide-controls">
-                <button class="crane-btn" id="crane-prev" disabled>← back</button>
-                <button class="crane-btn primary" id="crane-next">next →</button>
-              </div>
-            </div>
-
-            <div class="guide-content" id="guide-lotus">
-              <div class="guide-step-visual" id="lotus-step-svg"></div>
-              <div class="guide-step-counter">step <span id="lotus-step-num">1</span> <span class="guide-sep">of</span> <span id="lotus-step-total">6</span></div>
-              <p class="guide-step-desc" id="lotus-step-desc"></p>
-              <div class="guide-controls">
-                <button class="crane-btn" id="lotus-prev" disabled>← back</button>
-                <button class="crane-btn primary" id="lotus-next">next →</button>
-              </div>
-            </div>
-
-            <div class="guide-content" id="guide-boat">
-              <div class="guide-step-visual" id="boat-step-svg"></div>
-              <div class="guide-step-counter">step <span id="boat-step-num">1</span> <span class="guide-sep">of</span> <span id="boat-step-total">7</span></div>
-              <p class="guide-step-desc" id="boat-step-desc"></p>
-              <div class="guide-controls">
-                <button class="crane-btn" id="boat-prev" disabled>← back</button>
-                <button class="crane-btn primary" id="boat-next">next →</button>
-              </div>
-            </div>
-
-            <div class="guide-content" id="guide-dragon">
-              <div class="guide-step-visual" id="dragon-step-svg"></div>
-              <div class="guide-step-counter">step <span id="dragon-step-num">1</span> <span class="guide-sep">of</span> <span id="dragon-step-total">8</span></div>
-              <p class="guide-step-desc" id="dragon-step-desc"></p>
-              <div class="guide-controls">
-                <button class="crane-btn" id="dragon-prev" disabled>← back</button>
-                <button class="crane-btn primary" id="dragon-next">next →</button>
-              </div>
-            </div>
-
-            <div class="guide-content" id="guide-frog">
-              <div class="guide-step-visual" id="frog-step-svg"></div>
-              <div class="guide-step-counter">step <span id="frog-step-num">1</span> <span class="guide-sep">of</span> <span id="frog-step-total">6</span></div>
-              <p class="guide-step-desc" id="frog-step-desc"></p>
-              <div class="guide-controls">
-                <button class="crane-btn" id="frog-prev" disabled>← back</button>
-                <button class="crane-btn primary" id="frog-next">next →</button>
-              </div>
-            </div>
-
-            <div class="guide-content" id="guide-heart">
-              <div class="guide-step-visual" id="heart-step-svg"></div>
-              <div class="guide-step-counter">step <span id="heart-step-num">1</span> <span class="guide-sep">of</span> <span id="heart-step-total">5</span></div>
-              <p class="guide-step-desc" id="heart-step-desc"></p>
-              <div class="guide-controls">
-                <button class="crane-btn" id="heart-prev" disabled>← back</button>
-                <button class="crane-btn primary" id="heart-next">next →</button>
-              </div>
-            </div>
-
-            <div class="guide-content" id="guide-star">
-              <div class="guide-step-visual" id="star-step-svg"></div>
-              <div class="guide-step-counter">step <span id="star-step-num">1</span> <span class="guide-sep">of</span> <span id="star-step-total">6</span></div>
-              <p class="guide-step-desc" id="star-step-desc"></p>
-              <div class="guide-controls">
-                <button class="crane-btn" id="star-prev" disabled>← back</button>
-                <button class="crane-btn primary" id="star-next">next →</button>
-              </div>
-            </div>
-
-            <div class="guide-content" id="guide-butterfly">
-              <div class="guide-difficulty">⚠ hard</div>
-              <div class="guide-step-visual" id="butterfly-step-svg"></div>
-              <div class="guide-step-counter">step <span id="butterfly-step-num">1</span> <span class="guide-sep">of</span> <span id="butterfly-step-total">9</span></div>
-              <p class="guide-step-desc" id="butterfly-step-desc"></p>
-              <div class="guide-controls">
-                <button class="crane-btn" id="butterfly-prev" disabled>← back</button>
-                <button class="crane-btn primary" id="butterfly-next">next →</button>
-              </div>
-            </div>
-
-            <div class="guide-content" id="guide-phoenix">
-              <div class="guide-difficulty">💀 expert</div>
-              <div class="guide-step-visual" id="phoenix-step-svg"></div>
-              <div class="guide-step-counter">step <span id="phoenix-step-num">1</span> <span class="guide-sep">of</span> <span id="phoenix-step-total">10</span></div>
-              <p class="guide-step-desc" id="phoenix-step-desc"></p>
-              <div class="guide-controls">
-                <button class="crane-btn" id="phoenix-prev" disabled>← back</button>
-                <button class="crane-btn primary" id="phoenix-next">next →</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- RIGHT: Simulator -->
-          <div class="orig-sim-panel">
-            <div class="sim-top-bar">
-              <span class="orig-sim-title">fold it yourself</span>
-              <div class="orig-sim-actions">
-                <button class="sim-action-btn" id="fold-undo" title="undo">↩ undo</button>
-                <button class="sim-action-btn" id="fold-reset" title="reset">↺ reset</button>
-              </div>
-            </div>
-            <div class="sim-body">
-              <canvas id="origami-canvas"></canvas>
-              <div class="sim-fold-sidebar">
-                <button class="sim-mode-btn active" id="fold-valley" title="Valley fold: fold toward you">⌄ valley</button>
-                <button class="sim-mode-btn" id="fold-mountain" title="Mountain fold: fold away from you">⌃ mountain</button>
-                <button class="sim-mode-btn" id="fold-crease" title="Crease &amp; unfold: mark without folding">◇ crease</button>
-                <button class="sim-mode-btn" id="fold-pleat" title="Pleat fold: valley + parallel mountain mark">≡ pleat</button>
-                <button class="sim-mode-btn" id="fold-petal" title="Petal fold: opens flap into two symmetric points">⟡ petal</button>
-                <button class="sim-mode-btn" id="fold-squash" title="Squash fold: open and press a layered flap flat">◈ squash</button>
-                <button class="sim-mode-btn" id="fold-rabbit" title="Rabbit ear: three creases converge to a single point">☽ rabbit ear</button>
-                <button class="sim-mode-btn" id="fold-inside-rev" title="Inside reverse: push tip inward between layers">↩ inside rev</button>
-                <button class="sim-mode-btn" id="fold-outside-rev" title="Outside reverse: bend tip outward over layers">↪ outside rev</button>
-                <button class="sim-mode-btn" id="fold-sink" title="Sink fold: push a corner inward inside the model">⇲ sink</button>
-              </div>
-            </div>
-            <!-- sim-extra-controls (rotate/tools/angle/presets) injected here by JS -->
-            <div class="sim-status-row">
-              <span class="sim-hint" id="sim-hint">Click two points to draw a fold line</span>
-              <span class="sim-folds-count"><span id="fold-count">0</span> folds</span>
-            </div>
-          </div>
-
+          <div class="timeline-events" id="timeline-events"></div>
         </div>
       </section>
-    </div><!-- /#sec-origami -->
-
-    <!-- ============================================================
-         GRAPH SECTION
-         ============================================================ -->
-    <div class="top-section" id="sec-graph">
-      <section class="graph-section" style="padding: 3rem 5vw 6rem;">
-        <div class="section-header">
-          <svg class="section-squiggle" width="60" height="14" viewBox="0 0 60 14" fill="none">
-            <path d="M 2 7 C 10 2, 18 12, 30 7 C 42 2, 50 12, 58 7" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" fill="none"/>
-          </svg>
-          <span class="section-eyebrow">project knowledge graph</span>
-        </div>
-        <p class="graph-desc">Nodes = projects · Edges = shared technology stack · Drag to rotate · Scroll to zoom · Click a node to explore</p>
-        <div class="graph-layout">
-          <canvas id="graph-canvas" class="graph-canvas"></canvas>
-          <div class="graph-sidebar">
-            <div id="graph-info" class="graph-info">
-              <p class="gi-hint">Click a node to explore a project</p>
-            </div>
-            <div id="graph-chat" class="graph-chat" hidden>
-              <div class="gc-header">ask about this project</div>
-              <div class="gc-messages" id="gc-messages"></div>
-              <div class="gc-input-row">
-                <input type="text" id="gc-input" class="gc-input" placeholder="tech stack, architecture, challenges…" autocomplete="off">
-                <button id="gc-send" class="gc-send">↵</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div><!-- /#sec-graph -->
-
-    <!-- ============================================================
-         GAMES SECTION
-         ============================================================ -->
-    <div class="top-section" id="sec-games">
-      <div class="games-wip" aria-label="Games section — work in progress">
-
-        <!-- caution tape strips -->
-        <div class="wip-tape wip-tape-top" aria-hidden="true"></div>
-        <div class="wip-tape wip-tape-bottom" aria-hidden="true"></div>
-
-        <!-- floating background dots -->
-        <div class="wip-particles" aria-hidden="true">
-          <span class="wip-dot" style="--x:12%;--y:22%;--dur:3.8s;--del:0s"></span>
-          <span class="wip-dot" style="--x:78%;--y:18%;--dur:4.6s;--del:0.8s"></span>
-          <span class="wip-dot" style="--x:88%;--y:65%;--dur:5.1s;--del:0.3s"></span>
-          <span class="wip-dot" style="--x:5%;--y:72%;--dur:3.4s;--del:1.2s"></span>
-          <span class="wip-dot" style="--x:50%;--y:88%;--dur:4.2s;--del:0.6s"></span>
-          <span class="wip-dot" style="--x:35%;--y:10%;--dur:5.5s;--del:1.5s"></span>
-          <span class="wip-dot wip-dot--lg" style="--x:92%;--y:40%;--dur:6s;--del:0s"></span>
-          <span class="wip-dot wip-dot--lg" style="--x:8%;--y:48%;--dur:5.2s;--del:2s"></span>
-        </div>
-
-        <!-- central content -->
-        <div class="wip-inner">
-
-          <!-- hand-drawn astronaut-with-blueprint SVG -->
-          <div class="wip-illo-wrap" aria-hidden="true">
-            <svg class="wip-illo" width="200" height="210" viewBox="0 0 200 210" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- Hard hat -->
-              <path d="M 62 82 L 64 62 C 65 44 80 36 100 35 C 120 34 136 44 137 62 L 139 82 Z"
-                    stroke="var(--pencil)" stroke-width="2.2" stroke-linecap="round" fill="rgba(245,196,48,0.08)"/>
-              <path d="M 54 84 L 148 84" stroke="var(--pencil)" stroke-width="3" stroke-linecap="round"/>
-              <!-- hat brim shadow -->
-              <path d="M 56 87 L 146 87" stroke="var(--pencil)" stroke-width="1" stroke-linecap="round" opacity="0.25"/>
-
-              <!-- Helmet bubble -->
-              <path d="M 65 84 C 64 105 68 128 100 130 C 132 132 137 108 137 84"
-                    stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" fill="rgba(240,232,213,0.025)"/>
-              <!-- Visor -->
-              <path d="M 76 90 C 75 104 78 120 100 121 C 122 122 126 105 125 90 C 125 86 122 84 100 84 C 78 84 76 86 76 90 Z"
-                    fill="rgba(96,165,212,0.07)" stroke="var(--cobalt)" stroke-width="1.8" stroke-linecap="round"/>
-              <!-- Visor glare -->
-              <path d="M 81 92 C 82 99 82 108 81 114" stroke="var(--ink)" stroke-width="1.2" stroke-linecap="round" opacity="0.28" fill="none"/>
-
-              <!-- Body / suit torso -->
-              <rect x="74" y="129" width="52" height="28" rx="5"
-                    stroke="var(--ink)" stroke-width="1.8" fill="none"/>
-              <!-- chest control panel squiggles -->
-              <line x1="82" y1="138" x2="94" y2="138" stroke="var(--ink)" stroke-width="1.1" stroke-linecap="round" opacity="0.4"/>
-              <line x1="82" y1="143" x2="118" y2="143" stroke="var(--ink)" stroke-width="1.1" stroke-linecap="round" opacity="0.4"/>
-              <circle cx="112" cy="135" r="3.5" stroke="var(--rouge)" stroke-width="1.2" fill="none" opacity="0.6"/>
-
-              <!-- Left arm — holds blueprint -->
-              <path d="M 74 140 L 44 130" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
-              <!-- Blueprint scroll in left hand -->
-              <rect x="18" y="118" width="32" height="22" rx="3" stroke="var(--lavender)" stroke-width="1.6" fill="rgba(192,143,255,0.06)"/>
-              <line x1="24" y1="125" x2="44" y2="125" stroke="var(--lavender)" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
-              <line x1="24" y1="130" x2="38" y2="130" stroke="var(--lavender)" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
-              <line x1="24" y1="135" x2="40" y2="135" stroke="var(--lavender)" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
-              <!-- WIP label on blueprint -->
-              <text x="22" y="123" font-family="sans-serif" font-size="5" fill="rgba(192,143,255,0.9)" letter-spacing="1">W·I·P</text>
-
-              <!-- Right arm — holds wrench -->
-              <path d="M 126 140 L 156 128" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
-              <!-- Wrench head -->
-              <path d="M 155 115 C 157 109 165 109 167 115 C 169 121 164 128 159 125 C 154 122 153 118 155 115 Z"
-                    stroke="var(--orange)" stroke-width="2" fill="none"/>
-              <!-- Wrench handle -->
-              <path d="M 160 122 L 172 138" stroke="var(--orange)" stroke-width="3" stroke-linecap="round"/>
-
-              <!-- Legs -->
-              <path d="M 82 157 L 78 180" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
-              <path d="M 118 157 L 122 180" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
-              <!-- Boots -->
-              <path d="M 70 180 L 86 180" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-              <path d="M 116 180 L 132 180" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-
-              <!-- Sparkle stars around -->
-              <path d="M 155 60 L 156 55 L 157 60 L 162 61 L 157 62 L 156 67 L 155 62 L 150 61 Z"
-                    stroke="var(--pencil)" stroke-width="1.1" fill="none" opacity="0.7"/>
-              <circle cx="44" cy="68" r="2.5" stroke="var(--cobalt)" stroke-width="1.2" opacity="0.55"/>
-              <path d="M 38 105 L 39 101 L 40 105 L 44 106 L 40 107 L 39 111 L 38 107 L 34 106 Z"
-                    stroke="var(--lavender)" stroke-width="1" fill="none" opacity="0.5"/>
-              <circle cx="168" cy="85" r="3" stroke="var(--orange)" stroke-width="1.2" opacity="0.45"/>
-              <path d="M 170 50 L 171 47 L 172 50 L 175 51 L 172 52 L 171 55 L 170 52 L 167 51 Z"
-                    stroke="var(--rouge)" stroke-width="1" fill="none" opacity="0.4"/>
-              <!-- small dashes / construction marks -->
-              <path d="M 22 152 L 26 152 M 24 150 L 24 154" stroke="var(--ink-faint)" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
-              <path d="M 170 162 L 174 162 M 172 160 L 172 164" stroke="var(--ink-faint)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
-            </svg>
-          </div>
-
-          <!-- text block -->
-          <div class="wip-copy">
-            <div class="wip-eyebrow">games · play to explore</div>
-            <h2 class="wip-heading">getting a<br><em>proper rebuild.</em></h2>
-            <p class="wip-sub">new puzzles, tighter code, better vibes.<br>still usable as portfolio unlock challenges — check back soon.</p>
-
-            <!-- fake progress bar -->
-            <div class="wip-progress-outer">
-              <div class="wip-progress-label">
-                <span>rebuild progress</span>
-                <span class="wip-pct" id="wip-pct">—</span>
-              </div>
-              <div class="wip-progress-track">
-                <div class="wip-progress-fill" id="wip-fill"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div><!-- /.games-wip -->
-
-      <!-- Keep arena in DOM (hidden) so initGamesHub() doesn't crash -->
-      <div id="games-arena" style="display:none" aria-hidden="true"></div>
-    </div><!-- /#sec-games -->
-
-    <!-- ============================================================
-         3D MODELS VIEWER
-         ============================================================ -->
-    <div class="top-section" id="sec-models">
-      <div class="models-viewer">
-        <canvas id="models-canvas"></canvas>
-
-        <div class="models-ui" aria-label="Model viewer controls">
-
-          <!-- top-left: section label + current model name -->
-          <div class="models-title-block">
-            <span class="models-eyebrow">OBJECT VIEWER</span>
-            <div class="models-name" id="models-label">—</div>
-          </div>
-
-          <!-- loading dot (top-right) -->
-          <div class="models-loading-dot" id="models-loading" aria-label="Loading"></div>
-
-          <!-- bottom-center: model selector tabs -->
-          <nav class="models-selector" aria-label="Select 3D model">
-            <button class="model-tab active" data-model="0" aria-pressed="true">
-              <span class="mtab-num">01</span>
-              <span class="mtab-name">Che</span>
-            </button>
-            <span class="models-divider" aria-hidden="true"></span>
-            <button class="model-tab" data-model="1" aria-pressed="false">
-              <span class="mtab-num">02</span>
-              <span class="mtab-name">Cat Dispenser</span>
-            </button>
-            <span class="models-divider" aria-hidden="true"></span>
-            <button class="model-tab" data-model="2" aria-pressed="false">
-              <span class="mtab-num">03</span>
-              <span class="mtab-name">Painterly Cottage</span>
-            </button>
-          </nav>
-
-          <!-- bottom-right: interaction hint -->
-          <div class="models-hint" aria-hidden="true">drag · scroll · pinch</div>
-        </div><!-- /.models-ui -->
-      </div><!-- /.models-viewer -->
-    </div><!-- /#sec-models -->
+    </div>
 
   </div><!-- /#portfolio -->
 
-  <!-- Resume PDF Modal -->
+  <!-- RESUME MODAL -->
   <div id="resume-modal" role="dialog" aria-modal="true" aria-label="Resume PDF viewer">
     <div class="resume-modal-backdrop"></div>
     <div class="resume-modal-inner">
       <div class="resume-modal-header">
-        <span class="resume-modal-title">ryan qi — resume</span>
+        <span class="resume-modal-title">Ryan Qi — Résumé</span>
         <div class="resume-modal-actions">
-          <a href="resume.pdf" download class="resume-modal-btn resume-download-btn" title="Download PDF">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <a href="resume.pdf" download class="resume-modal-btn resume-download-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
               <polyline points="7 10 12 15 17 10"/>
               <line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
-            download
+            Download
           </a>
           <button class="resume-modal-btn resume-close-btn" id="resume-close" aria-label="Close resume">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
-            close
+            Close
           </button>
         </div>
       </div>
@@ -792,12 +228,7 @@
     </div>
   </div>
 
-  <!-- Custom cursor — must be a direct body child so #portfolio's opacity:0 doesn't hide it -->
-  <div id="cursor" aria-hidden="true"></div>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="script.js"></script>
-  <!-- 3D viewer (ES module, deferred by default) -->
-  <script type="module" src="models.js"></script>
 </body>
 </html>

@@ -259,18 +259,7 @@ function renderProjects(filter = 'hackathon') {
       </div>
     `;
 
-    card.addEventListener('click', () => {
-      if (card.classList.contains('open')) {
-        toggleCard(card);
-        return;
-      }
-      const beaten = sessionStorage.getItem(`proj_${p.id}`);
-      if (beaten) {
-        toggleCard(card);
-      } else {
-        AstronautGate.intercept(p.id, p.name, () => toggleCard(card));
-      }
-    });
+    card.addEventListener('click', () => toggleCard(card));
 
     list.appendChild(card);
   });
@@ -4019,17 +4008,10 @@ function initTimelineCanvas() {
 // ================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-  initGate();
   renderProjects();
   initProjectTabs();
   initTopNav();
-  initGamesHub();
-  initWipProgress();
-
   initScene();
-  initFaller();
-  initCursor();
-  initOrigami();
 });
 
 // ================================================================

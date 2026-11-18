@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
@@ -32,19 +32,19 @@
   <section>
     <div class="item">
       <div class="row"><span><img class="logo" src="img/postgresql.png" alt=""><span>logical replication &amp; CDC</span></span><span class="soon">soon</span></div>
-      <div class="reveal"><div><p>Streaming every row change out of Postgres through pgoutput, which is how Ferryman keeps two databases in sync.</p></div></div>
+      <p class="note">Postgres already writes every change to a log for crash recovery; CDC just reads that log, so you get a live feed of the whole database for free.</p>
     </div>
     <div class="item">
       <div class="row"><span><img class="logo" src="img/postgresql.png" alt=""><span>parallel snapshot backfill</span></span><span class="soon">soon</span></div>
-      <div class="reveal"><div><p>Copying a huge table from one frozen snapshot by splitting it into ctid page ranges and loading them in parallel.</p></div></div>
+      <p class="note">One exported snapshot lets many workers copy a huge table at once and still agree on the exact moment they all copied.</p>
     </div>
     <div class="item">
       <div class="row"><span><img class="logo" src="img/postgresql.png" alt=""><span>safe cutovers</span></span><span class="soon">soon</span></div>
-      <div class="reveal"><div><p>Syncing sequences with setval, waiting for replication lag to hit zero, and keeping reverse replication ready as the undo button.</p></div></div>
+      <p class="note">Switching databases is a few seconds of choreography: wait for lag to hit zero, bump sequences, flip, and keep replication running backwards in case you need to retreat.</p>
     </div>
     <div class="item">
       <div class="row"><span><img class="logo" src="img/envoyproxy.png" alt=""><span>shadow traffic</span></span><span class="soon">soon</span></div>
-      <div class="reveal"><div><p>Mirroring real production requests to a new system and diffing the responses before anyone depends on it.</p></div></div>
+      <p class="note">Test a new system on real production traffic without a single user ever seeing its answers.</p>
     </div>
   </section>
 
@@ -53,15 +53,15 @@
   <section>
     <div class="item">
       <div class="row"><span><img class="logo" src="img/vllm.png" alt=""><span>prefix caching &amp; cache-aware routing</span></span><span class="soon">soon</span></div>
-      <div class="reveal"><div><p>Sending requests that share a prompt to the vLLM server that already has it cached.</p></div></div>
+      <p class="note">Thousands of requests start with the same system prompt; send them to the server that already computed it and the first token shows up almost instantly.</p>
     </div>
     <div class="item">
       <div class="row"><span><img class="logo" src="img/pytorch.png" alt=""><span>long context windows</span></span><span class="soon">soon</span></div>
-      <div class="reveal"><div><p>RoPE scaling, why attention cost grows with the square of the length, ring attention, and squeezing the KV cache with quantization.</p></div></div>
+      <p class="note">Double the context and attention costs four times as much, so long context is really a memory problem wearing a model feature's clothes.</p>
     </div>
     <div class="item">
       <div class="row"><span><img class="logo" src="img/prometheus.png" alt=""><span>serving metrics</span></span><span class="soon">soon</span></div>
-      <div class="reveal"><div><p>Time to first token, time per output token, p50 vs p99, and load testing with Poisson arrivals instead of a steady stream.</p></div></div>
+      <p class="note">Averages lie: users feel the p99, and real traffic shows up in random bursts, not a polite steady stream.</p>
     </div>
   </section>
 

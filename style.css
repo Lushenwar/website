@@ -95,3 +95,4 @@ main > :nth-child(6) { animation-delay: .3s }  main > :nth-child(n+7) { animatio
 .stack { display: flex; margin-bottom: 12px; }
 .stack .logo + .logo { margin-left: -8px; }
 .next:hover .stack .logo:nth-child(2) { transform: translateX(6px) rotate(6deg); }
+.note { padding: 4px 0 0 40px; font-size: 16px; }

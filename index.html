@@ -10,20 +10,41 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #fdfdfc; --fg: #1a1a1a; --muted: #6b6b6b; --line: #d6d6d2; --card: #fff; }
+  :root { --bg: #fbfbfa; --fg: #1a1a1a; --muted: #6b6b6b; --line: #d6d6d2; --card: #fff; --a1: #4ade80; --a2: #2dd4bf; --a3: #a78bfa; --aurora: .28; }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #111; --fg: #ececea; --muted: #8f8f8c; --line: #3a3a3a; --card: #1b1b1b; }
+    :root { --bg: #0d0f12; --fg: #ececea; --muted: #8f8f8c; --line: #33363a; --card: #16181c; --aurora: .5; }
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background: var(--bg); color: var(--fg);
     font: 17px/1.65 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-    -webkit-font-smoothing: antialiased;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
   }
-  main { max-width: 600px; margin: 0 auto; padding: 112px 20px 72px; }
-  h1 { font: 400 44px/1.1 "Instrument Serif", Georgia, serif; letter-spacing: -.01em; margin-bottom: 16px; }
-  h2 { font: italic 400 26px/1.2 "Instrument Serif", Georgia, serif; margin: 64px 0 12px; }
+
+  /* aurora: three blurred blobs drifting across the top of the page */
+  .aurora { position: absolute; inset: 0 0 auto; height: 520px; overflow: hidden; pointer-events: none; z-index: -1;
+            -webkit-mask-image: linear-gradient(#000 30%, transparent); mask-image: linear-gradient(#000 30%, transparent); }
+  .aurora i { position: absolute; top: -160px; width: 60vw; height: 360px; border-radius: 50%; filter: blur(70px); opacity: var(--aurora); mix-blend-mode: normal; }
+  .aurora i:nth-child(1) { left: -10vw; background: var(--a1); animation: drift 18s ease-in-out infinite alternate; }
+  .aurora i:nth-child(2) { left: 25vw; background: var(--a2); animation: drift 23s ease-in-out -6s infinite alternate-reverse; }
+  .aurora i:nth-child(3) { left: 55vw; background: var(--a3); animation: drift 27s ease-in-out -12s infinite alternate; }
+  @keyframes drift {
+    0%   { transform: translate(0, 0) rotate(-8deg) scaleY(.7); }
+    50%  { transform: translate(8vw, 40px) rotate(6deg) scaleY(1); }
+    100% { transform: translate(-6vw, 10px) rotate(-3deg) scaleY(.8); }
+  }
+
+  main { max-width: 640px; margin: 0 auto; padding: 112px 20px 72px; }
+  h1 { font: 400 48px/1.1 "Instrument Serif", Georgia, serif; letter-spacing: -.01em; }
+  h2 { font: italic 400 28px/1.2 "Instrument Serif", Georgia, serif; margin: 72px 0 14px; }
   p { color: var(--muted); }
+
+  .clocks { margin: 10px 0 24px; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; display: flex; flex-wrap: wrap; gap: 4px 18px; }
+  .clocks b { font-weight: 500; color: var(--fg); }
+
+  .status { margin-top: 20px; padding: 14px 16px; border-radius: 10px; background: color-mix(in srgb, var(--card) 70%, transparent); box-shadow: 0 0 0 1px var(--line); color: var(--fg); font-size: 16px; backdrop-filter: blur(6px); }
+  .dot { display: inline-block; width: 8px; height: 8px; margin-right: 10px; border-radius: 50%; background: #22c55e; vertical-align: 2px; box-shadow: 0 0 0 0 #22c55e88; animation: ping 2s infinite; }
+  @keyframes ping { 70% { box-shadow: 0 0 0 8px #22c55e00; } 100% { box-shadow: 0 0 0 0 #22c55e00; } }
 
   a { color: var(--fg); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; transition: text-decoration-color .2s; }
   a:hover, a:focus-visible { text-decoration-color: var(--fg); }
@@ -32,26 +53,35 @@
 
   .links { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 20px; }
 
+  /* work */
   .item { padding: 12px 0; }
   .row { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
   .row > span:first-child { display: flex; align-items: center; gap: 12px; }
   .row > span:last-child { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
   .at { color: var(--muted); }
   .logo { width: 28px; height: 28px; flex: none; border-radius: 7px; background: #fff; object-fit: contain; padding: 3px; box-shadow: 0 0 0 1px var(--line); transition: transform .25s; }
-  .mono { display: grid; place-items: center; font: 600 14px/1 ui-sans-serif, system-ui, sans-serif; color: #1a1a1a; }
   .item:hover .logo { transform: rotate(-6deg) scale(1.08); }
 
-  /* reveal: animate height via grid rows */
   .reveal, .expand { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .35s ease, opacity .3s ease; }
   .reveal > div, .expand > div { overflow: hidden; }
   .reveal p { padding: 6px 0 0 40px; }
   .expand p { padding-top: 12px; }
   .item:hover > .reveal, .item:focus-within > .reveal, .open > .expand { grid-template-rows: 1fr; opacity: 1; }
   @media (hover: none) { .reveal { grid-template-rows: 1fr; opacity: 1; } }
-  .proj .reveal p { padding-left: 0; }
 
   .more { margin-top: 10px; background: none; border: 0; font: inherit; font-size: 15px; color: var(--muted); cursor: pointer; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; transition: color .2s; }
   .more:hover, .more:focus-visible { color: var(--fg); }
+
+  /* projects: numbered grid */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  .card { position: relative; padding: 18px; border-radius: 12px; box-shadow: 0 0 0 1px var(--line); transition: box-shadow .25s, transform .25s; }
+  .card:hover { box-shadow: 0 0 0 1px var(--fg); transform: translateY(-2px); }
+  .card .n { font: italic 400 22px/1 "Instrument Serif", Georgia, serif; color: var(--muted); }
+  .card h3 { font-size: 17px; font-weight: 500; margin: 10px 0 4px; }
+  .card h3 a::before { content: ""; position: absolute; inset: 0; } /* whole card clickable */
+  .card p { font-size: 15px; }
+  .card small { display: block; margin-top: 12px; font-size: 13px; color: var(--muted); }
 
   /* hover website preview */
   #pv { position: fixed; top: 0; left: 0; width: 320px; aspect-ratio: 16/10; border-radius: 10px; overflow: hidden; background: var(--card);
@@ -62,26 +92,32 @@
 
   footer { margin-top: 80px; font-size: 14px; color: var(--muted); }
 
-  /* load-in */
   main > * { animation: up .7s ease both; }
   main > :nth-child(2) { animation-delay: .06s } main > :nth-child(3) { animation-delay: .12s }
   main > :nth-child(4) { animation-delay: .18s } main > :nth-child(5) { animation-delay: .24s }
   main > :nth-child(6) { animation-delay: .3s }  main > :nth-child(n+7) { animation-delay: .36s }
   @keyframes up { from { opacity: 0; transform: translateY(10px); } }
-  @media (prefers-reduced-motion: reduce) { *, *::after { animation: none !important; transition: none !important; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 <main>
   <h1>ryan qi</h1>
+  <div class="clocks" aria-label="local times">
+    <span>waterloo <b data-tz="America/Toronto">--:--</b></span>
+    <span>reykjavík <b data-tz="Atlantic/Reykjavik">--:--</b></span>
+    <span>oslo <b data-tz="Europe/Oslo">--:--</b></span>
+  </div>
   <div>
     <p>I'm a software engineer and data science student at the University of Waterloo. I'm into infra, ML, and backend systems.</p>
     <div class="expand"><div>
       <p>Next up I'm joining RBC Capital Markets on the Quantitative Technology Services team. Before that I built a clinical portal at Mon Sheong and flight software at WARG. Lately I've been building developer infra, like an incident-response engine and a zero-downtime Postgres migrator.</p>
-      <p>I'm open to internship positions in infra, ML, and backend. If you're hiring or building something interesting, reach out at <a href="mailto:r28qi@uwaterloo.ca">r28qi@uwaterloo.ca</a>.</p>
+      <p>The long-term plan is to end up living somewhere like Norway or Iceland, closer to the mountains, the fjords, and the northern lights. That's what the two clocks up top are for.</p>
     </div></div>
     <button class="more" aria-expanded="false">read more</button>
   </div>
+  <p class="status"><span class="dot" aria-hidden="true"></span>I'm open to internship positions in infra, ML, and backend. If you're hiring or building something interesting, reach out at <a href="mailto:r28qi@uwaterloo.ca">r28qi@uwaterloo.ca</a>.</p>
   <div class="links">
     <a class="out" href="mailto:r28qi@uwaterloo.ca">email</a>
     <a class="out" href="https://github.com/Lushenwar">github</a>
@@ -100,7 +136,7 @@
       <div class="reveal"><div><p>Took paper-based care workflows to a Next.js/Postgres clinical portal with role-based access for 400+ staff. Record retrieval 40% faster.</p></div></div>
     </div>
     <div class="item">
-      <div class="row"><span><span class="logo mono" aria-hidden="true">U</span><span>research lead <span class="at">@</span> upnxxt</span></span><span>2026</span></div>
+      <div class="row"><span><img class="logo" src="img/upnxxt.png" alt=""><span>research lead <span class="at">@</span> <a class="out" href="https://www.upnxxt.net" data-preview="img/upnxxt-preview.jpg">upnxxt</a></span></span><span>2026</span></div>
       <div class="reveal"><div><p>UX research for the AI Sandbox. Mechanics shipped to the roadmap, 15% DAU lift.</p></div></div>
     </div>
     <div class="item">
@@ -110,22 +146,34 @@
   </section>
 
   <h2>projects</h2>
-  <section class="proj">
-    <div class="item">
-      <div class="row"><a class="out" href="https://github.com/Lushenwar/Sentinel" data-preview="img/sentinel-preview.jpg">sentinel</a><span>2026</span></div>
-      <div class="reveal"><div><p>Finds the commit that broke production in ~13s and writes the postmortem.</p></div></div>
-    </div>
-    <div class="item">
-      <div class="row"><a class="out" href="https://devpost.com/software/eco-pulse-fpbo15" data-preview="img/ecopulse-preview.jpg">eco-pulse</a><span>2026</span></div>
-      <div class="reveal"><div><p>Ranks 178k city parcels into tree-planting zones to cool urban heat. 1st place, GenAI Genesis.</p></div></div>
-    </div>
-    <div class="item">
-      <div class="row"><a class="out" href="https://github.com/Lushenwar/LOCATR" data-preview="img/locatr-preview.jpg">locatr</a><span>2026</span></div>
-      <div class="reveal"><div><p>Six-agent LangGraph venue planner, under a second cached. Winner, DeerHacks V.</p></div></div>
-    </div>
+  <section class="grid">
+    <article class="card">
+      <span class="n">01</span>
+      <h3><a class="out" href="https://github.com/Lushenwar/Sentinel" data-preview="img/sentinel-preview.jpg">sentinel</a></h3>
+      <p>Finds the commit that broke production in ~13s and writes the postmortem.</p>
+      <small>fastapi · rag · next.js · postgres</small>
+    </article>
+    <article class="card">
+      <span class="n">02</span>
+      <h3><a class="out" href="https://github.com/Lushenwar/Ferryman" data-preview="img/ferryman-preview.jpg">ferryman</a></h3>
+      <p>Moves a live Postgres database to a new home with zero downtime and an automatic rollback.</p>
+      <small>go · logical replication · docker</small>
+    </article>
+    <article class="card">
+      <span class="n">03</span>
+      <h3><a class="out" href="https://devpost.com/software/eco-pulse-fpbo15" data-preview="img/ecopulse-preview.jpg">eco-pulse</a></h3>
+      <p>Ranks 178k city parcels into tree-planting zones to cool urban heat. 1st place, GenAI Genesis.</p>
+      <small>scikit-learn · geopandas · gemini</small>
+    </article>
+    <article class="card">
+      <span class="n">04</span>
+      <h3><a class="out" href="https://github.com/Lushenwar/LOCATR" data-preview="img/locatr-preview.jpg">locatr</a></h3>
+      <p>Six-agent venue planner that answers in under a second cached. Winner, DeerHacks V.</p>
+      <small>langgraph · asyncio · snowflake</small>
+    </article>
   </section>
 
-  <footer>© 2026 ryan qi</footer>
+  <footer>© 2026 ryan qi · built in waterloo, dreaming of the north</footer>
 </main>
 <div id="pv" aria-hidden="true"><img alt=""></div>
 <script>
@@ -135,12 +183,17 @@
     b.textContent = open ? 'read less' : 'read more';
   });
 
+  const tick = () => document.querySelectorAll('[data-tz]').forEach(el =>
+    el.textContent = new Date().toLocaleTimeString('en-GB', { timeZone: el.dataset.tz, hour: '2-digit', minute: '2-digit' }));
+  tick(); setInterval(tick, 10000);
+
   // ponytail: static screenshots, live iframes get blocked by most sites' X-Frame-Options
   const pv = document.getElementById('pv'), img = pv.firstChild;
   if (matchMedia('(hover: hover)').matches) document.querySelectorAll('[data-preview]').forEach(a => {
-    a.onmouseenter = () => { img.src = a.dataset.preview; pv.classList.add('on'); };
-    a.onmouseleave = () => pv.classList.remove('on');
-    a.onmousemove = e => {
+    const t = a.closest('.card') || a;
+    t.onmouseenter = () => { img.src = a.dataset.preview; pv.classList.add('on'); };
+    t.onmouseleave = () => pv.classList.remove('on');
+    t.onmousemove = e => {
       const x = Math.min(e.clientX + 20, innerWidth - pv.offsetWidth - 12);
       const y = e.clientY + 24 + pv.offsetHeight > innerHeight ? e.clientY - pv.offsetHeight - 16 : e.clientY + 24;
       pv.style.left = x + 'px'; pv.style.top = y + 'px';

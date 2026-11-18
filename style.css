@@ -88,3 +88,10 @@ main > :nth-child(4) { animation-delay: .18s } main > :nth-child(5) { animation-
 main > :nth-child(6) { animation-delay: .3s }  main > :nth-child(n+7) { animation-delay: .36s }
 @keyframes up { from { opacity: 0; transform: translateY(10px); } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* discovery */
+.from { margin: -6px 0 8px; font-size: 14px; font-style: italic; }
+.next .why { color: var(--fg); margin-bottom: 10px; }
+.stack { display: flex; margin-bottom: 12px; }
+.stack .logo + .logo { margin-left: -8px; }
+.next:hover .stack .logo:nth-child(2) { transform: translateX(6px) rotate(6deg); }

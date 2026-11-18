@@ -10,9 +10,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #fbfbfa; --fg: #1a1a1a; --muted: #6b6b6b; --line: #d6d6d2; --card: #fff; --a1: #4ade80; --a2: #2dd4bf; --a3: #a78bfa; --aurora: .28; }
+  :root { --bg: #fbfbfa; --fg: #1a1a1a; --muted: #6b6b6b; --line: #d6d6d2; --card: #fff; }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #0d0f12; --fg: #ececea; --muted: #8f8f8c; --line: #33363a; --card: #16181c; --aurora: .5; }
+    :root { --bg: #0d0f12; --fg: #ececea; --muted: #8f8f8c; --line: #33363a; --card: #16181c; }
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -21,18 +21,8 @@
     -webkit-font-smoothing: antialiased; overflow-x: hidden;
   }
 
-  /* aurora: three blurred blobs drifting across the top of the page */
-  .aurora { position: absolute; inset: 0 0 auto; height: 520px; overflow: hidden; pointer-events: none; z-index: -1;
-            -webkit-mask-image: linear-gradient(#000 30%, transparent); mask-image: linear-gradient(#000 30%, transparent); }
-  .aurora i { position: absolute; top: -160px; width: 60vw; height: 360px; border-radius: 50%; filter: blur(70px); opacity: var(--aurora); mix-blend-mode: normal; }
-  .aurora i:nth-child(1) { left: -10vw; background: var(--a1); animation: drift 18s ease-in-out infinite alternate; }
-  .aurora i:nth-child(2) { left: 25vw; background: var(--a2); animation: drift 23s ease-in-out -6s infinite alternate-reverse; }
-  .aurora i:nth-child(3) { left: 55vw; background: var(--a3); animation: drift 27s ease-in-out -12s infinite alternate; }
-  @keyframes drift {
-    0%   { transform: translate(0, 0) rotate(-8deg) scaleY(.7); }
-    50%  { transform: translate(8vw, 40px) rotate(6deg) scaleY(1); }
-    100% { transform: translate(-6vw, 10px) rotate(-3deg) scaleY(.8); }
-  }
+
+  #bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 
   main { max-width: 640px; margin: 0 auto; padding: 112px 20px 72px; }
   h1 { font: 400 48px/1.1 "Instrument Serif", Georgia, serif; letter-spacing: -.01em; }
@@ -75,7 +65,7 @@
   /* projects: numbered grid */
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
-  .card { position: relative; padding: 18px; border-radius: 12px; box-shadow: 0 0 0 1px var(--line); transition: box-shadow .25s, transform .25s; }
+  .card { position: relative; padding: 18px; background: var(--bg); border-radius: 12px; box-shadow: 0 0 0 1px var(--line); transition: box-shadow .25s, transform .25s; }
   .card:hover { box-shadow: 0 0 0 1px var(--fg); transform: translateY(-2px); }
   .card .n { font: italic 400 22px/1 "Instrument Serif", Georgia, serif; color: var(--muted); }
   .card h3 { font-size: 17px; font-weight: 500; margin: 10px 0 4px; }
@@ -101,11 +91,11 @@
 </style>
 </head>
 <body>
-<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<canvas id="bg" aria-hidden="true"></canvas>
 <main>
   <h1>ryan qi</h1>
   <div class="clocks" aria-label="local times">
-    <span>waterloo <b data-tz="America/Toronto">--:--</b></span>
+    <span>toronto <b data-tz="America/Toronto">--:--</b></span>
     <span>reykjavík <b data-tz="Atlantic/Reykjavik">--:--</b></span>
     <span>oslo <b data-tz="Europe/Oslo">--:--</b></span>
   </div>
@@ -129,19 +119,19 @@
   <section>
     <div class="item">
       <div class="row"><span><img class="logo" src="img/rbccm.png" alt=""><span>software developer intern <span class="at">@</span> <a class="out" href="https://www.rbccm.com" data-preview="img/rbccm-preview.jpg">rbc capital markets</a></span></span><span>2027</span></div>
-      <div class="reveal"><div><p>Incoming, joining Quantitative Technology Services in Toronto.</p></div></div>
+      <div class="reveal"><div><p>Joining the team that builds the tech behind RBC's trading desks.</p></div></div>
     </div>
     <div class="item">
       <div class="row"><span><img class="logo" src="img/monsheong.png" alt=""><span>software engineer intern <span class="at">@</span> <a class="out" href="https://www.monsheong.org" data-preview="img/monsheong-preview.jpg">mon sheong foundation</a></span></span><span>2026</span></div>
-      <div class="reveal"><div><p>Took paper-based care workflows to a Next.js/Postgres clinical portal with role-based access for 400+ staff. Record retrieval 40% faster.</p></div></div>
+      <div class="reveal"><div><p>Nurses were digging through paper binders for patient records, so I built the portal that finds them 40% faster.</p></div></div>
     </div>
     <div class="item">
       <div class="row"><span><img class="logo" src="img/upnxxt.png" alt=""><span>research lead <span class="at">@</span> <a class="out" href="https://www.upnxxt.net" data-preview="img/upnxxt-preview.jpg">upnxxt</a></span></span><span>2026</span></div>
-      <div class="reveal"><div><p>UX research for the AI Sandbox. Mechanics shipped to the roadmap, 15% DAU lift.</p></div></div>
+      <div class="reveal"><div><p>Figured out what keeps kids coming back to an AI learning sandbox, and daily users went up 15%.</p></div></div>
     </div>
     <div class="item">
       <div class="row"><span><img class="logo" src="img/uwarg.png" alt=""><span>flight software <span class="at">@</span> <a class="out" href="https://www.uwarg.com" data-preview="img/uwarg-preview.jpg">waterloo aerial robotics group</a></span></span><span>2025</span></div>
-      <div class="reveal"><div><p>Embedded C++ for UAV flight controllers. Removed dynamic allocation from the real-time control loop, cut build times 25%.</p></div></div>
+      <div class="reveal"><div><p>A drone can't pause mid-flight to free memory, so I made its control loop run in guaranteed time.</p></div></div>
     </div>
   </section>
 
@@ -150,26 +140,26 @@
     <article class="card">
       <span class="n">01</span>
       <h3><a class="out" href="https://github.com/Lushenwar/Sentinel" data-preview="img/sentinel-preview.jpg">sentinel</a></h3>
-      <p>Finds the commit that broke production in ~13s and writes the postmortem.</p>
-      <small>fastapi · rag · next.js · postgres</small>
+      <p>When prod breaks at 3am, it names the commit that did it in 13 seconds and writes the postmortem for you.</p>
+      <small>fastapi · rag · next.js</small>
     </article>
     <article class="card">
       <span class="n">02</span>
       <h3><a class="out" href="https://github.com/Lushenwar/Ferryman" data-preview="img/ferryman-preview.jpg">ferryman</a></h3>
-      <p>Moves a live Postgres database to a new home with zero downtime and an automatic rollback.</p>
+      <p>Moves a live database to a new server without a second of downtime, and undoes itself if anything goes wrong.</p>
       <small>go · logical replication · docker</small>
     </article>
     <article class="card">
       <span class="n">03</span>
       <h3><a class="out" href="https://devpost.com/software/eco-pulse-fpbo15" data-preview="img/ecopulse-preview.jpg">eco-pulse</a></h3>
-      <p>Ranks 178k city parcels into tree-planting zones to cool urban heat. 1st place, GenAI Genesis.</p>
-      <small>scikit-learn · geopandas · gemini</small>
+      <p>Cities plant trees wherever there's room; this tells them where a tree will actually cool the city.</p>
+      <small>1st place, genai genesis · scikit-learn · gemini</small>
     </article>
     <article class="card">
       <span class="n">04</span>
       <h3><a class="out" href="https://github.com/Lushenwar/LOCATR" data-preview="img/locatr-preview.jpg">locatr</a></h3>
-      <p>Six-agent venue planner that answers in under a second cached. Winner, DeerHacks V.</p>
-      <small>langgraph · asyncio · snowflake</small>
+      <p>Picking a spot for the group usually takes a long group chat; six AI agents settle it in seconds.</p>
+      <small>winner, deerhacks v · langgraph · snowflake</small>
     </article>
   </section>
 
@@ -186,6 +176,28 @@
   const tick = () => document.querySelectorAll('[data-tz]').forEach(el =>
     el.textContent = new Date().toLocaleTimeString('en-GB', { timeZone: el.dataset.tz, hour: '2-digit', minute: '2-digit' }));
   tick(); setInterval(tick, 10000);
+
+  // dot grid that swells around the cursor
+  const cv = document.getElementById('bg'), ctx = cv.getContext('2d'), GAP = 28;
+  let mx = -999, my = -999, queued = false;
+  const draw = () => {
+    queued = false;
+    const dpr = devicePixelRatio || 1, w = innerWidth, h = innerHeight;
+    if (cv.width !== w * dpr || cv.height !== h * dpr) { cv.width = w * dpr; cv.height = h * dpr; }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = getComputedStyle(document.body).color;
+    for (let x = GAP / 2; x < w; x += GAP) for (let y = GAP / 2; y < h; y += GAP) {
+      const k = Math.max(0, 1 - Math.hypot(x - mx, y - my) / 160);
+      ctx.globalAlpha = .12 + .55 * k;
+      ctx.beginPath(); ctx.arc(x + (x - mx) * k * .12, y + (y - my) * k * .12, 1 + 1.6 * k, 0, 7); ctx.fill();
+    }
+  };
+  const req = () => { if (!queued) { queued = true; requestAnimationFrame(draw); } };
+  addEventListener('resize', req);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', req);
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches)
+    addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; req(); });
+  draw();
 
   // ponytail: static screenshots, live iframes get blocked by most sites' X-Frame-Options
   const pv = document.getElementById('pv'), img = pv.firstChild;

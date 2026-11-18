@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ryan qi</title>
-<meta name="description" content="Ryan Qi, software engineer and data science student at the University of Waterloo.">
+<meta name="description" content="Ryan Qi, software engineer and data science student at the University of Waterloo, into infra, ML and backend.">
 <link rel="canonical" href="https://ryanqi.dev/">
 <style>
-  :root { --bg: #fdfdfc; --fg: #1a1a1a; --muted: #6b6b6b; --line: #e6e6e3; }
+  :root { --bg: #fdfdfc; --fg: #1a1a1a; --muted: #6b6b6b; --line: #d6d6d2; }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #111; --fg: #e8e8e6; --muted: #8a8a88; --line: #262626; }
+    :root { --bg: #111; --fg: #e8e8e6; --muted: #8a8a88; --line: #3a3a3a; }
   }
-  * { box-sizing: border-box; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background: var(--bg); color: var(--fg);
     font: 15px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -19,68 +19,156 @@
   }
   main { max-width: 560px; margin: 0 auto; padding: 96px 20px 64px; }
   h1 { font-size: 15px; font-weight: 600; }
-  h2 { font-size: 13px; font-weight: 500; color: var(--muted); margin: 56px 0 20px; }
+  h2 { font-size: 13px; font-weight: 500; color: var(--muted); margin: 56px 0 16px; }
   p, li { color: var(--muted); }
-  a { color: var(--fg); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; transition: text-decoration-color .15s; }
-  a:hover { text-decoration-color: var(--fg); }
+  ul { padding-left: 18px; margin-top: 8px; }
+  li + li { margin-top: 4px; }
+
+  a { color: var(--fg); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; transition: text-decoration-color .2s; }
+  a:hover, a:focus-visible { text-decoration-color: var(--fg); }
+  a.out::after { content: "↗"; display: inline-block; margin-left: 2px; font-size: .8em; opacity: 0; transform: translate(-3px, 3px); transition: opacity .2s, transform .2s; }
+  a.out:hover::after, a.out:focus-visible::after { opacity: 1; transform: none; }
+
   .links { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 16px; }
-  .item { margin-bottom: 24px; }
-  .row { display: flex; justify-content: space-between; gap: 16px; color: var(--fg); }
-  .row span:last-child { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .item p { margin-top: 2px; }
+
+  .item { padding: 10px 0; }
+  .row { display: flex; justify-content: space-between; gap: 16px; }
+  .row > span:last-child { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .at { color: var(--muted); }
+
+  /* hover reveal: animate height via grid rows */
+  .reveal, .expand { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .35s ease, opacity .3s ease; }
+  .reveal > div, .expand > div { overflow: hidden; }
+  .reveal > div > p { padding-top: 4px; }
+  .item:hover > .reveal, .item:focus-within > .reveal, .item.open > .reveal,
+  .item.open .expand { grid-template-rows: 1fr; opacity: 1; }
+  @media (hover: none) { .reveal { grid-template-rows: 1fr; opacity: 1; } }
+
+  .more { margin-top: 6px; background: none; border: 0; font: inherit; font-size: 13px; color: var(--muted); cursor: pointer; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; transition: color .2s; }
+  .more:hover, .more:focus-visible { color: var(--fg); }
+
   footer { margin-top: 72px; font-size: 13px; color: var(--muted); }
+
+  /* load-in */
+  main > * { animation: up .6s ease both; }
+  main > :nth-child(2) { animation-delay: .05s } main > :nth-child(3) { animation-delay: .1s }
+  main > :nth-child(4) { animation-delay: .15s } main > :nth-child(5) { animation-delay: .2s }
+  main > :nth-child(6) { animation-delay: .25s } main > :nth-child(7) { animation-delay: .3s }
+  main > :nth-child(n+8) { animation-delay: .35s }
+  @keyframes up { from { opacity: 0; transform: translateY(8px); } }
+  @media (prefers-reduced-motion: reduce) { *, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
 <main>
   <h1>ryan qi</h1>
-  <p>I'm a software engineer and data science student at the University of Waterloo. I like building backend and infrastructure systems.</p>
+  <p>I'm a software engineer and data science student at the University of Waterloo. I'm into infra, ML, and backend systems.</p>
   <div class="links">
-    <a href="mailto:r28qi@uwaterloo.ca">email</a>
-    <a href="https://github.com/Lushenwar">github</a>
-    <a href="https://www.linkedin.com/in/ryan-qi/">linkedin</a>
-    <a href="resume.pdf">resume</a>
+    <a class="out" href="mailto:r28qi@uwaterloo.ca">email</a>
+    <a class="out" href="https://github.com/Lushenwar">github</a>
+    <a class="out" href="https://www.linkedin.com/in/ryan-qi/">linkedin</a>
+    <a class="out" href="resume.pdf">resume</a>
   </div>
 
   <h2>work</h2>
-  <div class="item">
-    <div class="row"><span>rbc capital markets</span><span>2027</span></div>
-    <p>Incoming software developer intern on Quantitative Technology Services.</p>
-  </div>
-  <div class="item">
-    <div class="row"><span>mon sheong foundation</span><span>2026</span></div>
-    <p>Took paper-based care workflows to a Next.js/Postgres clinical portal with role-based access for 400+ staff. Record retrieval 40% faster.</p>
-  </div>
-  <div class="item">
-    <div class="row"><span>waterloo aerial robotics group</span><span>2025</span></div>
-    <p>Embedded C++ flight software. Removed dynamic allocation from the real-time control loop, cut build times 25%.</p>
-  </div>
-  <div class="item">
-    <div class="row"><span>upnxxt</span><span>2026</span></div>
-    <p>Research lead on the AI Sandbox. Mechanics adopted into the roadmap, 15% DAU lift.</p>
-  </div>
+  <section>
+    <div class="item">
+      <div class="row"><span>software developer intern <span class="at">@</span> <a class="out" href="https://www.rbccm.com">rbc capital markets</a></span><span>2027</span></div>
+      <div class="reveal"><div><p>Incoming, joining Quantitative Technology Services in Toronto.</p></div></div>
+    </div>
+    <div class="item">
+      <div class="row"><span>software engineer intern <span class="at">@</span> <a class="out" href="https://www.monsheong.org">mon sheong foundation</a></span><span>2026</span></div>
+      <div class="reveal"><div>
+        <p>Turned paper-based care workflows into a clinical portal. Record retrieval 40% faster.</p>
+        <div class="expand"><div><ul>
+          <li>Built the end-to-end Next.js/Node.js clinical portal solo, replacing fully paper-based nursing workflows.</li>
+          <li>Role-based access control across Express APIs and PostgreSQL schemas, scoping every query by caregiver role for 400+ staff across 30 roles.</li>
+          <li>Real-time React dashboards with threshold-triggered alerts for clinical metrics.</li>
+        </ul></div></div>
+        <button class="more" aria-expanded="false">read more</button>
+      </div></div>
+    </div>
+    <div class="item">
+      <div class="row"><span>embedded flight software <span class="at">@</span> <a class="out" href="https://www.uwarg.com">waterloo aerial robotics group</a></span><span>2025</span></div>
+      <div class="reveal"><div>
+        <p>C++ flight software for custom UAV flight controllers.</p>
+        <div class="expand"><div><ul>
+          <li>Removed dynamic memory allocation from the real-time control loop for deterministic, bounded execution.</li>
+          <li>Restructured header dependency trees and build scripts, cutting firmware compile time 25%.</li>
+          <li>Tuned IMU sensor fusion filters to eliminate jitter, reaching 95% signal consistency.</li>
+        </ul></div></div>
+        <button class="more" aria-expanded="false">read more</button>
+      </div></div>
+    </div>
+    <div class="item">
+      <div class="row"><span>research lead <span class="at">@</span> upnxxt</span><span>2026</span></div>
+      <div class="reveal"><div>
+        <p>UX research for the AI Sandbox. Mechanics shipped to the roadmap, 15% DAU lift.</p>
+        <div class="expand"><div><ul>
+          <li>Analyzed competitor engagement loops to cut onboarding friction.</li>
+          <li>Designed child-first mechanics adopted into the roadmap, contributing to a 15% DAU lift over six months.</li>
+        </ul></div></div>
+        <button class="more" aria-expanded="false">read more</button>
+      </div></div>
+    </div>
+  </section>
 
   <h2>projects</h2>
-  <div class="item">
-    <div class="row"><span>sentinel</span><span>2026</span></div>
-    <p>Finds the commit that broke production in ~13s and writes the postmortem. <a href="https://github.com/Lushenwar/Sentinel">github ↗</a></p>
-  </div>
-  <div class="item">
-    <div class="row"><span>eco-pulse</span><span>2026</span></div>
-    <p>Ranks 178k city parcels into tree-planting zones to cool urban heat. 1st place, GenAI Genesis. <a href="https://devpost.com/software/eco-pulse-fpbo15">devpost ↗</a></p>
-  </div>
-  <div class="item">
-    <div class="row"><span>locatr</span><span>2026</span></div>
-    <p>Six-agent LangGraph pipeline that plans venues in under a second cached. Winner, DeerHacks V. <a href="https://github.com/Lushenwar/LOCATR">github ↗</a></p>
-  </div>
+  <section>
+    <div class="item">
+      <div class="row"><a class="out" href="https://github.com/Lushenwar/Sentinel">sentinel</a><span>2026</span></div>
+      <div class="reveal"><div>
+        <p>Finds the commit that broke production in ~13s and writes the postmortem.</p>
+        <div class="expand"><div><ul>
+          <li>FastAPI incident-response engine that cross-references git history against error logs to surface the faulty commit.</li>
+          <li>RAG pipeline over runbooks generating root-cause diagnoses and fixes in ~14s, auto-posting postmortems to Slack.</li>
+          <li>Next.js dashboard streaming live incidents and diffs.</li>
+        </ul></div></div>
+        <button class="more" aria-expanded="false">read more</button>
+      </div></div>
+    </div>
+    <div class="item">
+      <div class="row"><a class="out" href="https://devpost.com/software/eco-pulse-fpbo15">eco-pulse</a><span>2026</span></div>
+      <div class="reveal"><div>
+        <p>Ranks city land into tree-planting zones to cool urban heat. 1st place, GenAI Genesis.</p>
+        <div class="expand"><div><ul>
+          <li>Processed 178K land parcels in GeoPandas, filtering out buildings and roads to isolate plantable ground.</li>
+          <li>K-Means risk tiers merging 3.8K high-risk cells into 2,052 ranked planting zones.</li>
+          <li>Cooling intervention plans from Gemini and albedo models in under 5s.</li>
+        </ul></div></div>
+        <button class="more" aria-expanded="false">read more</button>
+      </div></div>
+    </div>
+    <div class="item">
+      <div class="row"><a class="out" href="https://github.com/Lushenwar/LOCATR">locatr</a><span>2026</span></div>
+      <div class="reveal"><div>
+        <p>Multi-agent venue planner. Winner, DeerHacks V.</p>
+        <div class="expand"><div><ul>
+          <li>Fault-tolerant 6-agent LangGraph pipeline routing queries by complexity and fanning out analysts concurrently with asyncio.</li>
+          <li>Ranked venues in under 8s cold, under 1s cached.</li>
+          <li>Snowflake risk memory batch-fetching historical vetoes for all candidates in one ~0.8s query.</li>
+        </ul></div></div>
+        <button class="more" aria-expanded="false">read more</button>
+      </div></div>
+    </div>
+  </section>
 
   <h2>education</h2>
-  <div class="item">
-    <div class="row"><span>university of waterloo</span><span>2030</span></div>
-    <p>Bachelor of Mathematics, Data Science.</p>
-  </div>
+  <section>
+    <div class="item">
+      <div class="row"><span>data science <span class="at">@</span> <a class="out" href="https://uwaterloo.ca">university of waterloo</a></span><span>2030</span></div>
+      <div class="reveal"><div><p>Bachelor of Mathematics. Data structures, algorithm design, computer systems, linear algebra, probability.</p></div></div>
+    </div>
+  </section>
 
   <footer>© 2026 ryan qi</footer>
 </main>
+<script>
+  document.querySelectorAll('.more').forEach(b => b.onclick = () => {
+    const open = b.closest('.item').classList.toggle('open');
+    b.setAttribute('aria-expanded', open);
+    b.textContent = open ? 'read less' : 'read more';
+  });
+</script>
 </body>
 </html>

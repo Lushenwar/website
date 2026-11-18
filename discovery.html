@@ -22,7 +22,7 @@
   <div class="next">
     <div class="stack" aria-hidden="true"><img class="logo" src="img/pytorch.png" alt=""><img class="logo" src="img/vllm.png" alt=""></div>
     <h3>an LLM inference server from scratch</h3>
-    <p class="why">Ferryman and Sentinel pulled me into infra, LOCATR and Eco-Pulse into ML, and this sits right where the two meet.</p>
+    <p class="why">The model is the ML half; the rest is infra: deciding which requests run together, where their memory lives, and how fast tokens come back.</p>
     <p>Continuous batching and a paged KV cache in PyTorch for a small 0.5–1B model, benchmarked on tokens/sec and time to first token against naive batching, then vLLM.</p>
     <p>The KV cache is a pool of fixed-size blocks allocated up front, the same no-dynamic-allocation rule I followed on the WARG flight controller.</p>
   </div>

@@ -14,7 +14,7 @@ let tx = -999, ty = -999, mx = -999, my = -999, glow = 0, last = -1e9, running =
 const frame = now => {
   const dpr = devicePixelRatio || 1, w = innerWidth, h = innerHeight;
   if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
-  mx += (tx - mx) * .14; my += (ty - my) * .14;
+  mx = tx; my = ty;
   glow = now - last < 120 ? Math.min(1, glow + .08) : glow * .965;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
   ctx.fillStyle = getComputedStyle(document.body).color;

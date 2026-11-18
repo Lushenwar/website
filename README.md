@@ -1,3 +1,1 @@
-welcome my portfolio.
-check out:
-https://ryanqiportfolio.vercel.app/
+Personal site: https://ryanqi.dev

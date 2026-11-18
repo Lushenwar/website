@@ -1,274 +1,86 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ryan Qi · Software Engineer</title>
-  <meta name="description" content="Portfolio of Ryan Qi, Math student at the University of Waterloo. Software engineer building backend and infrastructure systems.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <!-- anti-FOUC: apply saved theme before first paint -->
-  <script>(function(){var t=localStorage.getItem('rq-theme');if(t)document.documentElement.setAttribute('data-theme',t);})()</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ryan qi</title>
+<meta name="description" content="Ryan Qi, software engineer and data science student at the University of Waterloo.">
+<link rel="canonical" href="https://ryanqi.dev/">
+<style>
+  :root { --bg: #fdfdfc; --fg: #1a1a1a; --muted: #6b6b6b; --line: #e6e6e3; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #111; --fg: #e8e8e6; --muted: #8a8a88; --line: #262626; }
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font: 15px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 560px; margin: 0 auto; padding: 96px 20px 64px; }
+  h1 { font-size: 15px; font-weight: 600; }
+  h2 { font-size: 13px; font-weight: 500; color: var(--muted); margin: 56px 0 20px; }
+  p, li { color: var(--muted); }
+  a { color: var(--fg); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; transition: text-decoration-color .15s; }
+  a:hover { text-decoration-color: var(--fg); }
+  .links { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 16px; }
+  .item { margin-bottom: 24px; }
+  .row { display: flex; justify-content: space-between; gap: 16px; color: var(--fg); }
+  .row span:last-child { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .item p { margin-top: 2px; }
+  footer { margin-top: 72px; font-size: 13px; color: var(--muted); }
+</style>
 </head>
 <body>
-
-  <a href="#main-content" class="skip-link">Skip to content</a>
-
-  <div id="portfolio">
-
-    <!-- ============================================================
-         GLOBAL NAV — design1: fog blur, 44px, 12px SF Pro Text
-         ============================================================ -->
-    <nav class="top-nav" id="top-nav">
-      <div class="nav-brand" role="link" tabindex="0" aria-label="Ryan Qi">
-        <span class="brand-name">Ryan Qi</span>
-      </div>
-      <div class="nav-tabs">
-        <button class="top-tab nav-tab active" data-section="sec-portfolio">Work</button>
-        <button class="top-tab nav-tab" data-section="sec-timeline">Timeline</button>
-        <button class="top-tab nav-tab nav-cta" data-action="resume">Résumé</button>
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
-          <!-- sun icon (shown in dark mode) -->
-          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-          <!-- moon icon (shown in light mode) -->
-          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
-      </div>
-    </nav>
-
-    <!-- ============================================================
-         PORTFOLIO SECTION
-         ============================================================ -->
-    <div class="top-section active" id="sec-portfolio">
-      <main id="main-content">
-
-        <!-- ── HERO ──────────────────────────────────────────────
-             design1: centered stack, 96px display, 17px body,
-             single CTA pill, product-at-center structure
-             ─────────────────────────────────────────────────── -->
-        <section class="hero">
-
-          <p class="hero-eyebrow">Software Engineer · Backend &amp; Infrastructure</p>
-
-          <h1 class="hero-name">Ryan Qi</h1>
-
-          <p class="hero-sub">Math student at the University of Waterloo.<br>
-          Building backend and infrastructure systems.</p>
-
-          <div class="hero-actions">
-            <a href="https://github.com/Lushenwar" target="_blank" rel="noopener" class="btn-primary">GitHub ↗</a>
-            <a href="https://www.linkedin.com/in/ryan-qi/" target="_blank" rel="noopener" class="btn-ghost">LinkedIn</a>
-            <a href="mailto:r28qi@uwaterloo.ca" class="btn-ghost">Email</a>
-          </div>
-
-          <!-- Stats row — "price subtext" equivalent -->
-          <div class="hero-stats">
-            <div class="stat">
-              <span class="stat-n">9+</span>
-              <span class="stat-l">hackathons</span>
-            </div>
-            <span class="stat-div" aria-hidden="true"></span>
-            <div class="stat">
-              <span class="stat-n">5</span>
-              <span class="stat-l">awards</span>
-            </div>
-            <span class="stat-div" aria-hidden="true"></span>
-            <div class="stat">
-              <span class="stat-n">19</span>
-              <span class="stat-l">projects</span>
-            </div>
-          </div>
-
-          <!-- Visual anchor — theatrical gradient like finish showcase -->
-          <div class="hero-stage" aria-hidden="true">
-            <div class="hero-stage-glow"></div>
-          </div>
-
-        </section>
-
-        <!-- ── WINS TICKER — snow band ───────────────────────── -->
-        <div class="wins-bar">
-          <span class="wins-label">Highlights</span>
-          <div class="wins-track">
-            <div class="wins-inner">
-              <span class="win">🏆 1st Place, Virtual Track · GenAI Genesis · <a href="https://devpost.com/software/eco-pulse-fpbo15" target="_blank" rel="noopener">Eco-Pulse</a></span>
-              <span class="win-dot">·</span>
-              <span class="win">🥉 3rd Place, Beginner Stream · Hack404 · <a href="https://devpost.com/software/beginner-track-portfolio" target="_blank" rel="noopener">Health Assistant</a></span>
-              <span class="win-dot">·</span>
-              <span class="win">★ Best Auth0 · DeerHacks V · <a href="https://devpost.com/software/pathfinder-6h8y1v" target="_blank" rel="noopener">LOCATR</a></span>
-              <span class="win-dot">·</span>
-              <span class="win">★ Best Snowflake · CxC 2026 · <a href="https://devpost.com/software/ifyshop" target="_blank" rel="noopener">ifyShop</a></span>
-              <span class="win-dot">·</span>
-              <span class="win">◈ Finalist · 4 tracks · YHacks · <a href="https://devpost.com/software/fixmyfeed" target="_blank" rel="noopener">FixMyFeed</a></span>
-              <span class="win-dot">·</span>
-              <!-- dupe for seamless loop -->
-              <span class="win" aria-hidden="true">🏆 1st Place, Virtual Track · GenAI Genesis · <a href="https://devpost.com/software/eco-pulse-fpbo15" target="_blank" rel="noopener">Eco-Pulse</a></span>
-              <span class="win-dot" aria-hidden="true">·</span>
-              <span class="win" aria-hidden="true">🥉 3rd Place, Beginner Stream · Hack404 · <a href="https://devpost.com/software/beginner-track-portfolio" target="_blank" rel="noopener">Health Assistant</a></span>
-              <span class="win-dot" aria-hidden="true">·</span>
-              <span class="win" aria-hidden="true">★ Best Auth0 · DeerHacks V · <a href="https://devpost.com/software/pathfinder-6h8y1v" target="_blank" rel="noopener">LOCATR</a></span>
-              <span class="win-dot" aria-hidden="true">·</span>
-              <span class="win" aria-hidden="true">★ Best Snowflake · CxC 2026 · <a href="https://devpost.com/software/ifyshop" target="_blank" rel="noopener">ifyShop</a></span>
-              <span class="win-dot" aria-hidden="true">·</span>
-              <span class="win" aria-hidden="true">◈ Finalist · 4 tracks · YHacks · <a href="https://devpost.com/software/fixmyfeed" target="_blank" rel="noopener">FixMyFeed</a></span>
-              <span class="win-dot" aria-hidden="true">·</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── PROJECTS — fog canvas, white 28px cards ────────── -->
-        <section class="projects-section">
-          <div class="content-width">
-            <div class="section-head">
-              <div>
-                <p class="section-eyebrow">Selected Work</p>
-                <h2 class="section-title">Projects</h2>
-              </div>
-              <div class="filter-tabs" role="tablist">
-                <button class="proj-tab filter-tab active" data-filter="personal" role="tab">Featured</button>
-                <button class="proj-tab filter-tab" data-filter="hackathon" role="tab">Hackathon</button>
-              </div>
-            </div>
-            <div id="projects-list" class="projects-list"></div>
-          </div>
-        </section>
-
-        <!-- ── ABOUT — snow band, 2-column feature layout ──────── -->
-        <section class="about-section">
-          <div class="content-width">
-            <div class="about-grid">
-              <div class="about-left">
-                <p class="section-eyebrow">About</p>
-                <h2 class="about-title">Building the systems<br><em>underneath</em><br>the product.</h2>
-                <p class="about-body">Math student at the University of Waterloo. Most recently a software engineer intern at Mon Sheong Foundation, building a clinical portal and role-based EHR APIs for 400+ staff. On my own time I build incident-response and database infrastructure, and I've earned awards at GenAI Genesis, YHacks, DeerHacks, CxC, and more.</p>
-                <a href="mailto:r28qi@uwaterloo.ca" class="btn-primary" style="display:inline-flex;margin-top:24px;">Get in touch</a>
-              </div>
-              <div class="about-right">
-                <!-- Finish-showcase style visual panel -->
-                <div class="about-stage">
-                  <div class="about-stage-inner">
-                    <div class="about-stat-pair">
-                      <span class="asp-val">9+</span>
-                      <span class="asp-key">Hackathons competed</span>
-                    </div>
-                    <div class="asp-divider"></div>
-                    <div class="about-stat-pair">
-                      <span class="asp-val">5</span>
-                      <span class="asp-key">Awards &amp; top finishes</span>
-                    </div>
-                    <div class="asp-divider"></div>
-                    <div class="about-stat-pair">
-                      <span class="asp-val">19</span>
-                      <span class="asp-key">Projects shipped</span>
-                    </div>
-                  </div>
-                  <div class="skill-table">
-                    <div class="skill-row">
-                      <span class="skill-cat">Languages</span>
-                      <span class="skill-val">Python · Go · C++ · TypeScript · Java · SQL</span>
-                    </div>
-                    <div class="skill-row">
-                      <span class="skill-cat">Frameworks</span>
-                      <span class="skill-val">Node/Express · FastAPI · Next.js · React · LangGraph · PyTorch</span>
-                    </div>
-                    <div class="skill-row">
-                      <span class="skill-cat">Infra</span>
-                      <span class="skill-val">PostgreSQL · Docker · Snowflake · AWS · GitHub Actions · Unity/C#</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ── FOOTER ─────────────────────────────────────────── -->
-        <footer class="site-footer">
-          <div class="content-width">
-            <div class="footer-inner">
-              <span class="footer-name">Ryan Qi</span>
-              <nav class="footer-links">
-                <a href="https://github.com/Lushenwar" target="_blank" rel="noopener">GitHub</a>
-                <a href="https://www.linkedin.com/in/ryan-qi/" target="_blank" rel="noopener">LinkedIn</a>
-                <a href="mailto:r28qi@uwaterloo.ca">Email</a>
-              </nav>
-              <span class="footer-copy">© 2026 Ryan Qi</span>
-            </div>
-          </div>
-        </footer>
-
-      </main>
-    </div><!-- /#sec-portfolio -->
-
-    <!-- ============================================================
-         TIMELINE — design1: fog canvas, white 28px-radius cards,
-         specs-table layout, Apple motion reveals
-         ============================================================ -->
-    <div class="top-section" id="sec-timeline">
-
-      <!-- Snow band header -->
-      <div class="tl-header">
-        <div class="content-width">
-          <p class="section-eyebrow">Journey</p>
-          <h2 class="section-title">Timeline</h2>
-          <p class="tl-header-sub">Every build, competition, and milestone from first line of code to now.</p>
-        </div>
-      </div>
-
-      <!-- Fog canvas events -->
-      <div class="tl-body">
-        <div class="content-width">
-          <div class="tl-zigzag-wrap">
-            <div class="timeline-events" id="timeline-events"></div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-  </div><!-- /#portfolio -->
-
-  <!-- ============================================================
-       RESUME MODAL
-       ============================================================ -->
-  <div id="resume-modal" role="dialog" aria-modal="true" aria-label="Résumé">
-    <div class="modal-backdrop resume-modal-backdrop"></div>
-    <div class="modal-inner">
-      <div class="modal-header">
-        <span class="modal-title">Ryan Qi · Résumé</span>
-        <div class="modal-actions">
-          <a href="resume.pdf" download class="btn-primary" style="font-size:12px;padding:7px 14px;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Download
-          </a>
-          <button class="btn-secondary" id="resume-close" style="font-size:12px;padding:7px 14px;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            Close
-          </button>
-        </div>
-      </div>
-      <div class="modal-body">
-        <iframe id="resume-iframe" src="" title="Ryan Qi Resume" allowfullscreen></iframe>
-      </div>
-    </div>
+<main>
+  <h1>ryan qi</h1>
+  <p>I'm a software engineer and data science student at the University of Waterloo. I like building backend and infrastructure systems.</p>
+  <div class="links">
+    <a href="mailto:r28qi@uwaterloo.ca">email</a>
+    <a href="https://github.com/Lushenwar">github</a>
+    <a href="https://www.linkedin.com/in/ryan-qi/">linkedin</a>
+    <a href="resume.pdf">resume</a>
   </div>
 
-  <script src="script.js"></script>
-  <script>
-    (function () {
-      var btn = document.getElementById('theme-toggle');
-      if (!btn) return;
-      function applyTheme(t) {
-        document.documentElement.setAttribute('data-theme', t);
-        localStorage.setItem('rq-theme', t);
-      }
-      btn.addEventListener('click', function () {
-        var current = document.documentElement.getAttribute('data-theme');
-        applyTheme(current === 'dark' ? 'light' : 'dark');
-      });
-    })();
-  </script>
+  <h2>work</h2>
+  <div class="item">
+    <div class="row"><span>rbc capital markets</span><span>2027</span></div>
+    <p>Incoming software developer intern on Quantitative Technology Services.</p>
+  </div>
+  <div class="item">
+    <div class="row"><span>mon sheong foundation</span><span>2026</span></div>
+    <p>Took paper-based care workflows to a Next.js/Postgres clinical portal with role-based access for 400+ staff. Record retrieval 40% faster.</p>
+  </div>
+  <div class="item">
+    <div class="row"><span>waterloo aerial robotics group</span><span>2025</span></div>
+    <p>Embedded C++ flight software. Removed dynamic allocation from the real-time control loop, cut build times 25%.</p>
+  </div>
+  <div class="item">
+    <div class="row"><span>upnxxt</span><span>2026</span></div>
+    <p>Research lead on the AI Sandbox. Mechanics adopted into the roadmap, 15% DAU lift.</p>
+  </div>
+
+  <h2>projects</h2>
+  <div class="item">
+    <div class="row"><span>sentinel</span><span>2026</span></div>
+    <p>Finds the commit that broke production in ~13s and writes the postmortem. <a href="https://github.com/Lushenwar/Sentinel">github ↗</a></p>
+  </div>
+  <div class="item">
+    <div class="row"><span>eco-pulse</span><span>2026</span></div>
+    <p>Ranks 178k city parcels into tree-planting zones to cool urban heat. 1st place, GenAI Genesis. <a href="https://devpost.com/software/eco-pulse-fpbo15">devpost ↗</a></p>
+  </div>
+  <div class="item">
+    <div class="row"><span>locatr</span><span>2026</span></div>
+    <p>Six-agent LangGraph pipeline that plans venues in under a second cached. Winner, DeerHacks V. <a href="https://github.com/Lushenwar/LOCATR">github ↗</a></p>
+  </div>
+
+  <h2>education</h2>
+  <div class="item">
+    <div class="row"><span>university of waterloo</span><span>2030</span></div>
+    <p>Bachelor of Mathematics, Data Science.</p>
+  </div>
+
+  <footer>© 2026 ryan qi</footer>
+</main>
 </body>
 </html>

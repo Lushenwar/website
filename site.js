@@ -39,8 +39,8 @@ kick();
 // ponytail: static screenshots, live iframes get blocked by most sites' X-Frame-Options
 const pv = document.getElementById('pv');
 if (pv && matchMedia('(hover: hover)').matches) document.querySelectorAll('[data-preview]').forEach(a => {
-  const t = a.closest('.card') || a, img = pv.firstChild;
-  t.onmouseenter = () => { img.src = a.dataset.preview; pv.classList.add('on'); };
+  const t = a.closest('.card') || a, img = pv.firstChild, cap = pv.lastChild;
+  t.onmouseenter = () => { img.src = a.dataset.preview; cap.textContent = a.dataset.cap || ''; pv.classList.add('on'); };
   t.onmouseleave = () => pv.classList.remove('on');
   t.onmousemove = e => {
     const x = Math.min(e.clientX + 20, innerWidth - pv.offsetWidth - 12);

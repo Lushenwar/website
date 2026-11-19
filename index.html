@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
@@ -18,8 +18,8 @@
   <h1>ryan qi</h1>
   <div class="clocks" aria-label="local times">
     <span>toronto <b data-tz="America/Toronto">--:--</b></span>
-    <span>reykjavík <b data-tz="Atlantic/Reykjavik">--:--</b></span>
-    <span>oslo <b data-tz="Europe/Oslo">--:--</b></span>
+    <span data-preview="img/reykjavik-preview.jpg" data-cap="capital of iceland · northernmost capital in the world">reykjavík <b data-tz="Atlantic/Reykjavik">--:--</b></span>
+    <span data-preview="img/oslo-preview.jpg" data-cap="capital of norway · on the oslofjord, ringed by forest">oslo <b data-tz="Europe/Oslo">--:--</b></span>
   </div>
   <div>
     <p>I'm a software engineer and data science student at the University of Waterloo. I'm into infra, ML, and backend systems.</p>
@@ -87,8 +87,8 @@
 
   <footer>© 2026 ryan qi<span id="views"></span></footer>
 </main>
-<div id="pv" aria-hidden="true"><img alt=""></div>
-<script src="site.js?v=6"></script>
+<div id="pv" aria-hidden="true"><img alt=""><p></p></div>
+<script src="site.js?v=7"></script>
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>

@@ -48,3 +48,14 @@ if (pv && matchMedia('(hover: hover)').matches) document.querySelectorAll('[data
     pv.style.left = x + 'px'; pv.style.top = y + 'px';
   };
 });
+
+// view counter: each browser counts once, later visits just read the number; hidden if the API is down
+const vc = document.getElementById('views');
+if (vc) {
+  let seen = null;
+  try { seen = localStorage.getItem('rq-seen'); localStorage.setItem('rq-seen', '1'); } catch {}
+  fetch('/api/views', { method: seen ? 'GET' : 'POST' })
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(d => { vc.textContent = ` · views: ${d.views.toLocaleString()}`; vc.classList.add('on'); })
+    .catch(() => {});
+}

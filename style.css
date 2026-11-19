@@ -144,3 +144,6 @@ main > :nth-child(6) { animation-delay: .3s }  main > :nth-child(n+7) { animatio
 .cap { font-size: 13px; margin: 6px 0 12px; }
 .blocks rect { fill: none; stroke: var(--line); transition: fill .3s; }
 .blocks .r0 { fill: #22c55e; stroke: none; } .blocks .r1 { fill: var(--fg); stroke: none; opacity: .55; } .blocks .r2 { fill: var(--muted); stroke: none; opacity: .4; }
+
+#views { opacity: 0; transition: opacity .6s; font-variant-numeric: tabular-nums; }
+#views.on { opacity: 1; }

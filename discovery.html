@@ -4,69 +4,207 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>discovery · ryan qi</title>
-<meta name="description" content="Concepts in databases, infra and ML systems that Ryan Qi found worth digging into.">
+<meta name="description" content="A map of the database, infra and ML systems ideas Ryan Qi is exploring, and how they lead into each other.">
 <link rel="canonical" href="https://ryanqi.dev/discovery.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
 <main>
   <nav><a href="/">home</a><a href="discovery.html" aria-current="page">discovery</a></nav>
   <h1>discovery</h1>
-  <p class="lede">Ideas I ran into while building things and thought were really cool. Notes are on the way.</p>
+  <p class="lede">What I'm exploring, and how one idea led into the next. Hover a node to see what it connects to; click to jump to the note.</p>
+
+  <div class="mapwrap"><svg class="map" id="map" viewBox="0 0 640 420" role="img" aria-label="Map of how projects lead into concepts and into the next build"></svg></div>
+  <p class="legend"><span><i class="lg p"></i>things I've built</span><span><i class="lg c"></i>ideas</span><span><i class="lg n"></i>building next</span></p>
 
   <h2>building next</h2>
-  <div class="next">
+  <div class="next" id="next">
     <div class="stack" aria-hidden="true"><img class="logo" src="img/pytorch.png" alt=""><img class="logo" src="img/vllm.png" alt=""></div>
     <h3>an LLM inference server from scratch</h3>
     <p class="why">The model is the ML half; the rest is infra: deciding which requests run together, where their memory lives, and how fast tokens come back.</p>
     <p>Continuous batching and a paged KV cache in PyTorch for a small 0.5–1B model, benchmarked on tokens/sec and time to first token against naive batching, then vLLM.</p>
-    <p>The KV cache is a pool of fixed-size blocks allocated up front, the same no-dynamic-allocation rule I followed on the WARG flight controller.</p>
+    <svg class="fig wide" viewBox="0 0 320 44" aria-label="KV cache as a pool of fixed blocks handed out to requests"><g class="blocks"></g></svg>
+    <p class="cap">a fixed pool of KV blocks, handed out to requests and returned when they finish</p>
+    <p>The pool is allocated up front, the same no-dynamic-allocation rule I followed on the WARG flight controller.</p>
   </div>
 
   <h2>databases &amp; infra</h2>
   <p class="from">from building ferryman &amp; parallax</p>
-  <section>
-    <div class="item">
-      <div class="row"><span><img class="logo" src="img/postgresql.png" alt=""><span>logical replication &amp; CDC</span></span><span class="soon">soon</span></div>
-      <p class="note">Postgres already writes every change to a log for crash recovery; CDC just reads that log, so you get a live feed of the whole database for free.</p>
+
+  <article class="note" id="cdc">
+    <div>
+      <h3><img class="logo" src="img/postgresql.png" alt="">logical replication &amp; CDC</h3>
+      <p>Postgres already writes every change to a log for crash recovery; CDC just reads that log, so you get a live feed of the whole database for free.</p>
+      <a class="leads" href="#cutover">leads to safe cutovers</a>
     </div>
-    <div class="item">
-      <div class="row"><span><img class="logo" src="img/postgresql.png" alt=""><span>parallel snapshot backfill</span></span><span class="soon">soon</span></div>
-      <p class="note">One exported snapshot lets many workers copy a huge table at once and still agree on the exact moment they all copied.</p>
+    <svg class="fig" viewBox="0 0 160 80" aria-hidden="true">
+      <ellipse cx="24" cy="20" rx="16" ry="5"/><path d="M8 20v34c0 3 7 5 16 5s16-2 16-5V20"/>
+      <path d="M42 40h12"/><g>
+        <rect x="58" y="34" width="14" height="12"/><rect x="74" y="34" width="14" height="12"/><rect x="90" y="34" width="14" height="12"/>
+        <rect x="106" y="34" width="14" height="12"/><rect x="122" y="34" width="14" height="12"/><rect x="138" y="34" width="14" height="12"/></g>
+      <rect class="hot flow" x="58" y="34" width="14" height="12"/>
+      <text x="58" y="64">write-ahead log →</text>
+    </svg>
+  </article>
+
+  <article class="note" id="backfill">
+    <div>
+      <h3><img class="logo" src="img/postgresql.png" alt="">parallel snapshot backfill</h3>
+      <p>One exported snapshot lets many workers copy a huge table at once and still agree on the exact moment they all copied.</p>
+      <a class="leads" href="#cutover">leads to safe cutovers</a>
     </div>
-    <div class="item">
-      <div class="row"><span><img class="logo" src="img/postgresql.png" alt=""><span>safe cutovers</span></span><span class="soon">soon</span></div>
-      <p class="note">Switching databases is a few seconds of choreography: wait for lag to hit zero, bump sequences, flip, and keep replication running backwards in case you need to retreat.</p>
+    <svg class="fig" viewBox="0 0 160 80" aria-hidden="true">
+      <rect x="6" y="24" width="148" height="20"/>
+      <rect class="hot seg" x="6" y="24" width="37" height="20"/><rect class="hot seg" x="43" y="24" width="37" height="20" style="animation-delay:.3s"/>
+      <rect class="hot seg" x="80" y="24" width="37" height="20" style="animation-delay:.6s"/><rect class="hot seg" x="117" y="24" width="37" height="20" style="animation-delay:.15s"/>
+      <path d="M43 24v20M80 24v20M117 24v20"/>
+      <text x="18" y="60">w1</text><text x="55" y="60">w2</text><text x="92" y="60">w3</text><text x="129" y="60">w4</text>
+      <text x="6" y="16">one snapshot, split by ctid page range</text>
+    </svg>
+  </article>
+
+  <article class="note" id="cutover">
+    <div>
+      <h3><img class="logo" src="img/postgresql.png" alt="">safe cutovers</h3>
+      <p>Switching databases is a few seconds of choreography: wait for lag to hit zero, bump sequences, flip, and keep replication running backwards in case you need to retreat.</p>
+      <a class="leads" href="#shadow">checked first with shadow traffic</a>
     </div>
-    <div class="item">
-      <div class="row"><span><img class="logo" src="img/envoyproxy.png" alt=""><span>shadow traffic</span></span><span class="soon">soon</span></div>
-      <p class="note">Test a new system on real production traffic without a single user ever seeing its answers.</p>
+    <svg class="fig" viewBox="0 0 160 80" aria-hidden="true">
+      <ellipse cx="26" cy="22" rx="16" ry="5"/><path d="M10 22v30c0 3 7 5 16 5s16-2 16-5V22"/>
+      <ellipse cx="134" cy="22" rx="16" ry="5"/><path d="M118 22v30c0 3 7 5 16 5s16-2 16-5V22"/>
+      <path class="hot-line" d="M48 30h62m-6-5 6 5-6 5"/><path stroke-dasharray="3 3" d="M110 48H48m6-5-6 5 6 5"/>
+      <text x="64" y="22">flip</text><text x="54" y="70">rollback</text>
+    </svg>
+  </article>
+
+  <article class="note" id="shadow">
+    <div>
+      <h3><img class="logo" src="img/envoyproxy.png" alt="">shadow traffic</h3>
+      <p>Test a new system on real production traffic without a single user ever seeing its answers.</p>
+      <a class="leads" href="#metrics">leads to serving metrics</a>
     </div>
-  </section>
+    <svg class="fig" viewBox="0 0 160 80" aria-hidden="true">
+      <circle cx="12" cy="40" r="5"/><path d="M17 40h20c14 0 14-22 30-22h20"/>
+      <path class="hot-line" stroke-dasharray="3 3" d="M37 40c14 0 14 22 30 22h20"/>
+      <rect x="88" y="10" width="40" height="16"/><rect x="88" y="54" width="40" height="16"/>
+      <path d="M128 18h4c6 0 6 22 12 22M128 62h4c6 0 6-22 12-22"/>
+      <text x="96" y="21">prod</text><text x="91" y="65">shadow</text><text x="148" y="44">≠</text>
+    </svg>
+  </article>
 
   <h2>ml systems</h2>
   <p class="from">where the next project lives</p>
-  <section>
-    <div class="item">
-      <div class="row"><span><img class="logo" src="img/vllm.png" alt=""><span>prefix caching &amp; cache-aware routing</span></span><span class="soon">soon</span></div>
-      <p class="note">Thousands of requests start with the same system prompt; send them to the server that already computed it and the first token shows up almost instantly.</p>
+
+  <article class="note" id="prefix">
+    <div>
+      <h3><img class="logo" src="img/vllm.png" alt="">prefix caching &amp; cache-aware routing</h3>
+      <p>Thousands of requests start with the same system prompt; send them to the server that already computed it and the first token shows up almost instantly.</p>
+      <a class="leads" href="#context">leads to long context windows</a>
     </div>
-    <div class="item">
-      <div class="row"><span><img class="logo" src="img/pytorch.png" alt=""><span>long context windows</span></span><span class="soon">soon</span></div>
-      <p class="note">Double the context and attention costs four times as much, so long context is really a memory problem wearing a model feature's clothes.</p>
+    <svg class="fig" viewBox="0 0 160 80" aria-hidden="true">
+      <path class="hot-line thick" d="M8 40h62"/>
+      <path d="M70 40c14 0 14-24 30-24h48M70 40h78M70 40c14 0 14 24 30 24h48"/>
+      <text x="8" y="32">system prompt</text><text x="8" y="56">cached once</text>
+      <text x="112" y="12">user a</text><text x="112" y="36">user b</text><text x="112" y="76">user c</text>
+    </svg>
+  </article>
+
+  <article class="note" id="context">
+    <div>
+      <h3><img class="logo" src="img/pytorch.png" alt="">long context windows</h3>
+      <p>Double the context and attention costs four times as much, so long context is really a memory problem wearing a model feature's clothes.</p>
+      <a class="leads" href="#next">leads to the inference server</a>
     </div>
-    <div class="item">
-      <div class="row"><span><img class="logo" src="img/prometheus.png" alt=""><span>serving metrics</span></span><span class="soon">soon</span></div>
-      <p class="note">Averages lie: users feel the p99, and real traffic shows up in random bursts, not a polite steady stream.</p>
+    <svg class="fig" viewBox="0 0 160 80" aria-hidden="true">
+      <path d="M14 8v62h140"/>
+      <path stroke-dasharray="3 3" d="M14 70 150 34"/>
+      <path class="hot-line draw" pathLength="1" d="M14 70C80 68 120 50 150 8"/>
+      <text x="100" y="80">length</text><text x="18" y="14">cost</text><text x="122" y="20">n²</text><text x="134" y="50">n</text>
+    </svg>
+  </article>
+
+  <article class="note" id="metrics">
+    <div>
+      <h3><img class="logo" src="img/prometheus.png" alt="">serving metrics</h3>
+      <p>Averages lie: users feel the p99, and real traffic shows up in random bursts, not a polite steady stream.</p>
+      <a class="leads" href="#next">leads to the inference server</a>
     </div>
-  </section>
+    <svg class="fig" viewBox="0 0 160 80" aria-hidden="true">
+      <g class="bars"><rect x="10" y="50" width="10" height="16"/><rect x="22" y="22" width="10" height="44"/><rect x="34" y="14" width="10" height="52"/>
+      <rect x="46" y="30" width="10" height="36"/><rect x="58" y="44" width="10" height="22"/><rect x="70" y="52" width="10" height="14"/>
+      <rect x="82" y="57" width="10" height="9"/><rect x="94" y="60" width="10" height="6"/><rect x="106" y="62" width="10" height="4"/>
+      <rect x="118" y="63" width="10" height="3"/><rect x="130" y="64" width="10" height="2"/></g>
+      <path d="M6 66h148"/><path d="M39 6v60"/><path class="hot-line" d="M135 6v60"/>
+      <text x="42" y="12">p50</text><text x="114" y="12">p99</text><text x="60" y="80">latency →</text>
+    </svg>
+  </article>
 
   <footer>© 2026 ryan qi</footer>
 </main>
-<script src="site.js?v=4"></script>
+<script src="site.js?v=5"></script>
+<script>
+  // the map: nodes [x, y, label, kind, href], kind p = built, c = idea, n = next
+  const N = {
+    ferryman: [70, 60, 'ferryman', 'p', 'https://github.com/Lushenwar/Ferryman'],
+    warg:     [70, 215, 'warg flight code', 'p', 'https://www.uwarg.com'],
+    parallax: [70, 370, 'parallax', 'p', 'https://github.com/Lushenwar/Parallax'],
+    cdc:      [235, 40, 'logical replication', 'c', '#cdc'],
+    backfill: [235, 125, 'snapshot backfill', 'c', '#backfill'],
+    shadow:   [235, 370, 'shadow traffic', 'c', '#shadow'],
+    cutover:  [400, 80, 'safe cutovers', 'c', '#cutover'],
+    prefix:   [400, 200, 'prefix caching', 'c', '#prefix'],
+    metrics:  [400, 330, 'serving metrics', 'c', '#metrics'],
+    context:  [560, 120, 'long context', 'c', '#context'],
+    next:     [560, 270, 'inference server', 'n', '#next'],
+  };
+  const E = [
+    ['ferryman', 'cdc'], ['ferryman', 'backfill'], ['cdc', 'cutover'], ['backfill', 'cutover'],
+    ['parallax', 'shadow'], ['shadow', 'cutover', 'test before the flip'], ['shadow', 'metrics', 'replay = load test'],
+    ['prefix', 'context', 'both live in the kv cache'], ['context', 'next'], ['prefix', 'next'], ['metrics', 'next'],
+    ['warg', 'next', 'fixed-size pools'],
+  ];
+  const svg = document.getElementById('map'), ns = 'http://www.w3.org/2000/svg';
+  const el = (tag, attrs, parent = svg) => { const e = document.createElementNS(ns, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
+  E.forEach(([a, b, label], i) => {
+    const [x1, y1] = N[a], [x2, y2] = N[b], mx = (x1 + x2) / 2;
+    const g = el('g', { class: 'edge', 'data-a': a, 'data-b': b });
+    el('path', { d: `M${x1} ${y1}C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}`, pathLength: 1, style: `animation-delay:${.1 + i * .08}s` }, g);
+    if (label) el('text', { x: mx, y: (y1 + y2) / 2 - 6, 'text-anchor': 'middle' }, g).textContent = label;
+  });
+  Object.entries(N).forEach(([id, [x, y, label, kind, href]], i) => {
+    const a = el('a', { href, class: `node ${kind}`, 'data-id': id, style: `animation-delay:${.2 + i * .05}s` });
+    if (href.startsWith('http')) a.setAttribute('target', '_blank');
+    el('circle', { cx: x, cy: y, r: kind === 'n' ? 9 : 6 }, a);
+    if (kind === 'n') el('circle', { class: 'ring', cx: x, cy: y, r: 9 }, a);
+    el('text', { x, y: y + 24, 'text-anchor': 'middle' }, a).textContent = label;
+    a.addEventListener('pointerenter', () => {
+      svg.classList.add('focus');
+      svg.querySelectorAll('.edge').forEach(g => {
+        const on = g.dataset.a === id || g.dataset.b === id;
+        g.classList.toggle('hot', on);
+        if (on) svg.querySelectorAll(`[data-id="${g.dataset.a}"],[data-id="${g.dataset.b}"]`).forEach(n => n.classList.add('hot'));
+      });
+      a.classList.add('hot');
+    });
+    a.addEventListener('pointerleave', () => { svg.classList.remove('focus'); svg.querySelectorAll('.hot').forEach(n => n.classList.remove('hot')); });
+  });
+
+  // kv block pool: 3 requests take blocks, finish, give them back
+  const blocks = document.querySelector('.blocks');
+  const cells = Array.from({ length: 32 }, (_, i) => el('rect', { x: (i % 16) * 20, y: Math.floor(i / 16) * 20 + 4, width: 16, height: 16, rx: 3 }, blocks));
+  const owner = Array(32).fill(-1);
+  const step = () => {
+    const free = owner.map((o, i) => o < 0 ? i : -1).filter(i => i >= 0);
+    if (free.length && Math.random() < .6) owner[free[Math.floor(Math.random() * free.length)]] = Math.floor(Math.random() * 3);
+    else { const r = Math.floor(Math.random() * 3); owner.forEach((o, i) => { if (o === r && Math.random() < .5) owner[i] = -1; }); }
+    cells.forEach((c, i) => c.setAttribute('class', owner[i] < 0 ? '' : 'r' + owner[i]));
+  };
+  for (let i = 0; i < 14; i++) step();
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(step, 700);
+</script>
 </body>
 </html>

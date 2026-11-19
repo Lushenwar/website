@@ -29,7 +29,7 @@
     <p>Continuous batching and a paged KV cache in PyTorch for a small 0.5–1B model, benchmarked on tokens/sec and time to first token against naive batching, then vLLM.</p>
     <svg class="fig wide" viewBox="0 0 320 44" aria-label="KV cache as a pool of fixed blocks handed out to requests"><g class="blocks"></g></svg>
     <p class="cap">a fixed pool of KV blocks, handed out to requests and returned when they finish</p>
-    <p>The pool is allocated up front, the same no-dynamic-allocation rule I followed on the WARG flight controller.</p>
+    <p>The pool is allocated up front, so nothing gets allocated in the middle of a request.</p>
   </div>
 
   <h2>databases &amp; infra</h2>

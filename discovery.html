@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
@@ -145,28 +145,29 @@
 
   <footer>© 2026 ryan qi<span id="views"></span></footer>
 </main>
+<div id="tip" role="tooltip"></div>
 <script src="site.js?v=6"></script>
 <script defer src="/_vercel/insights/script.js"></script>
 <script>
   // the map: nodes [x, y, label, kind, href], kind p = built, c = idea, n = next
   const N = {
-    ferryman: [70, 60, 'ferryman', 'p', 'https://github.com/Lushenwar/Ferryman'],
-    warg:     [70, 215, 'warg flight code', 'p', 'https://www.uwarg.com'],
-    parallax: [70, 370, 'parallax', 'p', 'https://github.com/Lushenwar/Parallax'],
-    cdc:      [235, 40, 'logical replication', 'c', '#cdc'],
-    backfill: [235, 125, 'snapshot backfill', 'c', '#backfill'],
-    shadow:   [235, 370, 'shadow traffic', 'c', '#shadow'],
-    cutover:  [400, 80, 'safe cutovers', 'c', '#cutover'],
-    prefix:   [400, 200, 'prefix caching', 'c', '#prefix'],
-    metrics:  [400, 330, 'serving metrics', 'c', '#metrics'],
-    context:  [560, 120, 'long context', 'c', '#context'],
-    next:     [560, 270, 'inference server', 'n', '#next'],
+    ferryman: [70, 60, 'ferryman', 'p', 'https://github.com/Lushenwar/Ferryman', 'Moves live Postgres databases with zero downtime.'],
+    sentinel: [70, 215, 'sentinel', 'p', 'https://github.com/Lushenwar/Sentinel', 'Names the commit that broke production.'],
+    parallax: [70, 370, 'parallax', 'p', 'https://github.com/Lushenwar/Parallax', 'Mirrors live traffic to a second backend, diffs responses.'],
+    cdc:      [235, 40, 'logical replication', 'c', '#cdc', 'Streams every row change out of Postgres.'],
+    backfill: [235, 125, 'snapshot backfill', 'c', '#backfill', 'Many workers copy one table from one snapshot.'],
+    shadow:   [235, 370, 'shadow traffic', 'c', '#shadow', 'Test on real traffic, invisible to users.'],
+    cutover:  [400, 80, 'safe cutovers', 'c', '#cutover', 'Flip databases in seconds, with an undo.'],
+    prefix:   [400, 200, 'prefix caching', 'c', '#prefix', 'Reuse a computed prompt across requests.'],
+    metrics:  [400, 330, 'serving metrics', 'c', '#metrics', 'Users feel the p99, not the average.'],
+    context:  [560, 120, 'long context', 'c', '#context', 'Twice the length, four times the attention cost.'],
+    next:     [560, 270, 'inference server', 'n', '#next', 'Next build: batching plus a paged KV cache.'],
   };
   const E = [
     ['ferryman', 'cdc'], ['ferryman', 'backfill'], ['cdc', 'cutover'], ['backfill', 'cutover'],
     ['parallax', 'shadow'], ['shadow', 'cutover', 'test before the flip'], ['shadow', 'metrics', 'replay = load test'],
     ['prefix', 'context', 'both live in the kv cache'], ['context', 'next'], ['prefix', 'next'], ['metrics', 'next'],
-    ['warg', 'next', 'fixed-size pools'],
+    ['sentinel', 'metrics', 'watches error rates'],
   ];
   const svg = document.getElementById('map'), ns = 'http://www.w3.org/2000/svg';
   const el = (tag, attrs, parent = svg) => { const e = document.createElementNS(ns, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
@@ -176,7 +177,8 @@
     el('path', { d: `M${x1} ${y1}C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}`, pathLength: 1, style: `animation-delay:${.1 + i * .08}s` }, g);
     if (label) el('text', { x: mx, y: (y1 + y2) / 2 - 6, 'text-anchor': 'middle' }, g).textContent = label;
   });
-  Object.entries(N).forEach(([id, [x, y, label, kind, href]], i) => {
+  const tip = document.getElementById('tip');
+  Object.entries(N).forEach(([id, [x, y, label, kind, href, desc]], i) => {
     const a = el('a', { href, class: `node ${kind}`, 'data-id': id, style: `animation-delay:${.2 + i * .05}s` });
     if (href.startsWith('http')) a.setAttribute('target', '_blank');
     el('circle', { cx: x, cy: y, r: kind === 'n' ? 9 : 6 }, a);
@@ -190,8 +192,13 @@
         if (on) svg.querySelectorAll(`[data-id="${g.dataset.a}"],[data-id="${g.dataset.b}"]`).forEach(n => n.classList.add('hot'));
       });
       a.classList.add('hot');
+      tip.textContent = desc; tip.classList.add('on');
     });
-    a.addEventListener('pointerleave', () => { svg.classList.remove('focus'); svg.querySelectorAll('.hot').forEach(n => n.classList.remove('hot')); });
+    a.addEventListener('pointermove', e => {
+      tip.style.left = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 12) + 'px';
+      tip.style.top = e.clientY + 18 + 'px';
+    });
+    a.addEventListener('pointerleave', () => { tip.classList.remove('on'); svg.classList.remove('focus'); svg.querySelectorAll('.hot').forEach(n => n.classList.remove('hot')); });
   });
 
   // kv block pool: 3 requests take blocks, finish, give them back

@@ -147,3 +147,7 @@ main > :nth-child(6) { animation-delay: .3s }  main > :nth-child(n+7) { animatio
 
 #views { opacity: 0; transition: opacity .6s; font-variant-numeric: tabular-nums; }
 #views.on { opacity: 1; }
+
+#tip { position: fixed; top: 0; left: 0; max-width: 240px; padding: 6px 10px; border-radius: 8px; font-size: 13px; line-height: 1.4;
+       background: var(--fg); color: var(--bg); pointer-events: none; z-index: 10; opacity: 0; transform: translateY(4px); transition: opacity .15s, transform .15s; }
+#tip.on { opacity: 1; transform: none; }
